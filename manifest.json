@@ -1,0 +1,40 @@
+{
+  "name": "Swift Learning Lab",
+  "version": "0.2.0",
+  "generated": "2026-07-24",
+  "offline": true,
+  "lessons": 96,
+  "questions": 192,
+  "tracks": {
+    "swift": {
+      "name": "Swift Language",
+      "lessons": 36,
+      "questions": 72
+    },
+    "foundation": {
+      "name": "Foundation & Data",
+      "lessons": 16,
+      "questions": 32
+    },
+    "concurrency": {
+      "name": "Concurrency & Memory",
+      "lessons": 12,
+      "questions": 24
+    },
+    "development": {
+      "name": "Development Essentials",
+      "lessons": 20,
+      "questions": 40
+    },
+    "swiftui": {
+      "name": "SwiftUI",
+      "lessons": 6,
+      "questions": 12
+    },
+    "uikit": {
+      "name": "UIKit",
+      "lessons": 6,
+      "questions": 12
+    }
+  }
+}

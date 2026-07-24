@@ -1,0 +1,304 @@
+# SwiftUI
+
+Swiftとは別レイヤーとして、View、状態、データフロー、Navigationを学ぶ。
+
+このファイルは人が読みやすい教材原本です。構造化データは content.json、完成版は index.html です.
+
+## 01. View・宣言的UI [Beginner]
+
+概要: SwiftUIでは「どう変更するか」ではなく「今どう見えるべきか」を記述する。
+考え方: View は画面そのものではなく、現在の状態からUIを説明する値。
+
+重要ポイント:
+- View は protocol。
+- body は現在のUI構造を返す。
+- 状態が変わると SwiftUI が必要な差分を反映する。
+- View は小さな部品に分割して合成する。
+
+コード:
+```swift
+struct CounterView: View {
+    var count: Int
+
+    var body: some View {
+        Text("Count: \(count)")
+    }
+}
+```
+
+なぜ重要か: UIKit の命令的更新との最大の違い。SwiftUIを理解する中心概念。
+注意: body を『一度だけ作られる画面』と考えない。状態に応じて評価されるUI記述。
+
+確認問題:
+Q1. SwiftUIの宣言的UIの説明として最も近いものは？ [Beginner]
+```swift
+Text("Hello")
+```
+A. ピクセルを直接描く
+B. 現在どう見えるべきかを記述する
+C. UIViewを必ず継承する
+D. SQLでUIを作る
+正解: B
+解説: SwiftUIは状態から『UIがどうあるべきか』を宣言し、実際の更新はフレームワーク側が処理する。
+
+Q2. `some View` の役割として近いものは？ [Basic]
+```swift
+var body: some View { Text("Hi") }
+```
+A. Viewに準拠する具体型を隠して返す
+B. 必ずAnyViewに変換する
+C. UIKit専用
+D. Optional Viewを表す
+正解: A
+解説: `some View` は opaque result type。View に準拠する具体的な型をコンパイラが把握しつつ、呼び出し側には抽象化して示す。
+
+---
+
+## 02. Stack・Modifier・Layout [Basic]
+
+概要: VStack / HStack / ZStack と Modifier の合成を理解する。
+考え方: modifier は元Viewを直接書き換えるというより、修飾された新しいViewを返す連鎖として読む。
+
+重要ポイント:
+- VStack は縦、HStack は横、ZStack は重ねる。
+- modifier の順序で結果が変わることがある。
+- padding / frame / background の適用順を意識する。
+- Spacer で余白を柔軟に配分する。
+
+コード:
+```swift
+Text("Swift")
+    .padding()
+    .background(.blue)
+    .clipShape(.capsule)
+```
+
+なぜ重要か: SwiftUIコードの大半はViewの合成。修飾順序を読めるとレイアウトの原因を追いやすい。
+注意: `background().padding()` と `padding().background()` は見た目が異なる。
+
+確認問題:
+Q1. 縦方向にViewを並べるのは？ [Basic]
+```swift
+// A ? { Text("A"); Text("B") }
+```
+A. HStack
+B. VStack
+C. ZStack
+D. ListRow
+正解: B
+解説: VStack は Vertical Stack。子Viewを縦方向に配置する。
+
+Q2. modifier の順序について正しいものは？ [Basic]
+```swift
+Text("Hi").padding().background(.blue)
+```
+A. 順序は常に無関係
+B. 順序によって結果が変わることがある
+C. modifier は1つだけ使える
+D. background はUIKit専用
+正解: B
+解説: 各 modifier は新しい View を返すため、どの段階に padding や background を適用するかで見た目が変わる。
+
+---
+
+## 03. @State・@Binding [Basic]
+
+概要: 画面内の状態と、親子View間で共有する状態の入口。
+考え方: @State はViewが所有する状態、@Binding は他の場所が所有する状態への読み書き可能な窓。
+
+重要ポイント:
+- @State はローカルなUI状態の所有に使う。
+- @Binding は状態を所有せず参照する。
+- 状態変更により関連Viewが更新される。
+- データの所有者を曖昧にしない。
+
+コード:
+```swift
+struct ToggleRow: View {
+    @Binding var isOn: Bool
+
+    var body: some View {
+        Toggle("Enabled", isOn: $isOn)
+    }
+}
+```
+
+なぜ重要か: SwiftUIのバグは状態の所有場所が曖昧なときに起きやすい。誰がsource of truthかを決める。
+注意: @Binding は値のコピーではない。親などが所有する状態への接続。
+
+確認問題:
+Q1. @State が最も向いているのは？ [Basic]
+```swift
+struct Screen: View {
+    // ? var isPresented = false
+}
+```
+A. 画面内だけで所有する表示状態
+B. グローバルDB接続
+C. UIViewControllerの継承
+D. 定数
+正解: A
+解説: @State はViewが所有するローカル状態に適する。例えばシート表示やトグル状態。
+
+Q2. $isOn が意味するものは？ [Basic]
+```swift
+@State private var isOn = false
+Toggle("On", isOn: $isOn)
+```
+A. Boolの反転
+B. Binding<Bool>
+C. String化
+D. Optional化
+正解: B
+解説: $ を付けることで @State が提供する Binding を取り出し、Toggle が読み書きできる。
+
+---
+
+## 04. Observation・モデルと状態 [Intermediate]
+
+概要: 複数Viewで扱うモデルをUI更新と結び付ける。
+考え方: 画面に必要な状態をモデルに集め、Viewはその状態から表示を導出する。
+
+重要ポイント:
+- Observation を使うとモデルの変更をSwiftUIが追跡できる。
+- Viewにロジックを詰め込みすぎず、モデルやサービスへ分離する。
+- 派生値は保存せず計算できる場合が多い。
+- 依存関係の所有範囲を意識する。
+
+コード:
+```swift
+@Observable
+final class CounterModel {
+    var count = 0
+}
+```
+
+なぜ重要か: 中規模以上では状態管理が設計品質を大きく左右する。
+注意: 何でもグローバル共有すると依存関係が見えなくなり、テストもしにくくなる。
+
+確認問題:
+Q1. 状態モデルを分離する主な利点は？ [Intermediate]
+```swift
+@Observable final class Model { var count = 0 }
+```
+A. 必ず通信が速くなる
+B. 状態とUIの責務を分けやすい
+C. Viewが不要になる
+D. UIKitに変換される
+正解: B
+解説: 状態・ロジックとUI記述を分けることで責務が明確になり、テストや再利用がしやすくなる。
+
+Q2. 派生値の扱いとして良い設計は？ [Intermediate]
+```swift
+var firstName = "Yuki"
+var lastName = "K"
+// fullName は？
+```
+A. 必ず別の保存状態にする
+B. 必要なら計算プロパティで導出する
+C. UserDefaultsだけに置く
+D. 常にglobalにする
+正解: B
+解説: 元データから必ず計算できる値は重複保存すると不整合が起きやすい。計算プロパティなどで導出する方が安全。
+
+---
+
+## 05. List・ForEach・NavigationStack [Intermediate]
+
+概要: データの一覧表示と画面遷移を組み立てる。
+考え方: 一覧はデータのIdentity、Navigationは遷移先を表す値を意識する。
+
+重要ポイント:
+- ForEach は各要素の安定した識別子が重要。
+- Identifiable で id を型に持たせられる。
+- NavigationStack は値ベースのNavigationを構成できる。
+- 画面遷移とデータ選択を分離して考える。
+
+コード:
+```swift
+NavigationStack {
+    List(items) { item in
+        NavigationLink(value: item) {
+            Text(item.name)
+        }
+    }
+}
+```
+
+なぜ重要か: 実アプリの基本構造。IDが不安定だとアニメーションや更新差分で問題が出る。
+注意: 配列indexを恒久的IDとして使うと、並べ替え・削除時にIdentityがずれることがある。
+
+確認問題:
+Q1. ForEachで安定したidが重要な理由は？ [Intermediate]
+```swift
+ForEach(items) { item in Text(item.name) }
+```
+A. 文字色を決めるため
+B. 要素の同一性と差分更新を追跡するため
+C. ネット通信のため
+D. Optionalをなくすため
+正解: B
+解説: SwiftUIはidを使って前後の要素を対応付け、挿入・削除・更新を判断する。
+
+Q2. NavigationStackの役割は？ [Intermediate]
+```swift
+NavigationStack { ContentView() }
+```
+A. 画面遷移のスタックを管理する
+B. Auto Layoutを有効化する
+C. JSONを解析する
+D. ARCを無効化する
+正解: A
+解説: NavigationStack は階層的な画面遷移とnavigation pathを管理するコンテナ。
+
+---
+
+## 06. .task・非同期処理・MainActor [Intermediate]
+
+概要: Viewのライフサイクルに合わせて非同期処理を開始し、UI状態を安全に更新する。
+考え方: 通信処理そのものと、通信結果を画面状態へ反映する処理を分けて読む。
+
+重要ポイント:
+- .task でViewに関連した非同期処理を開始できる。
+- Taskはキャンセルされる可能性を考慮する。
+- UIに関係する状態はMainActorとの関係を理解する。
+- 通信ロジックをViewへ直接詰め込みすぎない。
+
+コード:
+```swift
+.task {
+    do {
+        items = try await repository.fetchItems()
+    } catch {
+        errorMessage = error.localizedDescription
+    }
+}
+```
+
+なぜ重要か: 現代のアプリは非同期処理が前提。Swift ConcurrencyとSwiftUIを接続する重要部分。
+注意: View表示のたびに重い処理を無条件で走らせると、重複リクエストなどが起きる可能性がある。
+
+確認問題:
+Q1. .task の用途として近いものは？ [Intermediate]
+```swift
+Text("Loading").task { await load() }
+```
+A. Viewに関連した非同期処理を開始する
+B. Auto Layout制約を作る
+C. Storyboardを開く
+D. classをstructへ変換する
+正解: A
+解説: .task はViewのライフサイクルに関連付いた非同期処理を実行するために使える。
+
+Q2. 非同期ロード設計で重要なのは？ [Intermediate]
+```swift
+let items = try await api.fetchItems()
+```
+A. 必ずsleepする
+B. 失敗・キャンセル・状態更新を考慮する
+C. 全処理を同期化する
+D. Optionalを禁止する
+正解: B
+解説: ネットワーク処理は失敗やキャンセルがあり得る。loading / success / error などの状態を設計する。
+
+---

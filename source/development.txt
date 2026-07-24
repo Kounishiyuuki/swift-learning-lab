@@ -1,0 +1,928 @@
+# Development Essentials
+
+Xcode、SwiftPM、Debug、Logging、Instruments、Testing、DI、Networking設計、SwiftData、Signing、Git、安全性まで実務の基礎を学ぶ。
+
+このファイルは人が読みやすい教材原本です。構造化データは content.json、完成版は index.html です.
+
+## 01. Xcode：Project・Target・Scheme・Build Configuration [Beginner]
+
+概要: Xcodeの設定単位を区別し、どこを変更しているのか理解する。
+考え方: Projectは入れ物、Targetは製品、Schemeは実行/テストの組み合わせ、ConfigurationはDebug/Release等の設定set。
+
+重要ポイント:
+- Projectは複数Targetを含められる。
+- TargetごとにBundle ID/Build Settings/Capabilities。
+- SchemeでRun/Test/Profileを構成。
+- Debug/Releaseで設定や最適化を分ける。
+
+コード:
+```swift
+// Project -> Target -> Build Settings
+// Scheme -> Run / Test / Profile -> Configuration
+```
+
+なぜ重要か: Xcode errorの多くは『どのTarget/Schemeか』を理解すると追いやすい。
+注意: ProjectとTargetを混同すると変更が反映されない原因になる。
+
+確認問題:
+Q1. Bundle Identifierを主に持つ単位は？ [Beginner]
+```swift
+Project -> Target -> General
+```
+A. Target
+B. Git branch
+C. Function
+D. Array
+正解: A
+解説: app Targetごとに製品設定を持つ。
+
+Q2. Schemeが主に決めるものは？ [Beginner]
+```swift
+Run / Test / Profile
+```
+A. どのTarget/Configurationで実行するか
+B. JSON key
+C. 継承
+D. HTTP status
+正解: A
+解説: Run/Test/Profile等のactionを構成する。
+
+---
+
+## 02. Compiler Error・Warning・Fix-it [Beginner]
+
+概要: error messageを修正指示ではなく、型と文脈の手掛かりとして読む。
+考え方: 最初のerrorが原因で後続errorが大量に出ることがある。
+
+重要ポイント:
+- errorとwarningを区別。
+- 最初の意味あるerrorから確認。
+- expected/found type、scope、access levelを見る。
+- Fix-itは意味を理解して適用。
+
+コード:
+```swift
+let count:Int="3"
+// Cannot convert value of type String to specified type Int
+```
+
+なぜ重要か: AIに丸投げせず原因を限定できる基礎。
+注意: error文を読まずにrandom修正しない。
+
+確認問題:
+Q1. 大量error時まず見る候補は？ [Beginner]
+```swift
+// 20 errors
+```
+A. 最初の根本error
+B. 最後のwarningだけ
+C. 全部無視
+D. Cleanだけ
+正解: A
+解説: 1つのsyntax/type errorが後続解析を崩す場合がある。
+
+Q2. Fix-itの扱いは？ [Beginner]
+```swift
+// Xcode suggests a fix
+```
+A. 意味を理解して適用
+B. 必ず全部適用
+C. 絶対使わない
+D. Git削除
+正解: A
+解説: 候補なので意図を理解して使う。
+
+---
+
+## 03. Module・import・File Organization [Basic]
+
+概要: Swift codeの可視性とFile/Module境界を理解する。
+考え方: Fileは整理単位、Moduleはcompile/import境界。
+
+重要ポイント:
+- importで他Moduleの公開API利用。
+- 同一Target内は通常同一Module。
+- 型/責務ごとにFile分割。
+- Access ControlはModule境界と関係。
+
+コード:
+```swift
+import Foundation
+import SwiftUI
+```
+
+なぜ重要か: Package分割やtest Targetで『見える/見えない』を理解できる。
+注意: Fileを分けただけでは別Moduleにならない。
+
+確認問題:
+Q1. 同一app Target内のSwift Fileは通常？ [Basic]
+```swift
+// App target
+```
+A. 同じModule
+B. 必ず別Module
+C. 同じclass
+D. Git submodule
+正解: A
+解説: 通常Targetがcompile module単位。
+
+Q2. importの目的は？ [Basic]
+```swift
+import Foundation
+```
+A. 他Moduleの公開APIを利用
+B. Git commit
+C. DB migration
+D. UI layout
+正解: A
+解説: Moduleの公開宣言を使えるようにする。
+
+---
+
+## 04. Swift Package Manager・Package.swift [Basic]
+
+概要: 外部依存と自作ModuleをPackageとして管理する。
+考え方: Packageはcodeを再利用可能なModuleとして切り出し、依存を明示する仕組み。
+
+重要ポイント:
+- Package.swiftにproduct/target/dependency。
+- Library/Executable等product。
+- Target間依存を明示。
+- XcodeからPackage Dependency追加可能。
+
+コード:
+```swift
+// Package.swift
+let package = Package(
+ name:"CoreKit",
+ products:[.library(name:"CoreKit",targets:["CoreKit"])],
+ targets:[.target(name:"CoreKit"),.testTarget(name:"CoreKitTests",dependencies:["CoreKit"])]
+)
+```
+
+なぜ重要か: library導入、自作共通層、test可能なModule分割で必須。
+注意: 依存を増やしすぎると更新/security/build costが増える。
+
+確認問題:
+Q1. SwiftPM manifestは？ [Basic]
+```swift
+// package definition
+```
+A. Package.swift
+B. Podfileだけ
+C. Info.plist
+D. README
+正解: A
+解説: Package.swiftでpackage構成を定義。
+
+Q2. testTargetのdependency例は？ [Basic]
+```swift
+.testTarget(name:"CoreTests",dependencies:["Core"])
+```
+A. test対象Target
+B. Git remote
+C. Simulator
+D. Bundle IDだけ
+正解: A
+解説: test対象moduleをdependencyにする。
+
+---
+
+## 05. Dependency Version・Lock・Supply Chain [Intermediate]
+
+概要: 外部Packageを安全に導入・更新する考え方を学ぶ。
+考え方: 依存追加は、その更新・脆弱性・互換性も引き受けること。
+
+重要ポイント:
+- version requirementを理解。
+- Package.resolvedで解決versionを再現。
+- repository/maintainer/licenseを確認。
+- 必要性が低い依存を増やさない。
+
+コード:
+```swift
+// Review repository, version rule, license, maintenance
+```
+
+なぜ重要か: 実務ではlibrary選定自体が設計判断。
+注意: 人気だけで安全とは限らない。
+
+確認問題:
+Q1. Package.resolvedの主目的は？ [Intermediate]
+```swift
+Package.resolved
+```
+A. 依存versionの再現性
+B. UI色
+C. Keychain保存
+D. HTTP body
+正解: A
+解説: 解決versionを記録する。
+
+Q2. 外部Package導入時に見るべきものは？ [Intermediate]
+```swift
+// dependency review
+```
+A. 必要性・更新状況・license・security
+B. 星数だけ
+C. README色
+D. 作者icon
+正解: A
+解説: 保守/security costも評価する。
+
+---
+
+## 06. Breakpoint・LLDB・Step実行 [Basic]
+
+概要: 実行中の状態を止めて観察し、原因を推測ではなく確認する。
+考え方: Debuggerは『その瞬間の真実を見る』道具。
+
+重要ポイント:
+- breakpointで停止。
+- step over/into/out。
+- Variables Viewで値確認。
+- LLDBのpo/pで式評価。
+
+コード:
+```swift
+// Breakpoint
+// po user
+// p count
+```
+
+なぜ重要か: bug解析をprintだけに依存しないための基本。
+注意: breakpointを置く前に何の仮説を確認するか考える。
+
+確認問題:
+Q1. Step Intoの意味は？ [Basic]
+```swift
+someFunction()
+```
+A. 関数内部へ入る
+B. 次行だけ
+C. app終了
+D. Git push
+正解: A
+解説: 呼び出し先内部へ進む。
+
+Q2. LLDBのpoでよくすることは？ [Basic]
+```swift
+po object
+```
+A. object情報を表示
+B. package更新
+C. 署名
+D. Auto Layout
+正解: A
+解説: 停止中の値を確認する。
+
+---
+
+## 07. Logger・OSLog・Debug Print [Basic]
+
+概要: 診断情報を適切なlevelとprivacyで記録する。
+考え方: Logは後で何が起きたか再現する観測点。
+
+重要ポイント:
+- Loggerでcategory/subsystem。
+- debug/info/notice/error/fault等。
+- secret/個人情報をlogしない。
+- productionで必要な観測点を設計。
+
+コード:
+```swift
+import OSLog
+let logger=Logger(subsystem:"com.example.app",category:"network")
+logger.info("Request completed")
+```
+
+なぜ重要か: 実機だけの問題や非同期bug解析に役立つ。
+注意: token/password/個人情報をlogしない。
+
+確認問題:
+Q1. Loggerのcategoryを分ける利点は？ [Basic]
+```swift
+Logger(subsystem:"...",category:"network")
+```
+A. 機能別に検索しやすい
+B. 必ず高速
+C. ARC制御
+D. JSON encode
+正解: A
+解説: network/database等で分類できる。
+
+Q2. logへ出してはいけない代表例は？ [Basic]
+```swift
+logger.debug("token=...")
+```
+A. 認証token/password
+B. 処理開始
+C. error種別
+D. 件数
+正解: A
+解説: 秘密情報漏洩につながる。
+
+---
+
+## 08. Instruments・Memory Graph・Sanitizer [Intermediate]
+
+概要: 性能・memory・競合を専用toolで測定する。
+考え方: 『遅い気がする』ではなく、計測してbottleneckを特定する。
+
+重要ポイント:
+- Time ProfilerでCPU。
+- Allocations/Leaksでmemory。
+- Memory Graphで参照循環。
+- Thread Sanitizerでdata race検出を支援。
+
+コード:
+```swift
+// Product > Profile
+// Time Profiler / Allocations / Leaks / Memory Graph
+```
+
+なぜ重要か: 中級以降は実行特性を測れることが重要。
+注意: 最適化前に計測する。
+
+確認問題:
+Q1. CPU bottleneck調査の代表toolは？ [Intermediate]
+```swift
+Instruments
+```
+A. Time Profiler
+B. Calendar
+C. JSONDecoder
+D. Git blame
+正解: A
+解説: CPU時間を分析する。
+
+Q2. 参照循環確認に役立つのは？ [Intermediate]
+```swift
+Debug Memory Graph
+```
+A. Memory Graph
+B. URLComponents
+C. Package.resolved
+D. FormatStyle
+正解: A
+解説: object graphを可視化する。
+
+---
+
+## 09. Swift Testing：@Test・#expect・#require [Basic]
+
+概要: Swift Testingで小さな単体testを書く。
+考え方: testは入力と期待結果を実行可能な仕様にする。
+
+重要ポイント:
+- @Testでtest function。
+- #expectで期待条件。
+- #requireで後続に必要な前提。
+- async/throwsと自然に統合。
+
+コード:
+```swift
+import Testing
+@Test func totalPrice(){
+ #expect(total(price:500,count:3) == 1500)
+}
+```
+
+なぜ重要か: refactor、安全なAI開発、regression防止の基礎。
+注意: 内部実装の細部だけをtestすると変更に弱い。
+
+確認問題:
+Q1. Swift Testingの期待Macroは？ [Basic]
+```swift
+#expect(value == 3)
+```
+A. #expect
+B. #if
+C. #selector
+D. #available
+正解: A
+解説: #expectで条件を検証。
+
+Q2. #requireの用途は？ [Basic]
+```swift
+let user=try #require(findUser())
+```
+A. 後続に必要な前提を要求
+B. 通信開始
+C. UI layout
+D. ARC retain
+正解: A
+解説: 必要値がない場合testをそこで失敗させられる。
+
+---
+
+## 10. Parameterized Test・Tags・Test Design [Intermediate]
+
+概要: 同じ性質を複数入力へ効率よく検証し、testを整理する。
+考え方: 1caseだけでなく境界値でもruleが成立するかを見る。
+
+重要ポイント:
+- @Test(arguments:)で複数input。
+- 境界値/異常系/nil/空配列。
+- tagで分類。
+- testは独立・再現可能に。
+
+コード:
+```swift
+@Test(arguments:[0,1,10])
+func nonNegative(value:Int){#expect(value>=0)}
+```
+
+なぜ重要か: 少ないcodeで境界条件を増やせる。
+注意: test同士がshared mutable stateに依存すると不安定。
+
+確認問題:
+Q1. Parameterized Testの利点は？ [Intermediate]
+```swift
+@Test(arguments:[1,2,3])
+```
+A. 同じbehaviorを複数inputで検証
+B. UI自動生成
+C. 必ずserial
+D. Network不要
+正解: A
+解説: 同じtest logicを複数dataへ適用。
+
+Q2. 良いtest dataに含めたいものは？ [Intermediate]
+```swift
+// cases
+```
+A. 正常値と境界/異常系
+B. 正常値1個だけ
+C. randomだけ
+D. 本番DBだけ
+正解: A
+解説: 境界/失敗条件も含める。
+
+---
+
+## 11. XCTest・UI Test [Intermediate]
+
+概要: 既存XCTestと、実際のapp UIを操作するUI Testの役割を知る。
+考え方: Unit Testは小さいlogic、UI Testは主要user flowを外側から検証。
+
+重要ポイント:
+- XCTestは既存projectで広く利用。
+- XCUITestでlaunch/tap/input。
+- accessibilityIdentifierで要素特定。
+- UI Testは重要導線へ絞る。
+
+コード:
+```swift
+let app=XCUIApplication()
+app.launch()
+app.buttons["saveButton"].tap()
+```
+
+なぜ重要か: legacy testやE2E QAで必要。
+注意: 表示文字だけに依存したselectorはlocalizationで壊れやすい。
+
+確認問題:
+Q1. UI Testで安定した要素特定に使えるのは？ [Intermediate]
+```swift
+view.accessibilityIdentifier="saveButton"
+```
+A. accessibilityIdentifier
+B. memory address
+C. array indexだけ
+D. log文字列
+正解: A
+解説: test用に安定したidentifierを付けられる。
+
+Q2. 全logicをUI Testにしない理由は？ [Intermediate]
+```swift
+XCUIApplication()
+```
+A. Unit Testより実行costが高い
+B. SwiftではUI Test不可
+C. JSON不可
+D. ARC問題
+正解: A
+解説: 起動/操作が必要で遅い。
+
+---
+
+## 12. Dependency Injection・Test Double [Intermediate]
+
+概要: 外部依存を差し替え可能にし、testしやすい設計を作る。
+考え方: 依存を内部で勝手に生成せず外から渡すと、何に依存するかが見える。
+
+重要ポイント:
+- initializer injectionがsimple。
+- Protocolでservice境界を表す場合。
+- Stub/Fake/Mock等。
+- global singleton依存を減らす。
+
+コード:
+```swift
+protocol UserRepository{func load() async throws -> User}
+final class VM{
+ let repo:any UserRepository
+ init(repo:any UserRepository){self.repo=repo}
+}
+```
+
+なぜ重要か: networkなしでlogicをtestし実装交換を容易にする。
+注意: Protocolを作ること自体がDIではない。
+
+確認問題:
+Q1. Initializer Injectionの利点は？ [Intermediate]
+```swift
+init(repository:UserRepository)
+```
+A. 依存が明示され差し替えやすい
+B. 必ずSingleton
+C. UI自動生成
+D. ARC不要
+正解: A
+解説: test doubleへ置換しやすい。
+
+Q2. Test Doubleの目的は？ [Intermediate]
+```swift
+FakeUserRepository()
+```
+A. 外部依存を制御可能な代替へ置換
+B. production APIを必ず呼ぶ
+C. Git操作
+D. 署名
+正解: A
+解説: testでnetwork/DBの不確定要素を制御する。
+
+---
+
+## 13. API Client・Service・Repository・DTO [Intermediate]
+
+概要: network処理を層へ分け、責務を明確にする。
+考え方: URLSessionは通信手段、Repositoryはappが必要なdata取得契約。
+
+重要ポイント:
+- API Client:transport。
+- DTO:外部data形式。
+- Repository:data取得/保存interface。
+- ViewからURLSession詳細を隠す。
+
+コード:
+```swift
+ViewModel -> UserRepository -> APIClient -> URLSession
+                     -> UserDTO -> User
+```
+
+なぜ重要か: 中規模appでtest・変更容易性を改善する。
+注意: 層を増やしすぎてsimple appを複雑にしない。
+
+確認問題:
+Q1. URLSession詳細をViewから隠す利点は？ [Intermediate]
+```swift
+View -> Repository -> APIClient
+```
+A. UIと通信実装を分離
+B. 通信無料
+C. SwiftUI不要
+D. JSON禁止
+正解: A
+解説: test/変更しやすい。
+
+Q2. DTOの責務は？ [Intermediate]
+```swift
+struct UserDTO:Decodable
+```
+A. 外部通信/保存形式
+B. UI layout
+C. ARC管理
+D. Git branch
+正解: A
+解説: 外部data構造との境界。
+
+---
+
+## 14. 保存方法の選び方：UserDefaults・File・SwiftData・Keychain [Basic]
+
+概要: data特性に応じて永続化手段を選ぶ。
+考え方: 保存手段はdata量・query・秘密性・関係性で選ぶ。
+
+重要ポイント:
+- UserDefaults:小さな設定。
+- File:document/blob/cache。
+- SwiftData:構造化model/query/relationship。
+- Keychain:credential/secret。
+
+コード:
+```swift
+Settings -> UserDefaults
+Models -> SwiftData
+Token -> Keychain
+Export JSON -> File
+```
+
+なぜ重要か: 適切な保存層を選ぶだけで多くの設計事故を防げる。
+注意: tokenをUserDefaults、大量dataをUserDefaults等の用途違いを避ける。
+
+確認問題:
+Q1. 認証tokenの保存候補は？ [Basic]
+```swift
+authToken
+```
+A. Keychain
+B. UserDefaults平文
+C. console log
+D. README
+正解: A
+解説: credentialはKeychain等へ。
+
+Q2. query/relationship付きmodel保存の候補は？ [Basic]
+```swift
+User -> Posts
+```
+A. SwiftData
+B. print
+C. Setだけ
+D. URLComponents
+正解: A
+解説: 構造化永続dataに向く。
+
+---
+
+## 15. SwiftData：@Model・ModelContainer・ModelContext [Basic]
+
+概要: AppleのSwift-native persistenceの基本構成を理解する。
+考え方: Modelは保存対象、Containerはstore全体、Contextはfetch/insert/delete/saveの作業窓口。
+
+重要ポイント:
+- @Modelでpersistent model。
+- ModelContainerがschema/storeを管理。
+- ModelContextでinsert/delete/fetch。
+- SwiftUIとEnvironmentで統合。
+
+コード:
+```swift
+import SwiftData
+@Model final class Item{
+ var name:String
+ init(name:String){self.name=name}
+}
+modelContext.insert(Item(name:"Swift"))
+```
+
+なぜ重要か: local-first appで実用的なdata保存手段。
+注意: @Model classは通常のDTO structと同じ性質ではない。
+
+確認問題:
+Q1. SwiftData保存対象classへ付けるMacroは？ [Basic]
+```swift
+@Model final class Item{}
+```
+A. @Model
+B. @State
+C. @Test
+D. @objc
+正解: A
+解説: @ModelがPersistentModel準拠等を生成する。
+
+Q2. insert/delete/fetchの作業窓口は？ [Basic]
+```swift
+@Environment(\.modelContext) var modelContext
+```
+A. ModelContext
+B. URLSession
+C. Calendar
+D. Logger
+正解: A
+解説: ModelContextがmodel操作context。
+
+---
+
+## 16. SwiftData：@Query・FetchDescriptor・Predicate・Relationship [Intermediate]
+
+概要: 保存済みmodelを条件付きで取得し、関係を設計する。
+考え方: DB操作も全件取得後filterではなく、必要条件をqueryとして表現する。
+
+重要ポイント:
+- @QueryでSwiftUIと同期fetch。
+- FetchDescriptorでview外からfetch。
+- #Predicateで条件。
+- @Relationshipでdelete rule/inverse等。
+
+コード:
+```swift
+@Query(sort:\Item.createdAt,order:.reverse) var items:[Item]
+let d=FetchDescriptor<Item>(predicate:#Predicate{$0.isDone == false})
+```
+
+なぜ重要か: data量が増えても効率的に扱うため必要。
+注意: UI filterごとに全件loadする設計はscaleしにくい。
+
+確認問題:
+Q1. SwiftUIでSwiftData結果を同期取得するWrapperは？ [Intermediate]
+```swift
+@Query var items:[Item]
+```
+A. @Query
+B. @Binding
+C. @AppStorageだけ
+D. @Published
+正解: A
+解説: @Queryがpersistent modelをfetchし変更と同期する。
+
+Q2. #Predicateの役割は？ [Intermediate]
+```swift
+#Predicate<Item>{$0.isDone == false}
+```
+A. fetch条件を型安全に表す
+B. JSON encode
+C. animation
+D. Git filter
+正解: A
+解説: query条件を表すMacro。
+
+---
+
+## 17. SwiftData：Schema・Migration・Data Evolution [Intermediate]
+
+概要: release後にdata modelを変更する責任を理解する。
+考え方: schema変更はcode変更だけでなく、既存user dataを新しい形へ移す問題。
+
+重要ポイント:
+- property rename/type change/deleteはmigration影響。
+- VersionedSchema等を使う場面。
+- 軽量migrationで済む変更も。
+- 本番dataを壊さないtestが必要。
+
+コード:
+```swift
+// v1: name
+// v2: displayName
+// existing store must remain readable
+```
+
+なぜ重要か: 永続化appを継続運用するなら必須。
+注意: 開発中のstore削除を本番migration代わりにしない。
+
+確認問題:
+Q1. release後のschema変更で最重要なのは？ [Intermediate]
+```swift
+// existing user data
+```
+A. 既存dataをどう移行するか
+B. Xcode theme
+C. Git username
+D. UI色
+正解: A
+解説: 既存storeの安全なmigrationが必要。
+
+Q2. store削除が本番migrationの代わりになる？ [Intermediate]
+```swift
+// delete app data
+```
+A. ならない
+B. 完全に同じ
+C. 必ず推奨
+D. SwiftDataはmigration不要
+正解: A
+解説: user dataを消せないためmigration設計が必要。
+
+---
+
+## 18. App Lifecycle・Info.plist・Permissions [Basic]
+
+概要: appの起動状態、設定値、権限要求の基本を理解する。
+考え方: codeだけでなくOSへ『このappが何を使うか』を宣言する設定がある。
+
+重要ポイント:
+- scenePhaseでactive/inactive/background。
+- Info.plistにusage description等。
+- 権限は必要なtimingで要求。
+- background前後の保存/処理を設計。
+
+コード:
+```swift
+@Environment(\.scenePhase) private var scenePhase
+.onChange(of:scenePhase){_,phase in
+ if phase == .background { save() }
+}
+```
+
+なぜ重要か: Camera/Photo/Location等を使うappで必須。
+注意: 権限説明keyがないままprotected resourceへaccessしない。
+
+確認問題:
+Q1. scenePhaseの代表状態は？ [Basic]
+```swift
+scenePhase
+```
+A. active/inactive/background
+B. GET/POST
+C. success/failureだけ
+D. public/private
+正解: A
+解説: sceneのlifecycle state。
+
+Q2. Camera等の権限で必要になるものは？ [Basic]
+```swift
+Info.plist usage description
+```
+A. 利用理由のdescription
+B. Package.resolved
+C. Hashable
+D. Tuple
+正解: A
+解説: 対応するusage descriptionが必要。
+
+---
+
+## 19. Capabilities・Entitlements・Signing・TestFlight [Intermediate]
+
+概要: OS機能と署名設定、配布buildの関係を理解する。
+考え方: Capabilityはcodeだけで有効にならず、App ID/entitlement/signingとOSの許可がつながる。
+
+重要ポイント:
+- Team/Certificate/Provisioning。
+- Capability追加でentitlement。
+- Bundle ID/App ID整合。
+- Archive→App Store Connect→TestFlight。
+
+コード:
+```swift
+// Signing & Capabilities
+// Scheme -> Archive -> App Store Connect -> TestFlight
+```
+
+なぜ重要か: 実機buildから配布まで詰まりやすい領域。
+注意: Debugで動いてもRelease/実機/entitlement差で問題が出る。
+
+確認問題:
+Q1. Push/iCloud等の設定場所の代表は？ [Intermediate]
+```swift
+Signing & Capabilities
+```
+A. Signing & Capabilities
+B. Array initializer
+C. LLDBだけ
+D. JSONDecoder
+正解: A
+解説: Targetのcapability/entitlementを設定する。
+
+Q2. TestFlightの主用途は？ [Intermediate]
+```swift
+Archive -> TestFlight
+```
+A. 公開前のbeta配布test
+B. syntax checkだけ
+C. Git hosting
+D. DB専用
+正解: A
+解説: App Store Connect経由でbeta buildを配布する。
+
+---
+
+## 20. Architecture・Git・Security・API Design [Intermediate]
+
+概要: 責務分離、変更管理、安全性を実装と同じレベルで扱う。
+考え方: 良い開発は『動くcode』だけでなく、変更可能・検証可能・安全な境界を作る。
+
+重要ポイント:
+- View→ViewModel→Repository等で責務分離。
+- git status/diff/小さなcommit/PR。
+- secret/tokenをcommitしない。
+- API名とdocumentationで意図を明確にする。
+
+コード:
+```swift
+View -> ViewModel -> Repository -> API / DB
+
+git status
+git diff
+// Never commit secrets
+```
+
+なぜ重要か: 個人開発でも規模が増えるほど差が出る。
+注意: pattern名を守ることより、責務・依存方向・安全境界が明確かを見る。
+
+確認問題:
+Q1. 責務分離の目的は？ [Intermediate]
+```swift
+View -> ViewModel -> Repository
+```
+A. 変更影響を局所化しtestしやすくする
+B. file数を増やすだけ
+C. 必ず高速
+D. Protocol最大化
+正解: A
+解説: 依存方向と責務を整理する。
+
+Q2. repositoryへcommitしてはいけないものは？ [Intermediate]
+```swift
+API_SECRET=...
+```
+A. secret/token/private key
+B. README
+C. test名
+D. public model
+正解: A
+解説: 履歴に残るためsecretをcommitしない。
+
+---

@@ -1,0 +1,1749 @@
+# Swift Language
+
+完全初学者から中級まで。データ型・制御フロー・型設計・Protocol・Generics・Macro・Memory Safetyまで、Swift言語を体系的に学ぶ。
+
+このファイルは人が読みやすい教材原本です。構造化データは content.json、完成版は index.html です.
+
+## 01. 値・let / var・型・型推論 [Beginner]
+
+概要: Swiftの土台。値に名前を付け、型で安全性を確保する仕組みを理解する。
+考え方: 変数は「箱」よりも、「値に付けた名前」と考えると後で理解しやすい。let は再代入できない名前、var は再代入できる名前。
+
+重要ポイント:
+- let は再代入不可、var は再代入可能。
+- Int / Double / String / Bool は代表的な基本型。
+- 型推論により、明示しなくても Swift が型を判断できる。
+- Swift は型安全で、意味の合わない値の操作をコンパイル時に多く検出する。
+
+コード:
+```swift
+let userName = "Yuki"
+var score = 10
+score += 5
+
+let isPassed = score >= 12
+print("\(userName): \(score), \(isPassed)")
+```
+
+なぜ重要か: アプリが大きくなるほど、「この値は変化するのか」「何型なのか」が設計そのものになる。SwiftUI の状態管理や API モデルでもこの基礎がそのまま使われる。
+注意: プログラミングの = は「等しい」ではなく、右辺を評価して左辺へ代入する演算。
+
+確認問題:
+Q1. このコードの出力は？ [Beginner]
+```swift
+var score = 10
+score += 5
+print(score)
+```
+A. 5
+B. 10
+C. 15
+D. コンパイルエラー
+正解: C
+解説: score は var なので変更可能。`score += 5` は `score = score + 5` と同じ意味で、10 + 5 = 15。
+
+Q2. コンパイルエラーになるものは？ [Beginner]
+```swift
+let name = "Swift"
+// 次のうち name に対して不可能なのは？
+```
+A. print(name)
+B. let copy = name
+C. name = "UIKit"
+D. print("\(name)!")
+正解: C
+解説: `let` で宣言した name には再代入できない。読み取りや別の定数への代入は可能。
+
+---
+
+## 02. 数値型・型変換・オーバーフロー [Beginner]
+
+概要: Int / UInt / Double / Float の違いと、安全な型変換を理解する。
+考え方: 同じ『数字』でも型が違えば別物。Swiftは暗黙変換を控えめにして、意図しない計算を防ぐ。
+
+重要ポイント:
+- Intは一般的な整数、UIntは負数を持たない整数。
+- Doubleは通常の小数計算で第一候補。
+- 異なる数値型同士は明示変換が必要な場合が多い。
+- 整数演算は範囲外になるとオーバーフローする。
+
+コード:
+```swift
+let count: Int = 3
+let price: Double = 120.5
+let total = Double(count) * price
+```
+
+なぜ重要か: API値、JSON、画面入力、計算結果で型がずれることは多い。変換の意味を理解するとバグを減らせる。
+注意: `Int(3.9)` は丸めではなく小数部分を切り捨てる。
+
+確認問題:
+Q1. result の型と値は？ [Beginner]
+```swift
+let a = 3
+let b = 2.5
+let result = Double(a) + b
+```
+A. Intの5
+B. Doubleの5.5
+C. Floatの5.5
+D. コンパイルエラー
+正解: B
+解説: aをDoubleへ明示変換しているため5.5。
+
+Q2. Int(3.9) の結果は？ [Basic]
+```swift
+let value = Int(3.9)
+```
+A. 3
+B. 4
+C. 3.9
+D. nil
+正解: A
+解説: 小数部分が切り捨てられて3になる。
+
+---
+
+## 03. Tuple・Typealias [Beginner]
+
+概要: 複数値を一時的にまとめるTupleと、型へ分かりやすい別名を付けるTypealiasを学ぶ。
+考え方: Tupleは『小さな一時セット』。長く意味を持つデータならstructを検討する。
+
+重要ポイント:
+- Tupleは複数値を1つにまとめる。
+- 要素へ名前を付けられる。
+- 分解代入ができる。
+- typealiasは既存型へ意味のある別名を付ける。
+
+コード:
+```swift
+let user = (name: "Yuki", score: 90)
+typealias UserID = String
+let id: UserID = "u-001"
+```
+
+なぜ重要か: 関数から複数値を返すときや複雑な型を読みやすくするときに使う。
+注意: Tupleが大きくなったらstructへ移す方が保守しやすい。
+
+確認問題:
+Q1. 出力は？ [Beginner]
+```swift
+let point = (x: 2, y: 5)
+print(point.y)
+```
+A. 2
+B. 5
+C. x
+D. コンパイルエラー
+正解: B
+解説: 名前付きTupleのy要素は5。
+
+Q2. typealias の説明として正しいものは？ [Basic]
+```swift
+typealias UserID = String
+```
+A. 新しい実行時型を作る
+B. StringにUserIDという別名を付ける
+C. Stringを継承する
+D. Optionalに変換する
+正解: B
+解説: typealiasは既存型の別名。
+
+---
+
+## 04. 演算子・比較・論理式 [Beginner]
+
+概要: 算術・比較・論理演算子を組み合わせ、条件や計算結果を作る。
+考え方: 式は「値を生み出すもの」。`score >= 60` も Bool という値を生み出す式。
+
+重要ポイント:
+- + - * / % で算術演算。
+- == != > < >= <= は Bool を返す。
+- && は AND、|| は OR、! は NOT。
+- 文字列補間 `\(value)` で値を String に埋め込める。
+
+コード:
+```swift
+let price = 1200
+let count = 3
+let total = price * count
+let message = "合計は\(total)円です"
+print(message)
+```
+
+なぜ重要か: if や guard の条件も最終的には Bool を作る式。比較演算を理解すると制御フローが自然に読める。
+注意: `=` は代入、`==` は比較。混同しない。
+
+確認問題:
+Q1. result の値は？ [Beginner]
+```swift
+let a = 10
+let b = 3
+let result = a % b
+print(result)
+```
+A. 0
+B. 1
+C. 3
+D. 3.333...
+正解: B
+解説: `%` は剰余（余り）。10 ÷ 3 の余りは 1。
+
+Q2. isValid は最終的に何になる？ [Beginner]
+```swift
+let age = 20
+let hasTicket = false
+let isValid = age >= 18 && hasTicket
+```
+A. true
+B. false
+C. nil
+D. コンパイルエラー
+正解: B
+解説: `&&` は両方が true のときだけ true。年齢条件は true だが hasTicket が false なので false。
+
+---
+
+## 05. String・Character・Unicode [Basic]
+
+概要: Swiftの文字列がUnicodeを正しく扱うことと、文字列indexが整数ではない理由を理解する。
+考え方: 見た目の1文字は内部で複数のUnicode scalarから構成されることがある。
+
+重要ポイント:
+- StringはUnicode対応。
+- Characterは人が認識する1文字に近い単位。
+- String.Indexを使って安全に位置へアクセスする。
+- prefix / suffix / splitなど実用操作を覚える。
+
+コード:
+```swift
+let text = "Swift🍎"
+print(text.count)
+print(text.prefix(5))
+```
+
+なぜ重要か: ユーザー入力、検索、表示名、API文字列など、文字列処理はどのアプリでも必須。
+注意: `text[0]` のようなInt添字アクセスはできない。
+
+確認問題:
+Q1. 先頭1文字を安全に取得する代表的な方法は？ [Basic]
+```swift
+let text = "Swift"
+```
+A. text[0]
+B. text.first
+C. text[Int(0)]
+D. text.byte(0)
+正解: B
+解説: firstはCharacter?を返す。
+
+Q2. text.count が数えるものとして最も近いのは？ [Basic]
+```swift
+let text = "A🍎"
+```
+A. UTF-8バイト数
+B. Characterとしての文字数
+C. メモリ容量
+D. ASCIIコード
+正解: B
+解説: String.countはCharacter単位の数を返す。
+
+---
+
+## 06. if・switch・guard [Beginner]
+
+概要: 条件によって実行するコードを変える。
+考え方: 制御フローは「次にどの道を通るか」を決める仕組み。条件式そのものは Bool。
+
+重要ポイント:
+- if / else if / else で条件分岐。
+- switch は複数パターンを網羅的に扱うのが得意。
+- guard は「条件を満たさないなら早く抜ける」ために使う。
+- Swift の switch は原則としてすべてのケースを扱う必要がある。
+
+コード:
+```swift
+let score = 82
+
+switch score {
+case 90...100: print("A")
+case 70..<90: print("B")
+default: print("C")
+}
+```
+
+なぜ重要か: 読みやすい分岐はバグを減らす。guard で異常系を先に処理すると、正常系のネストが浅くなる。
+注意: switch の `case 70..<90` は 70 以上 90 未満。`...` と `..<` の違いに注意。
+
+確認問題:
+Q1. 出力は？ [Beginner]
+```swift
+let score = 75
+if score >= 80 {
+    print("A")
+} else if score >= 60 {
+    print("B")
+} else {
+    print("C")
+}
+```
+A. A
+B. B
+C. C
+D. 何も出ない
+正解: B
+解説: 75 >= 80 は false。次の 75 >= 60 が true なので B が出力され、その後の else は評価されない。
+
+Q2. この guard の役割として最も近いものは？ [Basic]
+```swift
+func greet(name: String?) {
+    guard let name else { return }
+    print("Hello, \(name)")
+}
+```
+A. name を必ず nil にする
+B. nil なら関数を早期終了する
+C. name をグローバル変数にする
+D. 例外を投げる
+正解: B
+解説: guard let で Optional をアンラップし、nil なら return。以降では name を非 Optional として使える。
+
+---
+
+## 07. Pattern Matching・where・if case [Basic]
+
+概要: switchを強力にするPattern Matchingを理解する。
+考え方: switchは『値が一致するか』だけでなく『形が一致するか』を判定できる。
+
+重要ポイント:
+- Range、Tuple、Enumのassociated valueを分解できる。
+- whereでcaseへ追加条件を書ける。
+- if case / guard caseで1patternだけ判定できる。
+- Optionalもpattern matchingできる。
+
+コード:
+```swift
+let value = (200, "OK")
+switch value {
+case (200, let body): print(body)
+default: break
+}
+```
+
+なぜ重要か: enum中心の状態設計やレスポンス分岐で読みやすいコードを書くために重要。
+注意: caseの順序で広いpatternが先に一致すると後ろへ到達しない。
+
+確認問題:
+Q1. body は何になる？ [Basic]
+```swift
+let value=(200,"OK")
+switch value { case (200, let body): print(body); default: break }
+```
+A. 200
+B. OK
+C. Tuple全体
+D. nil
+正解: B
+解説: 2要素目をlet bodyで取り出す。
+
+Q2. where の役割は？ [Intermediate]
+```swift
+case let x where x > 10:
+```
+A. 型を作る
+B. 一致した値へ追加条件を課す
+C. Optional化する
+D. ループ終了
+正解: B
+解説: pattern一致後に追加条件を適用する。
+
+---
+
+## 08. for・while・Range [Beginner]
+
+概要: 同じ処理を繰り返し、コレクションを順番に処理する。
+考え方: for-in は「要素を1つずつ取り出して名前を付ける」。配列を読む基本動作。
+
+重要ポイント:
+- `1...3` は 1,2,3 を含む ClosedRange。
+- `0..<3` は 0,1,2。配列インデックスと相性が良い。
+- for-in は配列や Range の各要素を順番に処理する。
+- while は条件が true の間だけ繰り返す。
+
+コード:
+```swift
+var total = 0
+for number in 1...3 {
+    total += number
+}
+print(total)
+```
+
+なぜ重要か: map / filter / reduce などの高階関数を理解する前に、for で何をしているのか追えることが重要。
+注意: 無条件の while や、条件を更新しない while は無限ループになり得る。
+
+確認問題:
+Q1. 出力は？ [Beginner]
+```swift
+var total = 0
+for i in 1...4 {
+    total += i
+}
+print(total)
+```
+A. 4
+B. 6
+C. 10
+D. 11
+正解: C
+解説: 1 + 2 + 3 + 4 = 10。`...` は終端の 4 を含む。
+
+Q2. ループは何回実行される？ [Basic]
+```swift
+for _ in 0..<5 {
+    print("Swift")
+}
+```
+A. 4回
+B. 5回
+C. 6回
+D. 無限
+正解: B
+解説: `0..<5` は 0,1,2,3,4 の5要素。アンダースコアは値を使わないことを表す。
+
+---
+
+## 09. 関数・引数・戻り値 [Basic]
+
+概要: 処理に名前を付け、入力と出力を明確にする。
+考え方: 関数は「入力 → 処理 → 出力」の小さな機械。責務を小さくすると読みやすい。
+
+重要ポイント:
+- 引数ラベルとパラメータ名は別にできる。
+- `-> Type` が戻り値の型。
+- 副作用の少ない関数はテストしやすい。
+- 関数も型を持つため、変数に代入したり引数として渡せる。
+
+コード:
+```swift
+func total(price: Int, count: Int) -> Int {
+    price * count
+}
+
+let result = total(price: 500, count: 3)
+```
+
+なぜ重要か: 大きな処理を関数に分解すると、名前によって意図を表現でき、テスト単位も作りやすい。
+注意: 同じ型の引数が複数ある場合、ラベルを雑にすると呼び出し側で意味が分からなくなる。
+
+確認問題:
+Q1. result の値は？ [Basic]
+```swift
+func double(_ value: Int) -> Int {
+    value * 2
+}
+let result = double(4)
+```
+A. 2
+B. 4
+C. 8
+D. コンパイルエラー
+正解: C
+解説: `_` により呼び出し時の引数ラベルを省略できる。4 * 2 = 8。
+
+Q2. この関数の型として正しいものは？ [Basic]
+```swift
+func add(_ a: Int, _ b: Int) -> Int {
+    a + b
+}
+```
+A. Int
+B. (Int, Int) -> Int
+C. (Int) -> Int
+D. Void -> Int
+正解: B
+解説: Int を2つ受け取り Int を返すので、関数型は `(Int, Int) -> Int`。
+
+---
+
+## 10. 引数ラベル・Default・Variadic・inout [Basic]
+
+概要: 関数呼び出しを読みやすくし、特殊な入力方法を理解する。
+考え方: 関数は処理だけでなくAPI。呼び出し側が自然に読める設計が重要。
+
+重要ポイント:
+- 外部引数ラベルと内部名を分けられる。
+- default parameterで省略可能な引数を作れる。
+- variadicは可変個数の引数を受け取る。
+- inoutは呼び出し元の値そのものを変更する。
+
+コード:
+```swift
+func greet(_ name: String, prefix: String = "Hello") {
+    print("\(prefix), \(name)")
+}
+```
+
+なぜ重要か: 標準ライブラリやApple APIの関数signatureを読む力に直結する。
+注意: inoutは副作用が明確な場面で使う。
+
+確認問題:
+Q1. 出力は？ [Basic]
+```swift
+func greet(_ name:String,prefix:String="Hi"){print("\(prefix) \(name)")}
+greet("Yuki")
+```
+A. Yuki
+B. Hi
+C. Hi Yuki
+D. エラー
+正解: C
+解説: prefixの既定値Hiが使われる。
+
+Q2. inout引数を渡す記号は？ [Intermediate]
+```swift
+func addOne(_ x: inout Int){x+=1}
+var n=1
+addOne(/* ? */ n)
+```
+A. $
+B. &
+C. @
+D. !
+正解: B
+解説: inoutへは&nのように渡す。
+
+---
+
+## 11. 関数型・Higher-Order Function [Intermediate]
+
+概要: 関数を値として保存・受け渡しできることを理解する。
+考え方: Swiftでは『何をするか』そのものを値として扱える。
+
+重要ポイント:
+- 関数には型がある。
+- 関数を変数へ代入できる。
+- 関数を引数/戻り値として扱う関数を高階関数という。
+- map/filterは高階関数の代表。
+
+コード:
+```swift
+func add(_ a:Int,_ b:Int)->Int{a+b}
+let operation: (Int,Int)->Int = add
+```
+
+なぜ重要か: クロージャやコールバック、DIを読む根本になる。
+注意: `add` と `add(1,2)` は関数そのものと実行結果で別。
+
+確認問題:
+Q1. operation の型は？ [Basic]
+```swift
+func add(_ a:Int,_ b:Int)->Int{a+b}
+let operation=add
+```
+A. Int
+B. (Int, Int) -> Int
+C. () -> Void
+D. String
+正解: B
+解説: 2つのIntを受け取りIntを返す関数型。
+
+Q2. 高階関数とは？ [Intermediate]
+```swift
+func apply(_ v:Int, operation:(Int)->Int)->Int{operation(v)}
+```
+A. 関数を値として受け取る/返す関数
+B. 必ず再帰する関数
+C. 非同期関数だけ
+D. UIKit専用
+正解: A
+解説: 関数を引数または戻り値として扱う。
+
+---
+
+## 12. Closure・map / filter / reduce 入門 [Intermediate]
+
+概要: 処理そのものを値として扱う。
+考え方: クロージャは「名前のない関数」。map は各要素を変換、filter は残す要素を選別、reduce は1つに畳み込む。
+
+重要ポイント:
+- クロージャは `{ parameters in expression }` の形。
+- map は要素数を保ちながら変換する。
+- filter は条件に合う要素だけ残す。
+- reduce は複数要素から1つの結果を作る。
+
+コード:
+```swift
+let numbers = [1, 2, 3, 4]
+let doubled = numbers.map { $0 * 2 }
+let evens = doubled.filter { $0.isMultiple(of: 4) }
+```
+
+なぜ重要か: Swift / SwiftUI の API ではクロージャが大量に出てくる。ViewBuilder、Button action、非同期処理などの読解にも直結する。
+注意: `map` は元配列を変更しない。新しい配列を返す。
+
+確認問題:
+Q1. result は？ [Intermediate]
+```swift
+let numbers = [1, 2, 3]
+let result = numbers.map { $0 * 2 }
+```
+A. [1, 2, 3]
+B. [2, 4, 6]
+C. [1, 4, 9]
+D. 6
+正解: B
+解説: map は各要素をクロージャで変換した新しい配列を返す。各要素を2倍して [2,4,6]。
+
+Q2. result は？ [Intermediate]
+```swift
+let values = [1, 2, 3, 4]
+let result = values.filter { $0 % 2 == 0 }
+```
+A. [1, 3]
+B. [2, 4]
+C. [true, false, true, false]
+D. 10
+正解: B
+解説: filter はクロージャが true を返す要素だけ残す。偶数の 2 と 4 が残る。
+
+---
+
+## 13. @escaping・Capture・Capture List [Intermediate]
+
+概要: クロージャが外側の値を保持する仕組みとescapingを理解する。
+考え方: クロージャは外側の値を捕まえて後から使える。その保持が参照循環にもつながる。
+
+重要ポイント:
+- closureは外側の値をcaptureできる。
+- @escapingは関数終了後にも保持される可能性があるclosure。
+- classのselfを強くcaptureすると循環が起こる場合がある。
+- [weak self]などcapture listで保持方法を制御。
+
+コード:
+```swift
+onFinish = { [weak self] in
+    self?.handleFinish()
+}
+```
+
+なぜ重要か: UIKit completion、URLSession、Task、animationなどで頻出。
+注意: weak selfを機械的に付けず、所有関係を考える。
+
+確認問題:
+Q1. @escaping が必要になる代表例は？ [Intermediate]
+```swift
+func load(completion: @escaping ()->Void){ /* 保存して後で呼ぶ */ }
+```
+A. すぐ実行して破棄
+B. 関数終了後に保存して呼ぶ
+C. Intを返すだけ
+D. letを使う
+正解: B
+解説: 関数終了後にもclosureが生存する場合。
+
+Q2. [weak self] を使う主な理由は？ [Intermediate]
+```swift
+callback = { [weak self] in self?.finish() }
+```
+A. selfを値型にする
+B. 強参照循環を避ける
+C. 同期化する
+D. Optional禁止
+正解: B
+解説: closureとselfの循環を避けるために使うことがある。
+
+---
+
+## 14. Collection入門：Array・Set・Dictionary [Basic]
+
+概要: 複数の値を目的に合わせてまとめる。
+考え方: Array=順序付き、Set=重複なし、Dictionary=キーから値を引く。
+
+重要ポイント:
+- Array は順序を持ち、添字でアクセスする。
+- Set は順序を前提とせず、一意な要素を保持する。
+- Dictionary は Key: Value の対応を保持する。
+- 存在しない Dictionary キーへのアクセス結果は Optional。
+
+コード:
+```swift
+var scores = ["A": 90, "B": 75]
+scores["C"] = 82
+
+if let score = scores["C"] {
+    print(score)
+}
+```
+
+なぜ重要か: APIレスポンス、画面一覧、ID検索など、実アプリはコレクションの処理だらけ。型ごとの性質を使い分ける。
+注意: 配列の存在しない index にアクセスすると実行時エラー。Dictionary は Optional を返す。
+
+確認問題:
+Q1. numbers の最終状態は？ [Basic]
+```swift
+var numbers = [1, 2]
+numbers.append(3)
+numbers.removeFirst()
+```
+A. [1, 2, 3]
+B. [2, 3]
+C. [1, 3]
+D. [3]
+正解: B
+解説: append で [1,2,3]、removeFirst で先頭の 1 が削除され [2,3]。
+
+Q2. Dictionary の scores["C"] の型は？ [Basic]
+```swift
+let scores = ["A": 90, "B": 75]
+let value = scores["C"]
+```
+A. Int
+B. Int?
+C. String
+D. Bool
+正解: B
+解説: キーが存在しない可能性があるため Dictionary の添字アクセスは Optional。ここでは Int?。
+
+---
+
+## 15. Arrayを深く理解する [Basic]
+
+概要: 順序付きCollectionの追加・削除・検索・安全な扱いを学ぶ。
+考え方: Arrayは『順序が意味を持つ一覧』。indexは要素のIDではない。
+
+重要ポイント:
+- append / insert / remove / contains / first(where:)を使う。
+- first / lastはOptional。
+- indexは並べ替えや削除で変わる。
+- 操作によって計算量が異なる。
+
+コード:
+```swift
+var names=["A","B"]
+names.append("C")
+let firstB = names.first { $0 == "B" }
+```
+
+なぜ重要か: List、API response、検索結果など最も頻出するCollection。
+注意: 存在確認せずarray[index]へアクセスすると範囲外crashになる。
+
+確認問題:
+Q1. 安全に最初の要素を取りたい場合は？ [Basic]
+```swift
+let values=[1,2,3]
+```
+A. values[0]だけ
+B. values.first
+C. values[-1]
+D. values.get(0)!
+正解: B
+解説: firstは空配列ならnilを返す。
+
+Q2. removeFirst() 後は？ [Basic]
+```swift
+var v=["A","B","C"]
+v.removeFirst()
+```
+A. [A,B]
+B. [B,C]
+C. [A,C]
+D. []
+正解: B
+解説: 先頭Aが削除される。
+
+---
+
+## 16. Set・集合演算 [Basic]
+
+概要: 重複を許さないCollectionと集合演算を理解する。
+考え方: 順番ではなく『含まれているか』が重要なデータにSetを使う。
+
+重要ポイント:
+- Set要素はHashable。
+- insert/remove/containsが基本。
+- union/intersection/subtractingで集合演算。
+- 順序を前提にしない。
+
+コード:
+```swift
+let a:Set=[1,2,3]
+let b:Set=[3,4]
+let common=a.intersection(b)
+```
+
+なぜ重要か: 選択済みID、権限、tag、重複排除に自然に使える。
+注意: 表示順が必要ならArrayなど別構造を使う。
+
+確認問題:
+Q1. intersection結果は？ [Basic]
+```swift
+let a:Set=[1,2,3]
+let b:Set=[3,4]
+let c=a.intersection(b)
+```
+A. 1だけ
+B. 3だけ
+C. 3と4
+D. 1,2,3,4
+正解: B
+解説: 共通要素3だけ。
+
+Q2. Set要素に必要な代表Protocolは？ [Basic]
+```swift
+Set<MyType>()
+```
+A. Codable
+B. Hashable
+C. Observable
+D. Sendableだけ
+正解: B
+解説: Setはhash値で要素を管理する。
+
+---
+
+## 17. Dictionary・Key / Value [Basic]
+
+概要: KeyからValueへ効率よくアクセスする辞書型を理解する。
+考え方: Dictionaryは『ID→データ』『名前→設定』の検索表。
+
+重要ポイント:
+- KeyはHashable。
+- 添字アクセスはOptional。
+- default subscriptで初期値付き更新ができる。
+- keys / values / mergeなどを使える。
+
+コード:
+```swift
+var counts:[String:Int]=[:]
+counts["Swift", default: 0] += 1
+```
+
+なぜ重要か: ID検索、集計、cacheなど実務で頻出。
+注意: `dictionary[key] = nil` は通常そのKey削除になる。
+
+確認問題:
+Q1. default: 0 の利点は？ [Basic]
+```swift
+var c:[String:Int]=[:]
+c["A", default:0]+=1
+```
+A. Aが無い場合0から開始
+B. 必ずnil
+C. Array化
+D. Key削除
+正解: A
+解説: Keyが無ければdefault値から更新できる。
+
+Q2. Dictionary Keyに必要なのは？ [Basic]
+```swift
+var d:[Key:Value]
+```
+A. Hashable
+B. View
+C. Actor
+D. Error
+正解: A
+解説: Dictionary KeyはHashable。
+
+---
+
+## 18. map・compactMap・flatMap・filter・reduce・sorted [Intermediate]
+
+概要: Collection変換を用途ごとに正しく選ぶ。
+考え方: 『各要素を変える』『一部を残す』『nilを捨てる』『1つへ集約』を分けて考える。
+
+重要ポイント:
+- map:全要素を変換。
+- compactMap:nilを除きながら変換。
+- filter:条件に合う要素を残す。
+- reduce:複数要素を1つへ畳み込む。
+
+コード:
+```swift
+let texts=["1","x","3"]
+let numbers=texts.compactMap(Int.init)
+let sum=numbers.reduce(0,+)
+```
+
+なぜ重要か: API変換、表示model作成、集計処理で頻出。
+注意: 高階関数を1行に連結しすぎて読みにくくしない。
+
+確認問題:
+Q1. numbers は？ [Intermediate]
+```swift
+let v=["1","x","3"]
+let numbers=v.compactMap(Int.init)
+```
+A. [1,nil,3]
+B. [1,3]
+C. [1,0,3]
+D. ["1","3"]
+正解: B
+解説: 変換失敗のnilをcompactMapが除去する。
+
+Q2. reduce(0,+) の役割は？ [Intermediate]
+```swift
+let total=[1,2,3].reduce(0,+)
+```
+A. 並べ替え
+B. 合計して1つにする
+C. nil除去
+D. 重複排除
+正解: B
+解説: 0から+で畳み込み6になる。
+
+---
+
+## 19. Optional・if let・guard let [Basic]
+
+概要: 「値がある / ない」を型として安全に扱う。
+考え方: Optional は空っぽになれる箱ではなく、`.some(value)` または `.none` の2状態を持つ型と考える。
+
+重要ポイント:
+- `String?` は String または nil。
+- if let / guard let で安全にアンラップする。
+- nil-coalescing `??` で nil のときの既定値を指定できる。
+- 強制アンラップ `!` は nil ならクラッシュするため慎重に使う。
+
+コード:
+```swift
+let nickname: String? = nil
+let displayName = nickname ?? "Guest"
+print(displayName)
+```
+
+なぜ重要か: API、ユーザー入力、検索結果など「存在しない可能性」は現実のアプリで必ず発生する。Optional はその可能性を型で表現する。
+注意: `!` を「Optionalを消す記号」と覚えない。nil の可能性を無視して値を強制取得する操作。
+
+確認問題:
+Q1. 出力は？ [Basic]
+```swift
+let name: String? = nil
+print(name ?? "Guest")
+```
+A. nil
+B. Optional(nil)
+C. Guest
+D. クラッシュ
+正解: C
+解説: `??` は左側が nil の場合に右側を返す。したがって Guest。
+
+Q2. 最も安全な書き方は？ [Basic]
+```swift
+let text: String? = getText()
+// text を表示したい
+```
+A. print(text!)
+B. if let text { print(text) }
+C. print(text as String)
+D. text = nil
+正解: B
+解説: if let は値がある場合だけ安全にアンラップする。`!` は nil の場合クラッシュする。
+
+---
+
+## 20. Optional Chaining・Optional map / flatMap [Basic]
+
+概要: Optionalの中へ安全にアクセスし、存在しない場合を連鎖的に扱う。
+考え方: 途中がnilなら、その先を実行せず連鎖全体がnilになる。
+
+重要ポイント:
+- user?.profile?.nameのように連鎖できる。
+- 結果はOptional。
+- Optional.mapは値がある時だけ変換。
+- flatMapはOptionalの二重化を避ける。
+
+コード:
+```swift
+struct User{let name:String}
+let user:User?=User(name:"Yuki")
+let length=user?.name.count
+```
+
+なぜ重要か: APIや画面状態でOptionalが連鎖する場面を安全に扱える。
+注意: nilが隠れすぎるならguardで明示的に検証する。
+
+確認問題:
+Q1. length の型は？ [Basic]
+```swift
+struct User{let name:String}
+let user:User?=nil
+let length=user?.name.count
+```
+A. Int
+B. Int?
+C. String?
+D. Bool
+正解: B
+解説: 途中がnilかもしれないので結果はInt?。
+
+Q2. 途中がnilなら？ [Basic]
+```swift
+a?.b?.c
+```
+A. 必ずcrash
+B. 連鎖結果はnil
+C. 0
+D. 空文字
+正解: B
+解説: 以降を評価せずnilになる。
+
+---
+
+## 21. struct・値セマンティクス入門 [Intermediate]
+
+概要: 関連データを独自型にまとめ、値型として扱う基本を理解する。
+考え方: structは『独自の値』を定義する設計図。代入や引数渡しでは値セマンティクスを持つ。
+
+重要ポイント:
+- structは値型。
+- stored propertyとmethodを持てる。
+- memberwise initializerが自動生成される場合がある。
+- データモデルではstructが自然な場面が多い。
+
+コード:
+```swift
+enum LoadState {
+    case idle
+    case loading
+    case loaded([String])
+    case failed(Error)
+}
+```
+
+なぜ重要か: DTO、View用model、設定値など、多くのSwift型設計で中心になる。
+注意: structはclassの簡易版ではない。共有同一性が不要なら値型が自然なことが多い。
+
+確認問題:
+Q1. 出力は？ [Intermediate]
+```swift
+struct User { var score: Int }
+var a = User(score: 10)
+var b = a
+b.score = 20
+print(a.score)
+```
+A. 10
+B. 20
+C. nil
+D. コンパイルエラー
+正解: A
+解説: struct は値型。b は a の値を受け取り、b.score の変更は a に影響しない。
+
+Q2. enum を使う主な利点は？ [Intermediate]
+```swift
+enum NetworkState {
+    case idle, loading, loaded, failed
+}
+```
+A. すべて参照型になる
+B. 取り得る状態を型で限定できる
+C. 必ず rawValue が必要
+D. 継承できる
+正解: B
+解説: 状態の候補を型レベルで限定できる。switch と組み合わせると状態漏れも検出しやすい。
+
+---
+
+## 22. Enum・Raw Value・Associated Value [Intermediate]
+
+概要: 取り得る状態を型で限定し、状態ごとに異なるデータを保持する。
+考え方: enumは『文字列定数の集まり』ではなく、状態を安全に表現する強力な型。
+
+重要ポイント:
+- raw valueで固定値と対応。
+- associated valueでcaseごとに異なる値を持てる。
+- switchで全caseを網羅。
+- recursive enumも表現可能。
+
+コード:
+```swift
+enum LoadState {
+ case idle
+ case loading
+ case loaded([String])
+ case failed(message:String)
+}
+```
+
+なぜ重要か: 画面状態、network状態、routing、error種別を不正状態なく表せる。
+注意: 複数Boolで状態を表すと矛盾状態を作りやすい。
+
+確認問題:
+Q1. associated value の利点は？ [Intermediate]
+```swift
+enum State{case success(Int);case failure(String)}
+```
+A. caseごとに関連dataを持てる
+B. 必ずrawValue
+C. 継承可能
+D. 参照型
+正解: A
+解説: caseごとに異なる型の関連dataを保持できる。
+
+Q2. 状態管理にenumが向く理由は？ [Intermediate]
+```swift
+enum State{case idle,loading,loaded,failed}
+```
+A. 同時に複数case
+B. 取り得る状態を限定
+C. 必ずDB保存
+D. UI自動生成
+正解: B
+解説: 不正な組み合わせを作りにくい。
+
+---
+
+## 23. class・参照型・継承 [Intermediate]
+
+概要: 同じインスタンスを複数箇所から共有する参照セマンティクスを理解する。
+考え方: struct の代入は『値を渡す』、class の代入は『同じ対象を指す参照を渡す』と考える。
+
+重要ポイント:
+- class は参照型。
+- 継承、deinit、同一性比較 `===` は class 固有。
+- ARC が参照カウントを管理する。
+- 強参照循環を避けるため weak / unowned を使う場合がある。
+
+コード:
+```swift
+final class Counter {
+    var value = 0
+}
+let a = Counter()
+let b = a
+b.value = 5
+print(a.value)
+```
+
+なぜ重要か: UIKit の UIViewController などは class。Delegate やクロージャで参照循環を作らないためにも必要。
+注意: class を代入しても複製されない。同じインスタンスへの参照が増える。
+
+確認問題:
+Q1. 出力は？ [Intermediate]
+```swift
+final class Box { var value = 1 }
+let a = Box()
+let b = a
+b.value = 9
+print(a.value)
+```
+A. 1
+B. 9
+C. nil
+D. コンパイルエラー
+正解: B
+解説: class は参照型。a と b は同じ Box インスタンスを参照しているため、変更が共有される。
+
+Q2. weak がよく使われる理由は？ [Intermediate]
+```swift
+weak var delegate: SomeDelegate?
+```
+A. 値型に変換するため
+B. 強参照循環を避けるため
+C. 速度を必ず上げるため
+D. Optional を禁止するため
+正解: B
+解説: weak 参照は参照カウントを増やさないため、delegate などの双方向参照で強参照循環を避けやすい。
+
+---
+
+## 24. Stored / Computed / lazy / Property Observer [Intermediate]
+
+概要: 型の状態を表すPropertyの種類と、計算・監視の仕組みを理解する。
+考え方: 保存する値と、他の値から計算できる値を分ける。
+
+重要ポイント:
+- stored propertyは値を保存。
+- computed propertyはgetter/setterで計算。
+- lazyは初回accessまで初期化を遅延。
+- willSet/didSetで変更を観測。
+
+コード:
+```swift
+struct Rect{
+ var width:Double
+ var height:Double
+ var area:Double { width * height }
+}
+```
+
+なぜ重要か: 状態重複を避け、modelを一貫した状態に保つ。
+注意: 計算で導ける値を二重保存すると同期漏れが起きやすい。
+
+確認問題:
+Q1. area の種類は？ [Intermediate]
+```swift
+var area:Double { width * height }
+```
+A. stored
+B. computed
+C. lazy stored
+D. global
+正解: B
+解説: access時に計算するcomputed property。
+
+Q2. lazy の特徴は？ [Intermediate]
+```swift
+lazy var cache=makeCache()
+```
+A. 即作成
+B. 最初のaccessまで初期化を遅らせる
+C. letだけ
+D. Optional専用
+正解: B
+解説: 初回access時まで初期化を延期。
+
+---
+
+## 25. Method・mutating・Subscript [Intermediate]
+
+概要: 型に紐づく処理と、[]による独自accessを理解する。
+考え方: Methodは『その型にできること』、Subscriptは『[]でaccessする窓口』。
+
+重要ポイント:
+- instance/type methodがある。
+- struct/enumで自身を変更するmethodにはmutating。
+- static/classでtype method。
+- subscriptで独自[] access。
+
+コード:
+```swift
+struct Counter{
+ var value=0
+ mutating func increment(){value+=1}
+}
+```
+
+なぜ重要か: 標準libraryやframework APIを読むとき、変更性と所有者を理解できる。
+注意: 値型のmethodからstored propertyを変える場合はmutatingが必要。
+
+確認問題:
+Q1. structでselfを変更するmethodに必要なのは？ [Intermediate]
+```swift
+struct C{var n=0; /* ? */ func up(){n+=1}}
+```
+A. weak
+B. mutating
+C. override
+D. async
+正解: B
+解説: 値型の自身を変更するmethodはmutating。
+
+Q2. subscriptの目的は？ [Intermediate]
+```swift
+value[index]
+```
+A. []形式の独自access API
+B. 継承禁止
+C. 非同期化
+D. ARC停止
+正解: A
+解説: []で値へaccessするAPIを定義できる。
+
+---
+
+## 26. Initialization・Failable init・deinit [Intermediate]
+
+概要: instanceが有効な状態で生成され、必要な後処理が行われる仕組みを理解する。
+考え方: initは有効なinstanceを完成させる責任を持つ。
+
+重要ポイント:
+- stored propertyは初期化完了までに値を持つ。
+- init?は失敗してnilを返せる。
+- classではdesignated/convenience initializerがある。
+- deinitはclass破棄時のcleanup。
+
+コード:
+```swift
+struct Age{
+ let value:Int
+ init?(_ value:Int){guard value>=0 else{return nil}; self.value=value}
+}
+```
+
+なぜ重要か: 不正状態を生成時点で防ぐ設計に使える。
+注意: class継承時の初期化規則は厳密。
+
+確認問題:
+Q1. Age(-1) の結果は？ [Intermediate]
+```swift
+struct Age{let v:Int;init?(_ v:Int){guard v>=0 else{return nil};self.v=v}}
+let age=Age(-1)
+```
+A. Age
+B. Age?のnil
+C. Int -1
+D. エラー
+正解: B
+解説: failable initializerがnilを返す。
+
+Q2. deinitを持てる代表型は？ [Intermediate]
+```swift
+deinit { }
+```
+A. class
+B. structだけ
+C. enumだけ
+D. Tuple
+正解: A
+解説: deinitはclass instance破棄時。
+
+---
+
+## 27. Extension [Intermediate]
+
+概要: 既存型へ機能やProtocol準拠を追加する。
+考え方: 元の型定義を巨大化させず、責務や準拠ごとに分けられる。
+
+重要ポイント:
+- computed property/method/initializerなどを追加。
+- Protocol準拠を分離。
+- stored propertyは追加不可。
+- 標準型にも機能追加できる。
+
+コード:
+```swift
+extension String{
+ var isBlank:Bool{trimmingCharacters(in:.whitespacesAndNewlines).isEmpty}
+}
+```
+
+なぜ重要か: UIKit delegate準拠の分離やmodel機能整理で非常によく使う。
+注意: 便利Extensionを無制限に増やすとAPIが乱立する。
+
+確認問題:
+Q1. Extensionで追加できないものは？ [Intermediate]
+```swift
+extension User { /* ? */ }
+```
+A. method
+B. computed property
+C. Protocol準拠
+D. 新しいstored property
+正解: D
+解説: stored propertyは追加できない。
+
+Q2. 準拠をExtensionに分ける利点は？ [Intermediate]
+```swift
+extension Screen:UITableViewDelegate { }
+```
+A. 責務ごとに整理
+B. 必ず高速
+C. 継承不要確定
+D. Optional化
+正解: A
+解説: 関連実装をまとまりとして分けられる。
+
+---
+
+## 28. Protocol・Protocol Extension [Intermediate]
+
+概要: 具体型ではなく『満たすべき能力・契約』でコードを組み立てる。
+考え方: Protocolは『何者か』より『何ができるか』を表す契約。
+
+重要ポイント:
+- property/method要件を定義。
+- struct/class/enumが準拠できる。
+- Protocol Extensionで共通実装。
+- 複数Protocolを合成できる。
+
+コード:
+```swift
+protocol IdentifiableItem{var id:String{get}}
+struct Item:IdentifiableItem{let id:String}
+```
+
+なぜ重要か: DI、Repository、test doubleなど実アプリ設計の基礎。
+注意: 何でもProtocol化すると複雑になる。変更境界がある場所で使う。
+
+確認問題:
+Q1. Protocol準拠できる型は？ [Intermediate]
+```swift
+protocol Named{var name:String{get}}
+```
+A. classだけ
+B. structだけ
+C. struct/class/enumなど
+D. Tupleだけ
+正解: C
+解説: 複数種類の型が準拠できる。
+
+Q2. Protocolの主目的は？ [Intermediate]
+```swift
+protocol Loading{func load()}
+```
+A. 必要な能力/要件を定義
+B. instanceを保存
+C. JSON化
+D. UI描画
+正解: A
+解説: 準拠型が満たす契約を表す。
+
+---
+
+## 29. Generics・Constraint・where [Intermediate]
+
+概要: 具体型を固定せず、型安全な再利用コードを書く。
+考え方: 『何型でも』ではなく『必要条件を満たす型なら』使える設計。
+
+重要ポイント:
+- 型Parameter Tを使う。
+- Protocol constraintで必要能力を要求。
+- where句で型関係を表現。
+- Array/Dictionaryもgeneric型。
+
+コード:
+```swift
+func maximum<T:Comparable>(_ a:T,_ b:T)->T{a>b ? a:b}
+```
+
+なぜ重要か: 標準library、SwiftUI、Repository抽象化の型を読むために必須。
+注意: generic化しすぎるとsignatureが難しくなる。
+
+確認問題:
+Q1. T: Comparable の意味は？ [Intermediate]
+```swift
+func maxValue<T:Comparable>(_ a:T,_ b:T)->T
+```
+A. TはInt
+B. TはComparable準拠
+C. Tはclass
+D. TはOptional
+正解: B
+解説: 比較可能な型というconstraint。
+
+Q2. Array<Int> の Int は？ [Intermediate]
+```swift
+Array<Int>
+```
+A. generic型引数
+B. Protocol名
+C. 関数名
+D. access level
+正解: A
+解説: Arrayへ要素型Intを指定している。
+
+---
+
+## 30. associatedtype・any・some [Intermediate]
+
+概要: Protocolを値として扱うexistentialと、具体型を隠すopaque typeを区別する。
+考え方: `any P`はP準拠値を入れる箱、`some P`は具体型を1つに固定し外から隠す。
+
+重要ポイント:
+- associatedtypeで関連型を抽象化。
+- any Protocolはexistential。
+- some Protocolはopaque result type。
+- some Viewは代表例。
+
+コード:
+```swift
+protocol Store{associatedtype Item;func load()->Item}
+func makeView()->some View{Text("Hello")}
+```
+
+なぜ重要か: SwiftUIやmodern Swift APIで頻出。
+注意: anyとsomeは型情報の扱いが異なる。
+
+確認問題:
+Q1. some View の説明は？ [Intermediate]
+```swift
+func makeView()->some View{Text("A")}
+```
+A. 毎回異なる型可
+B. 具体型を隠しつつ1つの具体型
+C. Anyと同じ
+D. Optional
+正解: B
+解説: opaque typeは実装側で具体型が固定。
+
+Q2. any P の意味は？ [Intermediate]
+```swift
+let value:any P
+```
+A. P準拠値を保持できるexistential
+B. Pを継承するclassだけ
+C. Macro
+D. static member
+正解: A
+解説: 準拠する具体型を包んで扱う。
+
+---
+
+## 31. Type Casting・is / as? / as!・Any [Intermediate]
+
+概要: 実行時の型を確認し、より具体的な型へ安全に変換する。
+考え方: 静的型だけでは分からない値をruntimeで確認する操作。
+
+重要ポイント:
+- isで型判定。
+- as?は失敗時nil。
+- as!は失敗時crash。
+- Anyは多様な値を保持するが型安全性が下がる。
+
+コード:
+```swift
+let value:Any="Swift"
+if let text=value as? String{print(text.count)}
+```
+
+なぜ重要か: UIKitやObjective-C連携、汎用dataで遭遇する。
+注意: as!を安易に使わない。
+
+確認問題:
+Q1. 安全なdowncastは？ [Intermediate]
+```swift
+let value:Any="Swift"
+```
+A. value as! Int
+B. value as? String
+C. value is String!
+D. value -> String
+正解: B
+解説: as?は失敗時nil。
+
+Q2. is の結果型は？ [Intermediate]
+```swift
+let r=value is String
+```
+A. String
+B. Bool
+C. String?
+D. Any
+正解: B
+解説: 型判定結果はBool。
+
+---
+
+## 32. Access Control・Module・File [Intermediate]
+
+概要: 型やAPIをどこから見えるようにするか設計する。
+考え方: Access Controlは変更可能な境界を小さくし、安全にする。
+
+重要ポイント:
+- private/fileprivate/internal/public/open。
+- internalが通常の既定。
+- publicは他Moduleから利用可能。
+- openは他Moduleからsubclass/overrideも許可。
+
+コード:
+```swift
+public struct APIClient{
+ public init(){}
+ private let token="..."
+}
+```
+
+なぜ重要か: Package分割、SDK、test、アプリ内部境界に重要。
+注意: 全部publicにしない。最小限の公開を基本にする。
+
+確認問題:
+Q1. 既定access levelは？ [Intermediate]
+```swift
+struct User{}
+```
+A. private
+B. fileprivate
+C. internal
+D. public
+正解: C
+解説: 通常internal。
+
+Q2. openとpublicの違いの1つは？ [Intermediate]
+```swift
+open class Base{}
+```
+A. openは他Moduleからsubclass/override可能
+B. openはprivateより狭い
+C. publicはclass不可
+D. 違いなし
+正解: A
+解説: openは継承/overrideまで許可。
+
+---
+
+## 33. KeyPath・Property Wrapper・Result Builder [Intermediate]
+
+概要: SwiftUI周辺で頻出する高度な言語機能の役割を理解する。
+考え方: 繰り返しpatternを型安全に表現する仕組み。
+
+重要ポイント:
+- KeyPathはpropertyへの参照。
+- Property Wrapperは保存/取得ruleを再利用。
+- @State等はWrapper構文。
+- Result Builderは複数式からDSL構造を作る。
+
+コード:
+```swift
+let kp=\User.name
+let name=user[keyPath:kp]
+```
+
+なぜ重要か: SwiftUIの@State/@ViewBuilderを魔法ではなくSwiftの仕組みとして理解できる。
+注意: wrappedValueとprojectedValue($)を混同しない。
+
+確認問題:
+Q1. \User.name は？ [Intermediate]
+```swift
+let kp=\User.name
+```
+A. KeyPath
+B. Closure
+C. Macro
+D. Protocol
+正解: A
+解説: propertyを指すKeyPath。
+
+Q2. $value がWrapperで表すことがあるものは？ [Intermediate]
+```swift
+@State var value=0
+```
+A. projectedValue
+B. 必ずInt
+C. deinit
+D. subscript
+正解: A
+解説: $はprojectedValueへのaccess。
+
+---
+
+## 34. Macro [Intermediate]
+
+概要: コンパイル時にSwiftコードを生成するMacroを理解する。
+考え方: Macroはcompile前に展開され、繰り返しcodeを生成する。
+
+重要ポイント:
+- #で始まるfreestanding Macro。
+- @で付けるattached Macro。
+- @Modelや#expectで遭遇する。
+- 展開結果もSwiftとして型check。
+
+コード:
+```swift
+@Model
+final class Item{var name:String;init(name:String){self.name=name}}
+```
+
+なぜ重要か: 現代のApple開発ではMacroを使うAPIが増えている。
+注意: runtime reflectionではなくcompile-time code generation。
+
+確認問題:
+Q1. Macroが動作する主なtimingは？ [Intermediate]
+```swift
+@Model final class Item{}
+```
+A. compile時
+B. app終了後
+C. Git push時だけ
+D. tap時だけ
+正解: A
+解説: compile時に展開される。
+
+Q2. Swift TestingのMacro例は？ [Intermediate]
+```swift
+#expect(value == 3)
+```
+A. #expect
+B. print
+C. if
+D. import
+正解: A
+解説: #expectはMacro。
+
+---
+
+## 35. Bitwise・Overflow・Custom Operator [Intermediate]
+
+概要: 低levelやlibraryで出会う演算子機能を理解する。
+考え方: 演算子も型に対して定義でき、bit演算では整数の各bitを直接扱う。
+
+重要ポイント:
+- & | ^ ~ << >>はbitwise。
+- &+ &- &*はoverflow演算。
+- 独自operatorを定義可能。
+- precedence groupで優先順位定義。
+
+コード:
+```swift
+let flags=0b0011
+let mask=0b0101
+let result=flags & mask
+```
+
+なぜ重要か: flag、binary形式、低level APIで遭遇する。
+注意: 独自operatorの乱用は可読性を落とす。
+
+確認問題:
+Q1. & の役割は？ [Intermediate]
+```swift
+let r=0b0011 & 0b0101
+```
+A. 論理ANDと同じ
+B. bitwise AND
+C. 文字列結合
+D. unwrap
+正解: B
+解説: bitごとのAND。
+
+Q2. 独自operatorで最優先は？ [Intermediate]
+```swift
+infix operator <+>
+```
+A. 短さ
+B. 意味が明確で読みやすいこと
+C. 必ずpublic
+D. 常に使う
+正解: B
+解説: 標準的な関数より分かりやすい場合に限る。
+
+---
+
+## 36. Memory Safety・Exclusive Access [Intermediate]
+
+概要: Swiftが不正なmemory accessや重複変更を防ぐ仕組みを理解する。
+考え方: 自動memory管理でも、同じ値を同時にどう触るかには安全ruleがある。
+
+重要ポイント:
+- 未初期化/範囲外/解放後accessを防ぐ。
+- inoutは長時間のwrite accessになり得る。
+- 重複write accessを制限。
+- 並行data race対策とも関連。
+
+コード:
+```swift
+func balance(_ x:inout Int,_ y:inout Int){
+ let total=x+y
+ x=total/2
+ y=total-x
+}
+```
+
+なぜ重要か: Swiftの安全性の根本。inoutやConcurrency error理解につながる。
+注意: 同じ変数を複数inoutへ同時に渡す等は許可されない。
+
+確認問題:
+Q1. Memory Safetyの目的は？ [Intermediate]
+```swift
+var values=[1,2,3]
+```
+A. 無効/競合memory accessを防ぐ
+B. UI自動配置
+C. 通信暗号化
+D. Git conflict防止
+正解: A
+解説: Swiftはmemory accessの安全性を保証する。
+
+Q2. swapLike(&x,&x) の問題は？ [Intermediate]
+```swift
+swapLike(&x,&x)
+```
+A. 重複した排他的accessになり得る
+B. 必ず高速
+C. Optional化
+D. 問題なし
+正解: A
+解説: 同じmemoryへのoverlapping write accessになる。
+
+---

@@ -1,0 +1,284 @@
+# UIKit
+
+UIView / UIViewController / Auto Layout / Delegateなど、UIKit特有の考え方をSwiftと分けて学ぶ。
+
+このファイルは人が読みやすい教材原本です。構造化データは content.json、完成版は index.html です.
+
+## 01. UIView・UIViewController [Beginner]
+
+概要: UIKitの主要な責務分担を理解する。
+考え方: UIViewは見た目と描画、UIViewControllerは画面のライフサイクルやView群の管理を担う。
+
+重要ポイント:
+- UIView は画面部品の基本クラス。
+- UIViewController は画面単位の管理を担う。
+- UIKit はclassと参照セマンティクスが中心。
+- コードベースUIではViewを生成して階層へ追加する。
+
+コード:
+```swift
+final class ProfileViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+    }
+}
+```
+
+なぜ重要か: UIKitコードを読むとき、Swiftのclass機能とUIKitのフレームワーク機能を分離して理解する必要がある。
+注意: `override` はUIKit専用構文ではなくSwiftの継承機能。
+
+確認問題:
+Q1. UIViewControllerの主な役割は？ [Beginner]
+```swift
+final class ScreenVC: UIViewController {}
+```
+A. データベースだけを管理
+B. 画面とView群のライフサイクルを管理
+C. Swiftコンパイラを実行
+D. Gitを管理
+正解: B
+解説: UIViewControllerは画面に関するView階層や表示ライフサイクルなどを管理する中心クラス。
+
+Q2. `override` は何を表す？ [Basic]
+```swift
+override func viewDidLoad() { }
+```
+A. 親クラスのメソッドを上書きする
+B. Optionalにする
+C. 非同期化する
+D. Protocolを作る
+正解: A
+解説: UIViewControllerが持つviewDidLoadをサブクラスでオーバーライドして独自処理を追加している。
+
+---
+
+## 02. ViewController Lifecycle [Basic]
+
+概要: 画面が生成・表示・非表示になるタイミングを読む。
+考え方: 『一度だけ準備したい処理』と『表示されるたびに必要な処理』を分ける。
+
+重要ポイント:
+- viewDidLoad はViewロード後に初期設定を行う代表的な場所。
+- viewWillAppear は表示直前。
+- viewDidAppear は表示完了後。
+- viewWillDisappear / viewDidDisappear も存在する。
+
+コード:
+```swift
+override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    reloadData()
+}
+```
+
+なぜ重要か: 処理を置く場所を間違えると、更新されない・毎回重い処理が走るなどのバグになる。
+注意: viewDidLoad が「画面が表示されるたび」に呼ばれるとは限らない。
+
+確認問題:
+Q1. 表示される直前に毎回更新したい処理の候補は？ [Basic]
+```swift
+// override func ?(_ animated: Bool)
+```
+A. viewDidLoad
+B. viewWillAppear
+C. deinit
+D. init(coder:)
+正解: B
+解説: viewWillAppearは画面が表示される直前に呼ばれる。戻ってきた際の更新などに使われることが多い。
+
+Q2. viewDidLoadについて正しいものは？ [Basic]
+```swift
+override func viewDidLoad() {
+    super.viewDidLoad()
+}
+```
+A. 画面表示のたび必ず呼ばれる
+B. Viewがロードされた後の初期設定でよく使う
+C. アプリ終了時だけ呼ばれる
+D. Auto Layoutを無効にする
+正解: B
+解説: viewDidLoadはViewロード完了後の初期セットアップに使われる。表示のたびに呼ばれる前提にはしない。
+
+---
+
+## 03. Auto Layout・Constraints [Basic]
+
+概要: 固定座標ではなくView同士の関係でレイアウトを定義する。
+考え方: Constraintは『位置』ではなく『関係式』。leadingが親のleadingから16pt、など。
+
+重要ポイント:
+- translatesAutoresizingMaskIntoConstraints = false をコードレイアウトで使う。
+- NSLayoutConstraint.activate で複数制約を有効化。
+- Safe Area を基準にする場合が多い。
+- 不足・矛盾した制約をデバッグできるようにする。
+
+コード:
+```swift
+label.translatesAutoresizingMaskIntoConstraints = false
+NSLayoutConstraint.activate([
+    label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+    label.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+])
+```
+
+なぜ重要か: 画面サイズ・Dynamic Type・回転などに適応するUIKitの基本。
+注意: 制約を増やせば良いわけではない。必要十分で矛盾しない関係を作る。
+
+確認問題:
+Q1. コードでAuto Layout制約を張る際によく行う設定は？ [Basic]
+```swift
+label.________ = false
+```
+A. isHidden
+B. translatesAutoresizingMaskIntoConstraints
+C. clipsToBounds
+D. isUserInteractionEnabled
+正解: B
+解説: Autoresizing Maskから自動生成される制約との競合を避けるため false にするのが基本。
+
+Q2. この制約が表すものは？ [Intermediate]
+```swift
+label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16)
+```
+A. labelの幅を16にする
+B. label左端を親View左端から16ptにする
+C. labelを中央にする
+D. 高さを16にする
+正解: B
+解説: leadingAnchor同士の関係にconstant 16を設定しているため、親Viewのleadingから16pt離す。
+
+---
+
+## 04. Target-Action・Delegate [Intermediate]
+
+概要: UIKitでイベントや責務を別オブジェクトへ伝える代表的パターン。
+考え方: Target-Actionはイベント→処理、Delegateは『判断や処理を別オブジェクトに任せる』契約。
+
+重要ポイント:
+- UIButtonなどはTarget-Actionでイベントを処理できる。
+- Delegateはprotocolで契約を表すことが多い。
+- delegateはweak参照になる設計が多い。
+- UIKitの多くのAPIでDataSource / Delegateが使われる。
+
+コード:
+```swift
+button.addTarget(self, action: #selector(didTapButton), for: .touchUpInside)
+```
+
+なぜ重要か: UIKit既存コードを読むと必ず遭遇する。SwiftのProtocolとUIKitのDelegateパターンを結び付ける。
+注意: DelegateとNotification、Closureはすべて同じではない。依存方向や1対1/1対多などの性質が違う。
+
+確認問題:
+Q1. Delegateパターンの説明として最も近いものは？ [Intermediate]
+```swift
+weak var delegate: FormViewDelegate?
+```
+A. 処理の一部を別オブジェクトへ委譲する
+B. 必ず配列を作る
+C. 画面を自動保存する
+D. SwiftUIへ変換する
+正解: A
+解説: Delegateはprotocolなどで定義した契約を通じ、イベントや判断を別オブジェクトへ委譲する設計。
+
+Q2. UIButtonのタップ処理で使われる代表的仕組みは？ [Intermediate]
+```swift
+button.addTarget(self, action: ..., for: .touchUpInside)
+```
+A. Target-Action
+B. ARCのみ
+C. Generics
+D. Codable
+正解: A
+解説: UIControl系ではTarget-Actionが代表的。イベント発生時に指定したactionが呼ばれる。
+
+---
+
+## 05. UITableView・UICollectionView [Intermediate]
+
+概要: 大量のセルを再利用しながら一覧表示する。
+考え方: 画面に必要なセルを再利用することで、全件分のViewを常時保持しない。
+
+重要ポイント:
+- Cell Reuse が重要。
+- DataSourceは表示データを提供する役割。
+- Delegateは選択やレイアウトなどを扱う。
+- Diffable Data SourceではSnapshotで差分を表現できる。
+
+コード:
+```swift
+let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+```
+
+なぜ重要か: UIKitアプリの一覧画面で頻出。パフォーマンスとIdentityの理解につながる。
+注意: セルは再利用される。以前の状態が残らないようconfigure時に必要な状態を毎回設定する。
+
+確認問題:
+Q1. セル再利用の主な目的は？ [Intermediate]
+```swift
+dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+```
+A. すべてのセルを同時生成するため
+B. 必要なセルを再利用して効率化するため
+C. ネット通信を行うため
+D. Auto Layoutを無効にするため
+正解: B
+解説: 画面外のセルを再利用してView生成・メモリコストを抑えるのが基本。
+
+Q2. 再利用セルで注意することは？ [Intermediate]
+```swift
+func configure(with model: Item) { ... }
+```
+A. 以前の表示状態が残らないよう毎回設定する
+B. 一度設定したら変更しない
+C. 必ずglobal変数を使う
+D. IDを毎フレーム変える
+正解: A
+解説: セルは別データ用に再利用されるため、画像・ラベル・選択状態など必要な表示状態をconfigure時に確実に更新する。
+
+---
+
+## 06. SwiftUIとの共存・設計 [Intermediate]
+
+概要: UIKitとSwiftUIを段階的に混在させる。
+考え方: アプリ全体を一度に置き換える必要はない。画面・部品単位で境界を作れる。
+
+重要ポイント:
+- UIHostingControllerでSwiftUI ViewをUIKit側に載せられる。
+- UIViewRepresentableでUIViewをSwiftUI側に橋渡しできる。
+- 既存UIKitアプリへ段階的にSwiftUIを導入できる。
+- 境界では状態・ライフサイクル・所有関係を明確にする。
+
+コード:
+```swift
+let controller = UIHostingController(rootView: ProfileView())
+navigationController?.pushViewController(controller, animated: true)
+```
+
+なぜ重要か: 実務ではUIKit既存資産とSwiftUI新規画面が混在するケースが多い。
+注意: ラッパーを作るだけで設計問題が消えるわけではない。状態の同期方法を決める。
+
+確認問題:
+Q1. UIHostingControllerの用途は？ [Intermediate]
+```swift
+UIHostingController(rootView: MySwiftUIView())
+```
+A. SwiftUI ViewをUIKitのViewControllerとして扱う
+B. UIKitを削除する
+C. JSONを保存する
+D. Auto Layoutを禁止する
+正解: A
+解説: UIHostingControllerはSwiftUI Viewをホストし、UIKitのViewController階層へ組み込むために使える。
+
+Q2. UIViewRepresentableの用途は？ [Intermediate]
+```swift
+struct LegacyMapView: UIViewRepresentable { ... }
+```
+A. UIViewをSwiftUIで利用できるよう橋渡しする
+B. classをenumに変換する
+C. GitHubへpushする
+D. Optionalを削除する
+正解: A
+解説: UIViewRepresentableはUIKitのUIViewをSwiftUIのView階層へ組み込むための橋渡し。
+
+---

@@ -1,0 +1,566 @@
+# Concurrency & Memory
+
+Error Handling、ARC、weak/unowned、async/await、Task、Actor、MainActor、SendableまでSwift Concurrencyとメモリ管理を学ぶ。
+
+このファイルは人が読みやすい教材原本です。構造化データは content.json、完成版は index.html です.
+
+## 01. Error Handling・throws / do-catch / defer [Basic]
+
+概要: 失敗する処理を型と制御フローで明示的に扱う。
+考え方: Errorは『想定外でcrash』ではなく『この操作は失敗し得る』ことをAPIに表す。
+
+重要ポイント:
+- Error準拠型で失敗理由。
+- throws関数をtryで呼ぶ。
+- do-catchで回復。
+- deferでscope終了時の後処理。
+
+コード:
+```swift
+enum LoadError:Error{case invalid}
+func load() throws -> String { throw LoadError.invalid }
+do { _=try load() } catch { print(error) }
+```
+
+なぜ重要か: network、file、decode、永続化など失敗するI/Oで必須。
+注意: try?で何でもnil化するとerror理由が消える。
+
+確認問題:
+Q1. throws関数の通常呼び出しに必要なのは？ [Basic]
+```swift
+func load() throws -> String{"OK"}
+let x=/* ? */ load()
+```
+A. try
+B. await
+C. weak
+D. mutating
+正解: A
+解説: throws関数はtryで呼ぶ。
+
+Q2. deferはいつ実行？ [Basic]
+```swift
+func f(){defer{print("end")};print("body")}
+```
+A. scopeを抜ける直前
+B. 最初
+C. compile時
+D. 実行されない
+正解: A
+解説: scope終了時に実行。
+
+---
+
+## 02. Result<Success, Failure> [Basic]
+
+概要: 成功/失敗を値として持ち運ぶResult型を理解する。
+考え方: throwsが制御フローなら、Resultは成功/失敗をdataとして保持する。
+
+重要ポイント:
+- .success(value) / .failure(error)。
+- completion APIで頻出。
+- get()で成功値取得またはthrow。
+- async throwsへ移行できる場合も多い。
+
+コード:
+```swift
+func load(completion:(Result<Data,Error>)->Void){ }
+```
+
+なぜ重要か: legacy callback APIやlibraryで頻出。
+注意: throwsとResultは用途が違う。失敗を値として保持したいかで考える。
+
+確認問題:
+Q1. Resultの主要caseは？ [Basic]
+```swift
+Result<Int,Error>
+```
+A. success/failure
+B. some/none
+C. on/off
+D. left/right
+正解: A
+解説: 成功と失敗をenum caseで表す。
+
+Q2. result.get() がfailure時どうなる？ [Intermediate]
+```swift
+try result.get()
+```
+A. Errorをthrow
+B. nil固定
+C. 0
+D. compile error
+正解: A
+解説: 保持Errorをthrowする。
+
+---
+
+## 03. ARC・Object Lifetime [Intermediate]
+
+概要: class instanceの寿命をreference countで管理する仕組みを理解する。
+考え方: ARCは『誰かが強く必要としている間だけclassを生かす』仕組み。
+
+重要ポイント:
+- strong reference中は保持。
+- referenceがなくなるとdeinit。
+- structの値semanticsとは別。
+- 循環参照は自動解消できない。
+
+コード:
+```swift
+final class User{deinit{print("deinit")}}
+var user:User?=User()
+user=nil
+```
+
+なぜ重要か: UIKit、delegate、closure、service lifetime理解に必須。
+注意: ARCはGCのように循環を自動検出して回収しない。
+
+確認問題:
+Q1. class instanceが通常解放される条件は？ [Intermediate]
+```swift
+var obj:MyClass?=MyClass()
+obj=nil
+```
+A. strong referenceがなくなる
+B. 1秒経つ
+C. GCが必ず検出
+D. let使用
+正解: A
+解説: ARCはstrong reference countに基づく。
+
+Q2. ARCが自動解決できない代表問題は？ [Intermediate]
+```swift
+a.b=b; b.a=a
+```
+A. strong reference cycle
+B. Int加算
+C. Array sort
+D. URL encoding
+正解: A
+解説: 相互strong参照で解放されない。
+
+---
+
+## 04. weak・unowned・Closure Capture [Intermediate]
+
+概要: 参照循環を避ける非所有参照とcapture listを理解する。
+考え方: 所有関係を『強く持つ』『存在する間だけ弱く見る』に分ける。
+
+重要ポイント:
+- weakは通常Optionalで対象解放時nil。
+- unownedは対象生存を前提。
+- delegateをweakにする設計が多い。
+- capture listでself保持方法を指定。
+
+コード:
+```swift
+final class Child{weak var parent:Parent?}
+```
+
+なぜ重要か: delegate、completion、Coordinatorなどでmemory leakを防ぐ。
+注意: weak/unownedはlifetime保証で使い分ける。
+
+確認問題:
+Q1. weak対象が解放されると？ [Intermediate]
+```swift
+weak var owner:Owner?
+```
+A. nilになる
+B. 必ずcrash
+C. strongへ変化
+D. copy
+正解: A
+解説: zeroing weak referenceでnilになる。
+
+Q2. unownedの前提は？ [Intermediate]
+```swift
+unowned let owner:Owner
+```
+A. 参照中は対象が生存保証
+B. いつでもnil
+C. 値型だけ
+D. MainActor必須
+正解: A
+解説: 対象lifetimeがより長いと保証できる場合。
+
+---
+
+## 05. async / await [Basic]
+
+概要: 非同期処理を直線的なcodeとして書く基本を理解する。
+考え方: awaitは『Taskが一時中断され後で再開する可能性』を示す。
+
+重要ポイント:
+- async関数は非同期完了。
+- awaitはsuspension point。
+- async throwsならtry await。
+- async=必ず別threadではない。
+
+コード:
+```swift
+func load() async throws -> User{
+ try await api.fetchUser()
+}
+```
+
+なぜ重要か: URLSessionなどmodern Swift開発の中心。
+注意: await前後で同じthreadとは限らない。
+
+確認問題:
+Q1. awaitが示すものは？ [Basic]
+```swift
+let user=try await load()
+```
+A. Taskが中断され得る地点
+B. 必ずnew thread
+C. Error無視
+D. 同期化
+正解: A
+解説: suspension point。
+
+Q2. async throwsの呼び出しは？ [Basic]
+```swift
+func load() async throws -> Data
+```
+A. try await load()
+B. await?だけ
+C. weak load()
+D. load!()
+正解: A
+解説: throwとasyncの両方を扱う。
+
+---
+
+## 06. async let・Structured Concurrency [Intermediate]
+
+概要: 独立した複数処理を並行に進め、親子Task構造を保つ。
+考え方: 独立して待てる処理は同時開始し最後にまとめてawaitできる。
+
+重要ポイント:
+- async letでchild task開始。
+- 親scopeとchild lifetimeが結び付く。
+- latencyを重ねられる。
+- 依存処理を無理に並行化しない。
+
+コード:
+```swift
+async let user=api.fetchUser()
+async let posts=api.fetchPosts()
+let result=try await (user,posts)
+```
+
+なぜ重要か: 複数APIや画像loadで待ち時間を短縮できる。
+注意: 同じmutable stateを複数childから変更しない。
+
+確認問題:
+Q1. async letが向くのは？ [Intermediate]
+```swift
+async let a=loadA()
+async let b=loadB()
+```
+A. 互いに独立した非同期処理
+B. 順番依存処理
+C. 同期定数だけ
+D. Auto Layout
+正解: A
+解説: 独立処理を並行開始できる。
+
+Q2. Structured Concurrencyの利点は？ [Intermediate]
+```swift
+withTaskGroup{...}
+```
+A. Task lifetimeが親子構造で管理
+B. Taskが永久に残る
+C. ARC不要
+D. HTTP不要
+正解: A
+解説: child taskがscopeに構造化される。
+
+---
+
+## 07. Task・Priority・Cancellation [Intermediate]
+
+概要: Taskを開始し、キャンセル可能な処理として扱う。
+考え方: Cancellationは強制停止ではなく『もう結果が不要』という協調的signal。
+
+重要ポイント:
+- Task{}で新task。
+- Task.isCancelled / checkCancellation()。
+- 一部async APIはcancelをthrow。
+- 画面消失時など不要処理をcancel。
+
+コード:
+```swift
+let task=Task{
+ try Task.checkCancellation()
+ return try await load()
+}
+task.cancel()
+```
+
+なぜ重要か: 検索、画像load、画面遷移で古いrequestを捨てる時に重要。
+注意: cancel()で任意codeが即停止するわけではない。
+
+確認問題:
+Q1. Task cancellationの性質は？ [Intermediate]
+```swift
+task.cancel()
+```
+A. 協調的signal
+B. 任意命令を即強制終了
+C. app終了
+D. thread kill保証
+正解: A
+解説: 処理側が確認/反応する。
+
+Q2. cancelをthrowとして確認するAPIは？ [Intermediate]
+```swift
+try Task.checkCancellation()
+```
+A. CancellationErrorをthrow可能
+B. Boolだけ
+C. UIを閉じる
+D. Git reset
+正解: A
+解説: cancel済みならErrorをthrowする。
+
+---
+
+## 08. TaskGroup [Intermediate]
+
+概要: 動的な数のchild taskを並行実行し、結果を集約する。
+考え方: async letが固定個数ならTaskGroupは実行時に増減する仕事の集合。
+
+重要ポイント:
+- withTaskGroup / withThrowingTaskGroup。
+- group.addTaskで追加。
+- 結果は完了順に取得され得る。
+- 親scopeでchild終了を管理。
+
+コード:
+```swift
+let values=await withTaskGroup(of:Int.self){group in
+ for n in 1...3{group.addTask{n*2}}
+ return await group.reduce(into:[]){$0.append($1)}
+}
+```
+
+なぜ重要か: 複数画像や複数endpointなど動的並行処理に使う。
+注意: 入力順と完了順は一致しないことがある。
+
+確認問題:
+Q1. TaskGroup結果順について正しいのは？ [Intermediate]
+```swift
+for await value in group { }
+```
+A. 完了順になり得る
+B. 必ず追加順
+C. 必ず逆順
+D. 取得不可
+正解: A
+解説: taskは並行実行される。
+
+Q2. TaskGroupが向くのは？ [Intermediate]
+```swift
+for url in urls{group.addTask{...}}
+```
+A. 動的個数の並行task
+B. 1個の同期計算だけ
+C. Auto Layout
+D. ARC解放
+正解: A
+解説: runtimeで数が決まる並行処理。
+
+---
+
+## 09. Actor・Isolation [Intermediate]
+
+概要: 共有mutable stateをactor isolationで保護する。
+考え方: actorは『この状態を触る入口を1列にする』イメージ。
+
+重要ポイント:
+- actorは参照型だがstate accessが制御される。
+- 外部からawaitが必要な場合。
+- data raceを防ぐ。
+- await中のreentrancyに注意。
+
+コード:
+```swift
+actor Counter{
+ private var value=0
+ func increment(){value+=1}
+ func current()->Int{value}
+}
+```
+
+なぜ重要か: cache、共有service、並行更新で重要。
+注意: actor内の処理全体がtransactionになるわけではない。
+
+確認問題:
+Q1. actorの主目的は？ [Intermediate]
+```swift
+actor Store{var items:[Item]=[]}
+```
+A. 共有mutable stateをisolationで保護
+B. UI描画
+C. JSON encode
+D. class継承
+正解: A
+解説: 並行accessから内部stateを隔離する。
+
+Q2. actor外からisolated methodを呼ぶ時一般に必要なのは？ [Intermediate]
+```swift
+let v=/* ? */ counter.current()
+```
+A. await
+B. weak
+C. override
+D. mutating
+正解: A
+解説: actor境界を越えるためawaitが必要な場合が多い。
+
+---
+
+## 10. MainActor・UI Isolation [Intermediate]
+
+概要: UI関連stateをMainActorへ隔離する考え方を理解する。
+考え方: MainActorはUIに関係する仕事を同じactor境界へまとめる。
+
+重要ポイント:
+- @MainActorで型/関数/propertyを隔離。
+- SwiftUI/UIKitのUI更新と関係。
+- 重いwork全部をMainActorで行わない。
+- MainActor.runを使う場合も。
+
+コード:
+```swift
+@MainActor
+final class ViewModel{
+ var title=""
+ func update(_ v:String){title=v}
+}
+```
+
+なぜ重要か: Swift 6 strict concurrencyでUI state更新errorを理解するために必須。
+注意: MainActorをmain threadという低level概念だけで覚えない。
+
+確認問題:
+Q1. @MainActorの意味は？ [Intermediate]
+```swift
+@MainActor final class VM{var state=0}
+```
+A. MainActorへisolate
+B. new thread固定
+C. ARC停止
+D. Optional化
+正解: A
+解説: MainActor isolationを付ける。
+
+Q2. 重いCPU処理をMainActorで行う問題は？ [Intermediate]
+```swift
+@MainActor func heavy(){...}
+```
+A. UI responsiveness悪化
+B. 必ず高速化
+C. 通信暗号化
+D. 問題なし
+正解: A
+解説: MainActorを長時間占有する。
+
+---
+
+## 11. Sendable・Strict Concurrency [Intermediate]
+
+概要: 並行境界を越えて安全に渡せる値を型で表す。
+考え方: Sendableは『別のConcurrency contextへ渡しても安全か』の契約。
+
+重要ポイント:
+- 値型は構成要素次第でSendableになりやすい。
+- mutable classは設計が難しい。
+- @Sendable closureでcapture安全性を検査。
+- Swift 6 modeでdata race診断が強化。
+
+コード:
+```swift
+struct User:Sendable{
+ let id:Int
+ let name:String
+}
+```
+
+なぜ重要か: actor/Task境界のcompiler errorを理解するために必要。
+注意: @unchecked Sendableをerror消し目的で使わない。
+
+確認問題:
+Q1. Sendableが表すものは？ [Intermediate]
+```swift
+struct Value:Sendable{}
+```
+A. 並行境界を安全に渡せる契約
+B. JSON保存
+C. View描画
+D. Hashable同義
+正解: A
+解説: Concurrency domain間のtransfer safety。
+
+Q2. @unchecked Sendableを慎重にする理由は？ [Intermediate]
+```swift
+final class Box:@unchecked Sendable{}
+```
+A. 安全性保証を自分で引き受ける
+B. compile不可
+C. UIKit専用
+D. 遅い
+正解: A
+解説: compilerの一部確認を開発者責任で迂回する。
+
+---
+
+## 12. Continuation・Callback Bridge [Intermediate]
+
+概要: completion handler型APIをasync/awaitへ橋渡しする。
+考え方: Continuationは『後でここからasync関数を再開する』ための橋。
+
+重要ポイント:
+- withCheckedContinuation系。
+- resumeは原則1回。
+- returning/throwingで結果返却。
+- 既にasync APIがあるなら無理にwrapしない。
+
+コード:
+```swift
+func load() async throws -> Data{
+ try await withCheckedThrowingContinuation{c in
+  legacyLoad{result in c.resume(with:result)}
+ }
+}
+```
+
+なぜ重要か: 古いUIKit/SDKのcallback APIとmodern Concurrencyをつなぐ。
+注意: resume漏れや複数resumeは重大bug。
+
+確認問題:
+Q1. Continuationの代表用途は？ [Intermediate]
+```swift
+withCheckedContinuation{c in ...}
+```
+A. callback APIをasyncへbridge
+B. Array sort
+C. Auto Layout
+D. Codable合成
+正解: A
+解説: callback形式をasyncへ変換する。
+
+Q2. resumeの重要ruleは？ [Intermediate]
+```swift
+c.resume(returning:value)
+```
+A. 原則ちょうど1回
+B. 何回でも
+C. 呼ばなくてよい
+D. main thread限定
+正解: A
+解説: async処理を正しく完了させるため1回resumeする。
+
+---

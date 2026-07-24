@@ -1,0 +1,738 @@
+# Foundation & Data
+
+Codable、JSON、Date、URL、HTTP、URLSession、File、UserDefaults、Regex、データモデリングなど実アプリのデータ処理を学ぶ。
+
+このファイルは人が読みやすい教材原本です。構造化データは content.json、完成版は index.html です.
+
+## 01. Equatable・Hashable・Comparable・Identifiable [Basic]
+
+概要: データ型が『比較できる・Set/Dictionaryで使える・順序比較できる・IDを持つ』能力を表す。
+考え方: 標準Protocol準拠は、型が何を保証するかを宣言すること。
+
+重要ポイント:
+- Equatableで==比較。
+- HashableでSet要素やDictionary Key。
+- Comparableで大小比較とsorted。
+- Identifiableで安定したid。
+
+コード:
+```swift
+struct User:Identifiable,Hashable{
+ let id:UUID
+ let name:String
+}
+```
+
+なぜ重要か: SwiftUI List、cache、重複排除、sortで頻出。
+注意: Hashableのidentityに関わる値を不適切に変更する設計は避ける。
+
+確認問題:
+Q1. Dictionary Keyに必要な代表Protocolは？ [Basic]
+```swift
+struct Key: /* ? */ {}
+```
+A. Hashable
+B. View
+C. Error
+D. Actor
+正解: A
+解説: Dictionary KeyはHashable。
+
+Q2. Identifiableが要求する中心propertyは？ [Basic]
+```swift
+struct Item:Identifiable{...}
+```
+A. id
+B. name
+C. hash
+D. body
+正解: A
+解説: 安定したidentifier idを提供する。
+
+---
+
+## 02. Codable・Encodable・Decodable [Basic]
+
+概要: Swift型とJSONなどの外部表現を相互変換する基本を学ぶ。
+考え方: Codableは『保存/通信できる形への変換契約』。
+
+重要ポイント:
+- Codable=Encodable+Decodable。
+- JSONDecoderでData→型。
+- JSONEncoderで型→Data。
+- propertyがCodableなら自動合成される場合が多い。
+
+コード:
+```swift
+struct User:Codable{
+ let id:Int
+ let name:String
+}
+```
+
+なぜ重要か: REST API、file保存、cacheの中心。
+注意: JSONの型やkeyがmodelと合わないとdecode失敗する。
+
+確認問題:
+Q1. Codableは何の組み合わせ？ [Basic]
+```swift
+struct User:Codable{}
+```
+A. Equatable+Hashable
+B. Encodable+Decodable
+C. View+Identifiable
+D. Error+Sendable
+正解: B
+解説: CodableはEncodableとDecodableのtypealias。
+
+Q2. JSON Data→Userは？ [Basic]
+```swift
+let user = try /* ? */
+```
+A. JSONEncoder().encode(User.self)
+B. JSONDecoder().decode(User.self,from:data)
+C. String(data)
+D. User(data)
+正解: B
+解説: JSONDecoderでDecodable型へdecodeする。
+
+---
+
+## 03. CodingKeys・Custom Codable [Intermediate]
+
+概要: JSON keyとSwift名が違う場合や特殊変換を制御する。
+考え方: 外部APIの形と、内部で読みやすいmodel名を無理に一致させなくてよい。
+
+重要ポイント:
+- CodingKeysでkey対応。
+- decoderのdate strategy等を利用。
+- 必要ならinit(from:)を自前実装。
+- DTOとDomain Modelを分ける設計も有効。
+
+コード:
+```swift
+struct UserDTO:Decodable{
+ let userID:Int
+ enum CodingKeys:String,CodingKey{case userID="user_id"}
+}
+```
+
+なぜ重要か: snake_case APIや特殊JSONを安全に扱う。
+注意: 外部API都合をapp全体のmodelへ漏らさない。
+
+確認問題:
+Q1. CodingKeysの役割は？ [Intermediate]
+```swift
+case userID="user_id"
+```
+A. Swift名とJSON keyを対応
+B. 暗号化
+C. Optional化
+D. HTTP header
+正解: A
+解説: 外部key名とSwift property名を対応付ける。
+
+Q2. DTOをDomain Modelと分ける利点は？ [Intermediate]
+```swift
+UserDTO -> User
+```
+A. API変更影響を内部から分離
+B. 必ず通信速度倍
+C. Codable不要
+D. UIKit専用
+正解: A
+解説: 外部形式との境界を作れる。
+
+---
+
+## 04. Data・JSON・Base64 [Basic]
+
+概要: FoundationのDataが生のbyte列を表すことを理解する。
+考え方: DataはJSONでも画像でもStringでもなく『byteのまとまり』。
+
+重要ポイント:
+- URLSession response bodyでDataを受ける。
+- String(data:encoding:)で文字列化可能な場合。
+- Base64へ変換可能。
+- 内容形式は文脈が必要。
+
+コード:
+```swift
+let data=Data("Swift".utf8)
+let text=String(data:data,encoding:.utf8)
+```
+
+なぜ重要か: 通信・file・画像などのI/Oで必須。
+注意: Dataだけ見ても中身のformatは分からない。
+
+確認問題:
+Q1. Dataが表すものは？ [Basic]
+```swift
+let data:Data
+```
+A. byte列
+B. 必ずJSON
+C. 必ずString
+D. View
+正解: A
+解説: Dataはbyte列。
+
+Q2. UTF-8 Data→Stringの代表例は？ [Basic]
+```swift
+String(data:data,encoding:.utf8)
+```
+A. 正しい
+B. 不可
+C. JSONDecoder専用
+D. UIKit専用
+正解: A
+解説: encodingを指定してStringとして解釈できる。
+
+---
+
+## 05. Date・Calendar・TimeZone [Basic]
+
+概要: 時刻の一点と、人間のcalendar上の年月日を分けて扱う。
+考え方: Dateは絶対時刻、Calendar/TimeZoneは年月日時分へ解釈する規則。
+
+重要ポイント:
+- Dateは特定の瞬間。
+- Calendarで日付成分の加減算。
+- TimeZoneで時差。
+- 固定秒数で1日を計算しない。
+
+コード:
+```swift
+let now=Date()
+let tomorrow=Calendar.current.date(byAdding:.day,value:1,to:now)
+```
+
+なぜ重要か: 予約、log、締切、calendar UIでdate bugを防ぐ。
+注意: 1日は常に86400秒とは限らない。
+
+確認問題:
+Q1. Dateが表すものは？ [Basic]
+```swift
+let now=Date()
+```
+A. 特定の瞬間
+B. 必ず日本時間文字列
+C. calendar画面
+D. TimeZoneだけ
+正解: A
+解説: Dateは時間軸上の一点。
+
+Q2. 翌日計算に推奨されるのは？ [Intermediate]
+```swift
+Calendar.current.date(byAdding:.day,value:1,to:date)
+```
+A. Calendarで日加算
+B. 86400秒固定
+C. 文字列+1
+D. 計算不可
+正解: A
+解説: 暦ruleを考慮できる。
+
+---
+
+## 06. Locale・FormatStyle・Measurement [Basic]
+
+概要: 内部の値とユーザー向け表示を分離する。
+考え方: 同じ数値や日付でも地域で表記が違う。
+
+重要ポイント:
+- Date.formattedで日付表示。
+- 数値FormatStyleでcurrency/percent等。
+- Localeで地域rule。
+- Measurementで単位付き値。
+
+コード:
+```swift
+let price=1234.5
+let text=price.formatted(.currency(code:"JPY"))
+```
+
+なぜ重要か: 国際化、通貨、単位、日付表示で必要。
+注意: 保存値と表示文字列を同一視しない。
+
+確認問題:
+Q1. FormatStyleの主用途は？ [Basic]
+```swift
+price.formatted(.currency(code:"JPY"))
+```
+A. ユーザー向け整形
+B. DB作成
+C. Actor化
+D. Git管理
+正解: A
+解説: 値を用途/地域に応じて表示形式へ変換。
+
+Q2. 内部Dateの扱いとして良いのは？ [Basic]
+```swift
+Date -> formatted String
+```
+A. 内部はDate、表示時format
+B. 常にStringだけ
+C. TimeZone無視
+D. Locale固定
+正解: A
+解説: dataとpresentationを分離する。
+
+---
+
+## 07. URL・URLComponents・Percent Encoding [Basic]
+
+概要: URLを文字列連結ではなく構造として安全に組み立てる。
+考え方: URLはscheme/host/path/queryなどの部品を持つ。
+
+重要ポイント:
+- URLでresource場所を表す。
+- URLComponentsでqueryを構築。
+- URLQueryItemを使う。
+- Percent encodingを手書きしない。
+
+コード:
+```swift
+var c=URLComponents(string:"https://example.com/search")!
+c.queryItems=[URLQueryItem(name:"q",value:"Swift UI")]
+```
+
+なぜ重要か: 検索API、deep link、file URLで必須。
+注意: String連結は空白や&などで壊れやすい。
+
+確認問題:
+Q1. Query parameterを安全に作る型は？ [Basic]
+```swift
+var c=URLComponents(...)
+```
+A. URLComponents
+B. Calendar
+C. Set
+D. Dataだけ
+正解: A
+解説: URLComponentsとURLQueryItemを使う。
+
+Q2. URLをString連結しない主理由は？ [Basic]
+```swift
+"https://x.com?q="+query
+```
+A. 特殊文字encodingで壊れやすい
+B. +禁止
+C. URLはInt
+D. 理由なし
+正解: A
+解説: 構造化APIでencodingを扱う方が安全。
+
+---
+
+## 08. URLRequest・HTTP Method・Header・Status Code [Basic]
+
+概要: HTTP通信を構成する基本要素を理解する。
+考え方: 通信はURLだけでなくmethod/header/body/statusの契約。
+
+重要ポイント:
+- GET/POST/PUT/PATCH/DELETE。
+- HeaderでContent-Type/Authorization等。
+- BodyにJSON Data等。
+- HTTP status codeを確認。
+
+コード:
+```swift
+var request=URLRequest(url:url)
+request.httpMethod="POST"
+request.setValue("application/json",forHTTPHeaderField:"Content-Type")
+```
+
+なぜ重要か: API連携の最低限。HTTPの意味が分からないとdebugできない。
+注意: transport成功でも404/500などapplication上の失敗はある。
+
+確認問題:
+Q1. Content-Typeが示すものは？ [Basic]
+```swift
+Content-Type: application/json
+```
+A. request bodyの形式
+B. 通信速度
+C. OS
+D. Git branch
+正解: A
+解説: bodyのmedia typeを示す。
+
+Q2. URLSessionがthrowしなければstatusは必ず200？ [Basic]
+```swift
+let (data,response)=try await URLSession.shared.data(for:request)
+```
+A. 必ず200
+B. HTTP statusを別途確認
+C. 必ず404
+D. response無し
+正解: B
+解説: network成功とHTTP成功は別。
+
+---
+
+## 09. URLSession・async/await Networking [Intermediate]
+
+概要: URLSessionで非同期通信を行い、response検証とdecodeまでつなげる。
+考え方: 通信処理は request → await → status確認 → decode の流れで読む。
+
+重要ポイント:
+- data(for:)でDataとURLResponse。
+- HTTPURLResponseへcastしてstatus確認。
+- JSONDecoderでDTOへdecode。
+- timeout/retry/cancellationは別途設計。
+
+コード:
+```swift
+let (data,response)=try await URLSession.shared.data(for:request)
+guard let http=response as? HTTPURLResponse,
+      200..<300 ~= http.statusCode else { throw APIError.invalidResponse }
+let dto=try JSONDecoder().decode(UserDTO.self,from:data)
+```
+
+なぜ重要か: ほぼすべてのnetwork appで必要。
+注意: View内にrequest生成からdecodeまで全部書くとtestしづらい。
+
+確認問題:
+Q1. 200..<300 ~= statusCode の意味は？ [Intermediate]
+```swift
+guard 200..<300 ~= http.statusCode else { ... }
+```
+A. 2xx範囲か確認
+B. 300以上だけ
+C. String化
+D. URL作成
+正解: A
+解説: statusが200以上300未満かpattern matchingしている。
+
+Q2. JSON Dataを型へ変換するのは？ [Intermediate]
+```swift
+let (data,_)=try await URLSession.shared.data(from:url)
+```
+A. JSONDecoder
+B. Calendar
+C. FileManager
+D. Set
+正解: A
+解説: Decodable型へdecodeする。
+
+---
+
+## 10. FileManager・File URL・Sandbox [Basic]
+
+概要: アプリのfile保存場所と読み書きの基本を学ぶ。
+考え方: アプリは好きな場所へ書けず、自分のsandbox内の適切なdirectoryを使う。
+
+重要ポイント:
+- Documents/Cachesなど用途別directory。
+- FileManagerで作成/削除/存在確認。
+- URLでpathを組み立てる。
+- Data.write / Data(contentsOf:)で簡単なI/O。
+
+コード:
+```swift
+let dir=FileManager.default.urls(for:.documentDirectory,in:.userDomainMask)[0]
+let file=dir.appendingPathComponent("settings.json")
+try data.write(to:file)
+```
+
+なぜ重要か: 画像、JSON、export、cacheを扱う時に必要。
+注意: cacheとユーザー生成dataの保存先を混同しない。
+
+確認問題:
+Q1. ユーザー生成fileの候補は？ [Basic]
+```swift
+.documentDirectory
+```
+A. Documents
+B. 必ず/tmpだけ
+C. 任意のsystem folder
+D. Git repo
+正解: A
+解説: Documentsは保持すべき文書dataの代表的保存先。
+
+Q2. Cachesに置くdataは？ [Basic]
+```swift
+.cachesDirectory
+```
+A. 再生成/再取得可能なdata
+B. 唯一の重要data
+C. password平文
+D. signing certificate
+正解: A
+解説: 削除されても再取得できるdata向け。
+
+---
+
+## 11. UserDefaults・小さな設定値 [Basic]
+
+概要: 軽量なユーザー設定をKey-Valueで保存する。
+考え方: UserDefaultsは小さな設定帳。DBでも秘密情報storeでもない。
+
+重要ポイント:
+- Bool/String/Int等の小さな設定向け。
+- 再起動後も保持。
+- 大量data/複雑queryには不向き。
+- 秘密情報はKeychain等を検討。
+
+コード:
+```swift
+UserDefaults.standard.set(true,forKey:"hasOnboarded")
+let done=UserDefaults.standard.bool(forKey:"hasOnboarded")
+```
+
+なぜ重要か: onboarding完了や表示設定に手軽。
+注意: token/passwordをUserDefaultsへ平文保存しない。
+
+確認問題:
+Q1. UserDefaultsが向くものは？ [Basic]
+```swift
+UserDefaults.standard.set(true,forKey:"darkMode")
+```
+A. 小さな設定
+B. 大量画像
+C. password平文
+D. 動画
+正解: A
+解説: 軽量設定値向け。
+
+Q2. 秘密情報の保存候補は？ [Basic]
+```swift
+let token="secret"
+```
+A. Keychain
+B. UserDefaults平文
+C. print log
+D. README
+正解: A
+解説: credentialはKeychain等を検討。
+
+---
+
+## 12. NotificationCenter [Intermediate]
+
+概要: 1対多のevent通知を疎結合に配信する仕組みを理解する。
+考え方: 送信者が受信者を直接知らずに『出来事』をbroadcastする。
+
+重要ポイント:
+- Notification.Nameでevent種別。
+- 複数observerが受信可能。
+- object/userInfoでpayload。
+- 型安全性はdelegate/closureより弱くなりやすい。
+
+コード:
+```swift
+NotificationCenter.default.post(name:.didLogout,object:nil)
+```
+
+なぜ重要か: app全体eventやlegacy codeで遭遇する。
+注意: 何でもNotificationCenterにすると依存関係が見えなくなる。
+
+確認問題:
+Q1. NotificationCenterが向く性質は？ [Intermediate]
+```swift
+NotificationCenter.default.post(...)
+```
+A. 1対多event通知
+B. 型継承
+C. JSON decode
+D. Auto Layout
+正解: A
+解説: broadcast用途。
+
+Q2. 乱用時の問題は？ [Intermediate]
+```swift
+post(name:...,object:nil)
+```
+A. 依存関係やdata型が追いづらい
+B. 必ずcompile error
+C. 通信不能
+D. ARC停止
+正解: A
+解説: event flowが暗黙的になりやすい。
+
+---
+
+## 13. Regex・RegexBuilder [Intermediate]
+
+概要: 文字列patternを検索・検証する。
+考え方: Regexは文字列の規則を表し、単純containsより構造的な検証ができる。
+
+重要ポイント:
+- Regex literalを利用可能。
+- wholeMatch/firstMatch等で判定。
+- capture部分を取り出せる。
+- 複雑なRegexは分解してtest。
+
+コード:
+```swift
+let regex=/\d{4}-\d{2}-\d{2}/
+let matched="2026-07-24".wholeMatch(of:regex) != nil
+```
+
+なぜ重要か: 入力検証、log解析、text抽出で便利。
+注意: 仕様全体を巨大な1本のRegexで完全検証しようとしない。
+
+確認問題:
+Q1. wholeMatchの特徴は？ [Intermediate]
+```swift
+"2026-07-24".wholeMatch(of:/\d{4}-\d{2}-\d{2}/)
+```
+A. 文字列全体が一致するか
+B. 先頭1文字だけ
+C. HTTP通信
+D. Dateへ自動変換
+正解: A
+解説: 入力全体とのmatchを確認する。
+
+Q2. 複雑なRegexで重要なのは？ [Intermediate]
+```swift
+/.../
+```
+A. 具体例/反例をtest
+B. 1行へ詰める
+C. force unwrap
+D. UI限定
+正解: A
+解説: 境界条件をtestする。
+
+---
+
+## 14. Sequence・Collection・Lazy [Intermediate]
+
+概要: Arrayの下にある抽象化と遅延評価を理解する。
+考え方: Sequenceは順番に値を取り出せ、Collectionはindex等のより強い保証を持つ。
+
+重要ポイント:
+- Sequenceはfor-in可能。
+- Collectionはindex等を追加保証。
+- lazyで変換を必要時まで遅延。
+- 巨大dataで中間配列を減らせる場合。
+
+コード:
+```swift
+let result=(1...1_000_000).lazy.map{$0*2}.first{$0>100}
+```
+
+なぜ重要か: 標準library APIとperformance理解につながる。
+注意: lazyを付ければ常に高速ではない。
+
+確認問題:
+Q1. lazyの主特徴は？ [Intermediate]
+```swift
+(1...100).lazy.map{$0*2}
+```
+A. 必要まで変換を遅延
+B. 必ず並列化
+C. DB保存
+D. Optional化
+正解: A
+解説: 要素要求まで評価を遅らせる。
+
+Q2. CollectionがSequenceより追加する代表能力は？ [Intermediate]
+```swift
+Collection
+```
+A. index access等
+B. 必ずSet
+C. 必ず参照型
+D. HTTP通信
+正解: A
+解説: より強い走査/indexの保証を持つ。
+
+---
+
+## 15. DTO・Domain Model・Value Object・ID [Intermediate]
+
+概要: データを外部形式・アプリの意味・表示へ分けて設計する。
+考え方: data型は単なる入れ物ではなく、不正状態を作らせない設計手段。
+
+重要ポイント:
+- DTOはAPI/保存形式の境界。
+- Domain Modelはapp内の意味。
+- Value Objectで単位/制約を型に閉じ込める。
+- 安定IDと表示indexを区別。
+
+コード:
+```swift
+struct UserDTO:Decodable{let user_id:Int}
+struct User:Identifiable{let id:Int}
+func map(_ dto:UserDTO)->User{User(id:dto.user_id)}
+```
+
+なぜ重要か: 中規模以上で変更影響を小さくしtestしやすくする。
+注意: 何でも巨大な1 Modelへまとめない。
+
+確認問題:
+Q1. DTOを分ける主目的は？ [Intermediate]
+```swift
+API JSON -> UserDTO -> User
+```
+A. 外部形式変更を内部から分離
+B. 必ずcode量削減
+C. UI自動生成
+D. ARC無効
+正解: A
+解説: 外部仕様との境界を作れる。
+
+Q2. indexとIDの違いは？ [Intermediate]
+```swift
+items[index].id
+```
+A. indexは位置、IDは同一性
+B. 常に同じ
+C. IDは表示位置
+D. indexはUUID
+正解: A
+解説: 並べ替えでindexは変わる。
+
+---
+
+## 16. Copy-on-Write・Value Semantics [Intermediate]
+
+概要: Array/String/Dictionary等が値型として振る舞いつつ効率よくcopyされる考え方を知る。
+考え方: 見た目はcopyでも内部共有し、変更時に実copyする最適化がある。
+
+重要ポイント:
+- 標準Collectionは値semantics。
+- 片方変更が他方へ影響しない。
+- Copy-on-Writeで不要copyを避ける。
+- 値semanticsと内部memory共有は別。
+
+コード:
+```swift
+var a=[1,2,3]
+var b=a
+b.append(4)
+print(a)
+```
+
+なぜ重要か: struct/Arrayのperformanceと意味を正しく理解する。
+注意: 値型=毎回即フルcopyと単純化しない。
+
+確認問題:
+Q1. b.append後のaは？ [Intermediate]
+```swift
+var a=[1,2]
+var b=a
+b.append(3)
+```
+A. [1,2]
+B. [1,2,3]
+C. nil
+D. 未定義
+正解: A
+解説: Arrayは値semantics。
+
+Q2. Copy-on-Writeとは？ [Intermediate]
+```swift
+var b=a
+```
+A. 変更時まで実copyを遅らせる最適化
+B. 必ず参照型化
+C. 非同期化
+D. JSON化
+正解: A
+解説: 値semanticsを保ちつつcopy costを抑える。
+
+---
