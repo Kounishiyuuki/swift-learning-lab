@@ -273,7 +273,37 @@
               "値を画面に表示する"
             ],
             "answer": 1,
-            "explanation": "= は代入です。まず右側の 10 が読まれ、その値が左側の名前 score に入ります。等しいかどうかを調べる記号ではありません。"
+            "explanation": "= は代入です。まず右側の 10 が読まれ、その値が左側の名前 score に入ります。等しいかどうかを調べる記号ではありません。",
+            "detail": {
+              "concept": "= は「代入」の記号です。数学の「左と右が等しい」という意味ではありません。左側には値を入れる先の名前、右側には入れたい値を書きます。var は、後から値を変えられる名前を作るキーワードです。",
+              "steps": [
+                "Swift はこの行を右側から片付けます。まず = の右にある 10 が値として読まれます。",
+                "var score という新しい名前が作られます。",
+                "読み取った 10 が、名前 score に入ります。",
+                "この後 print(score) と書けば 10 が表示されます。"
+              ],
+              "whyCorrect": "= は右側の値を左側の名前へ入れる動作なので、「右側の値を左側の名前に入れる」が正しい説明です。この向き（右から左）は常に決まっていて、逆になることはありません。",
+              "otherChoices": [
+                {
+                  "choice": "左と右が等しいか確認する",
+                  "reason": "これは == の役割です。= は「入れる」という動作、== は「等しい？」という質問だと分けて覚えると混同しません。== はレッスン9で学びます。"
+                },
+                {
+                  "choice": "左右の数を足す",
+                  "reason": "足すのは + です。= 自体は計算しません。ただし score = score + 5 のように、右側で計算した結果を代入することはできます。"
+                },
+                {
+                  "choice": "値を画面に表示する",
+                  "reason": "表示するのは print です。= は名前に値を入れるだけで、画面には何も出ません。"
+                }
+              ],
+              "example": {
+                "code": "var score = 10\nscore = 25\nprint(score)",
+                "output": "25",
+                "explanation": "同じ名前にもう一度代入すると、前の値 10 は上書きされて消えます。最後に入った 25 だけが残るので、表示されるのは 25 です。"
+              },
+              "takeaway": "= は「入れる」、== は「等しい？」。"
+            }
           },
           {
             "id": "q-starter-014",
@@ -1945,7 +1975,37 @@
               "Sendableだけ"
             ],
             "answer": 1,
-            "explanation": "Setはhash値で要素を管理する。"
+            "explanation": "Setはhash値で要素を管理する。",
+            "detail": {
+              "concept": "Set は「重複のない値の集まり」を表す型で、並び順を持たない代わりに「その値が既に入っているか」を高速に判定できる。この判定を成立させるために、要素の型は Hashable に適合している必要がある。Hashable は値から hash 値（値を要約した整数）を計算できることを保証し、さらに Equatable（== による同値比較）も要求する。",
+              "steps": [
+                "Set に値を入れるとき、まず要素の hash 値を計算し、格納先の候補を絞り込む。",
+                "hash 値が一致した要素同士だけを == で比較し、本当に同じ値かどうかを確定する。",
+                "同じ値が既にあれば追加されない。これが重複排除の仕組み。",
+                "つまり要素型には hash の計算と == の判定の両方が必要で、その2つをまとめて要求するのが Hashable。"
+              ],
+              "whyCorrect": "Set<MyType> の MyType に必要なのは Hashable。Hashable は Equatable を継承しているため、hash 値による絞り込みと == による確定の両方が揃う。Int / String / Bool など標準の型は既に Hashable に適合しているので、そのまま Set に入れられる。",
+              "otherChoices": [
+                {
+                  "choice": "Codable",
+                  "reason": "Encodable と Decodable をまとめた別名で、JSON など外部表現との相互変換のための Protocol。保存や通信のためのものであり、重複判定とは無関係。"
+                },
+                {
+                  "choice": "Observable",
+                  "reason": "値の変化を観測して UI を更新するための仕組みで、主に SwiftUI の状態管理で使う。集合の要素条件とは無関係。"
+                },
+                {
+                  "choice": "Sendableだけ",
+                  "reason": "Sendable は「並行処理の境界を越えて安全に渡せる」ことを表す契約で、スレッド安全性の話。重複判定には使えず、Sendable だけでは Set の要素にできない。"
+                }
+              ],
+              "example": {
+                "code": "struct Member: Hashable {\n    let id: Int\n    let name: String\n}\n\nvar members: Set<Member> = []\nmembers.insert(Member(id: 1, name: \"Yuki\"))\nmembers.insert(Member(id: 1, name: \"Yuki\"))\nprint(members.count)",
+                "output": "1",
+                "explanation": "すべての stored property が Hashable なら、struct は Hashable への適合を自動合成でき、== と hash(into:) が自動生成される。同じ内容の Member を2回入れても2回目は重複と判定されるため、要素数は 1 のまま。"
+              },
+              "takeaway": "Set の要素と Dictionary の Key は Hashable。hash で候補を絞り、== で確定する。"
+            }
           }
         ]
       },
@@ -2069,7 +2129,37 @@
               "クラッシュ"
             ],
             "answer": 2,
-            "explanation": "`??` は左側が nil の場合に右側を返す。したがって Guest。"
+            "explanation": "`??` は左側が nil の場合に右側を返す。したがって Guest。",
+            "detail": {
+              "concept": "String? は「String が入っているか、nil か」を表す Optional 型。?? は nil 合体演算子（nil-coalescing operator）で、「左が nil なら右の既定値を使う」という意味になる。左の Optional を安全に外し、必ず値のある結果を返す。",
+              "steps": [
+                "name は String? 型で、値は nil。",
+                "print に渡す前に、name ?? \"Guest\" が先に評価される。",
+                "?? は左の name を確認し、nil なので右側の \"Guest\" を採用する。",
+                "結果は Optional が外れた String の \"Guest\" になり、そのまま出力される。"
+              ],
+              "whyCorrect": "?? の結果は Optional が外れた String なので、Optional(...) の形にはならない。name が nil であるため既定値の \"Guest\" が選ばれ、出力は Guest になる。",
+              "otherChoices": [
+                {
+                  "choice": "nil",
+                  "reason": "?? があるため nil のまま出力されることはない。?? を書かずに print(name) とした場合は nil と出力される。"
+                },
+                {
+                  "choice": "Optional(nil)",
+                  "reason": "そのような値は存在しない。Optional をそのまま print すると Optional(\"Yuki\") のように包まれた形で出るが、?? で既定値に置き換えた後は包みが外れている。"
+                },
+                {
+                  "choice": "クラッシュ",
+                  "reason": "クラッシュするのは name! のように強制アンラップした場合。?? は nil でも安全に既定値へ切り替わるのでクラッシュしない。"
+                }
+              ],
+              "example": {
+                "code": "let nickname: String? = \"Yuki\"\nlet missing: String? = nil\nprint(nickname ?? \"Guest\")\nprint(missing ?? \"Guest\")",
+                "output": "Yuki\nGuest",
+                "explanation": "?? は左に値があればその中身を、nil なら右の既定値を返す。どちらの場合も結果は Optional ではない String になるため、そのまま文字列として扱える。"
+              },
+              "takeaway": "?? は「無ければこれ」。! と違って nil でもクラッシュしない。"
+            }
           },
           {
             "id": "q-swift-012",
