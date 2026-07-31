@@ -1,11 +1,16 @@
 {
   "name": "Swift Learning Lab",
-  "version": "0.2.0",
-  "generated": "2026-07-24",
+  "version": "0.3.0",
+  "generated": "2026-07-30",
   "offline": true,
-  "lessons": 96,
-  "questions": 192,
+  "lessons": 116,
+  "questions": 252,
   "tracks": {
+    "starter": {
+      "name": "Swift Starter",
+      "lessons": 20,
+      "questions": 60
+    },
     "swift": {
       "name": "Swift Language",
       "lessons": 36,
