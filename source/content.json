@@ -1,5 +1,1213 @@
 [
   {
+    "id": "starter",
+    "name": "Swift Starter",
+    "subtitle": "コードを読むための超基礎",
+    "description": "値・型・nil・Optional・{ }・引数・property / method といった言葉がまだ分からない段階から始める入門トラック。記号の意味を1つずつ確認しながら、コードを1行ずつ読める状態を作る。",
+    "lessons": [
+      {
+        "id": "starter-program-and-code",
+        "level": "Starter",
+        "title": "プログラムとコードとは何か",
+        "summary": "プログラムはコンピュータへの指示書、コードはその指示を文字で書いたもの。まずこの関係を掴む。",
+        "mental": "コードは「上から下へ順番に読まれる指示のリスト」。魔法ではなく、書いた順に、書いたことだけが起きる。",
+        "points": [
+          "プログラムとは、コンピュータにやらせたい指示の集まり。",
+          "コードとは、その指示を文字で書き表したもの。",
+          "Swiftのコードは、基本的に上の行から下の行へ順番に実行される。",
+          "print は「( ) の中身を画面に表示する」命令。\" \" で囲んだ部分は文字として扱われる。"
+        ],
+        "code": "print(\"Hello\")\nprint(\"Gym\")",
+        "why": "「このコードを実行すると何が起きるか」を自分で予測できることが、学習のすべての土台になる。予測できれば、結果とのズレから原因を探せる。",
+        "pitfall": "コードは意味を推測して動いてはくれない。書いていないことは起きず、書いた順番は変わらない。",
+        "questions": [
+          {
+            "id": "q-starter-001",
+            "difficulty": "Starter",
+            "prompt": "このコードを実行すると画面には何が表示されますか？",
+            "code": "print(\"Hello\")\nprint(\"Gym\")",
+            "choices": [
+              "Hello だけ",
+              "Gym だけ",
+              "1行目に Hello、2行目に Gym",
+              "何も表示されない"
+            ],
+            "answer": 2,
+            "explanation": "print は上の行から順に1つずつ実行されます。1行目で Hello、2行目で Gym が表示され、合計2行が出ます。"
+          },
+          {
+            "id": "q-starter-002",
+            "difficulty": "Starter",
+            "prompt": "print(\"Yuki\") の \" \" は何を表す記号ですか？",
+            "code": "print(\"Yuki\")",
+            "choices": [
+              "囲んだ中身を文字として扱う記号",
+              "囲んだ中身を計算する記号",
+              "その行を消す記号",
+              "画面をクリアする記号"
+            ],
+            "answer": 0,
+            "explanation": "\" \" （ダブルクォート）は「ここからここまでは文字である」という印です。中身は計算されず、そのままの文字として扱われます。"
+          },
+          {
+            "id": "q-starter-003",
+            "difficulty": "Starter",
+            "prompt": "このコードで先に表示されるのはどちらですか？",
+            "code": "print(\"A\")\nprint(\"B\")",
+            "choices": [
+              "A",
+              "B",
+              "同時に表示される",
+              "どちらも表示されない"
+            ],
+            "answer": 0,
+            "explanation": "実行の順番は上から下です。1行目の print が先に実行されるので A が先に表示されます。"
+          }
+        ]
+      },
+      {
+        "id": "starter-read-line-by-line",
+        "level": "Starter",
+        "title": "コードを1行ずつ分解して読む",
+        "summary": "1行を「何をする命令か」と「その対象は何か」に切り分けて読む練習をする。",
+        "mental": "分からない行を丸ごと理解しようとしない。記号ごとに区切って、命令の名前と、その対象を分けて見る。",
+        "points": [
+          "1行は「命令の名前」と「その対象」に分けて読める。",
+          "print(\"Gym\") なら、命令は print、対象は ( ) の中の \"Gym\"。",
+          "// から行末まではコメントで、人間向けのメモとして扱われ実行されない。",
+          "読めない行は、記号（\" \" や ( ) など）を目印に区切って読む。"
+        ],
+        "code": "print(\"Yuki\")   // これはコメント。実行されない",
+        "why": "コードが読めない原因は「難しい機能」ではなく、1行の中でどこが命令でどこが対象かを見分けられていないことが多い。",
+        "pitfall": "コメントは実行されないので、コメントに書いた内容が動作に影響することはない。",
+        "questions": [
+          {
+            "id": "q-starter-004",
+            "difficulty": "Starter",
+            "prompt": "この行で「表示される対象」はどの部分ですか？",
+            "code": "print(\"Gym\")",
+            "choices": [
+              "print",
+              "\"Gym\"",
+              "( )",
+              "行全体"
+            ],
+            "answer": 1,
+            "explanation": "print は「表示する」という命令の名前で、実際に表示される対象は ( ) の中に書かれた \"Gym\" です。"
+          },
+          {
+            "id": "q-starter-005",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "print(\"A\")   // print(\"B\")",
+            "choices": [
+              "A",
+              "B",
+              "A と B",
+              "エラーになる"
+            ],
+            "answer": 0,
+            "explanation": "// から行末まではコメントとして無視されます。実行されるのは print(\"A\") だけなので A のみが表示されます。"
+          },
+          {
+            "id": "q-starter-006",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "print(\"score\")",
+            "choices": [
+              "score",
+              "0",
+              "何も表示されない",
+              "エラーになる"
+            ],
+            "answer": 0,
+            "explanation": "\" \" の中は、たとえ英単語でもただの文字です。score という文字がそのまま表示されます。"
+          }
+        ]
+      },
+      {
+        "id": "starter-values",
+        "level": "Starter",
+        "title": "値・文字・数字とは何か",
+        "summary": "コードが扱うデータ1つ1つを「値」と呼ぶ。文字の値と数の値の書き分けを覚える。",
+        "mental": "値は「コードが手に持てるデータ1個」。同じ 10 でも、数として持つのか文字として持つのかで別物になる。",
+        "points": [
+          "値とは、コードが扱うデータ1つ1つのこと。",
+          "文字の値は \" \" で囲んで書く（例：\"Yuki\"）。",
+          "数の値は \" \" を付けずにそのまま書く（例：10）。",
+          "10 は数の値、\"10\" は文字の値で、別のものとして扱われる。"
+        ],
+        "code": "print(10)\nprint(\"10\")",
+        "why": "後で出てくる「型」「計算」「比較」はすべて値の話。値の種類を取り違えると、原因の分からないエラーになる。",
+        "pitfall": "\"10\" は文字なので、数としての大小や計算の対象にはできない。見た目が同じでも中身が違う。",
+        "questions": [
+          {
+            "id": "q-starter-007",
+            "difficulty": "Starter",
+            "prompt": "10 と \"10\" の違いの説明として正しいのはどれですか？",
+            "code": "print(10)\nprint(\"10\")",
+            "choices": [
+              "まったく同じもの",
+              "10 は数の値、\"10\" は文字の値",
+              "\"10\" のほうが大きい値",
+              "どちらも文字の値"
+            ],
+            "answer": 1,
+            "explanation": "\" \" で囲むと文字の値になります。10 は数として扱える値、\"10\" は文字として扱われる値で、種類が違います。"
+          },
+          {
+            "id": "q-starter-008",
+            "difficulty": "Starter",
+            "prompt": "次のうち「文字の値」はどれですか？",
+            "code": "// A から D の中から選ぶ",
+            "choices": [
+              "100",
+              "\"100\"",
+              "0",
+              "12"
+            ],
+            "answer": 1,
+            "explanation": "\" \" で囲まれているものだけが文字の値です。囲みのない 100 や 0、12 は数の値です。"
+          },
+          {
+            "id": "q-starter-009",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "print(\"Yuki\")\nprint(30)",
+            "choices": [
+              "Yuki と 30",
+              "\"Yuki\" と 30",
+              "Yuki と \"30\"",
+              "エラーになる"
+            ],
+            "answer": 0,
+            "explanation": "\" \" は「ここは文字」という印なので、表示そのものには含まれません。Yuki と 30 が2行に分かれて表示されます。"
+          }
+        ]
+      },
+      {
+        "id": "starter-let-var",
+        "level": "Starter",
+        "title": "名前を付ける・let・var",
+        "summary": "値に名前を付けて何度も使い回す。後から変えない名前は let、変える名前は var。",
+        "mental": "let / var は「箱」ではなく「値に付けた名札」。let の名札は貼り替えられず、var の名札は貼り替えられる。",
+        "points": [
+          "値に名前を付けると、その値を何度でも使い回せる。",
+          "let で付けた名前は、後から別の値に変えられない。",
+          "var で付けた名前は、後から別の値に変えられる。",
+          "= は名前と値を結びつける記号（詳しくは次のレッスン）。"
+        ],
+        "code": "let userName = \"Yuki\"\nvar workoutCount = 3\nprint(userName)\nprint(workoutCount)",
+        "why": "実際のアプリでは「変わらない値」と「変わる値」を区別することが設計そのものになる。let を選べるところで let を選ぶと、想定外の変更を防げる。",
+        "pitfall": "「後で変えるかもしれない」と迷って全部 var にすると、どこで値が変わるのか追えなくなる。まず let で書く。",
+        "questions": [
+          {
+            "id": "q-starter-010",
+            "difficulty": "Starter",
+            "prompt": "このコードでエラーになるのはどの行ですか？",
+            "code": "let gymName = \"Fit24\"\ngymName = \"Anytime\"",
+            "choices": [
+              "1行目",
+              "2行目",
+              "両方",
+              "エラーにならない"
+            ],
+            "answer": 1,
+            "explanation": "let で付けた名前は後から変えられません。2行目で別の値に変えようとしているためエラーです。変える予定があるなら var を使います。"
+          },
+          {
+            "id": "q-starter-011",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "var score = 10\nscore = 20\nprint(score)",
+            "choices": [
+              "10",
+              "20",
+              "30",
+              "エラーになる"
+            ],
+            "answer": 1,
+            "explanation": "var で付けた名前は変更できます。2行目で score が 20 になり、その後に print されるので 20 が表示されます。"
+          },
+          {
+            "id": "q-starter-012",
+            "difficulty": "Starter",
+            "prompt": "値を後から変更しない名前として workoutCount を作るとき、行の先頭に入るキーワードはどれですか？",
+            "code": "workoutCount = 0",
+            "choices": [
+              "let",
+              "var",
+              "print",
+              "\" \""
+            ],
+            "answer": 0,
+            "explanation": "let は、値を後から変更しない名前を新しく作るキーワードです。完成したコードは let workoutCount = 0 です。"
+          }
+        ]
+      },
+      {
+        "id": "starter-assignment",
+        "level": "Starter",
+        "title": "代入の =",
+        "summary": "= は「等しい」ではない。右側を先に読み、その結果を左の名前に入れる動作。",
+        "mental": "= は矢印だと思うとよい。右 → 左に値が流れる。「等しいか確かめる」記号は別に存在する。",
+        "points": [
+          "= は代入。右側の値を、左側の名前に入れる。",
+          "右側が先に読まれ、その結果が左の名前に入る。",
+          "同じ名前にもう一度代入すると、前の値は上書きされる。",
+          "「等しいか」を確かめる記号は == で、これは別物（レッスン9で学ぶ）。"
+        ],
+        "code": "var score = 10\nscore = 25\nprint(score)",
+        "why": "= を「等しい」と読んでしまうと、score = score + 5 のような行が意味不明になる。代入だと分かれば、上から順に値をたどれる。",
+        "pitfall": "= の左に来るのは名前。10 = score のように左に値を書くことはできない。",
+        "questions": [
+          {
+            "id": "q-starter-013",
+            "difficulty": "Starter",
+            "prompt": "Swift の = の意味として正しいのはどれですか？",
+            "code": "var score = 10",
+            "choices": [
+              "左と右が等しいか確認する",
+              "右側の値を左側の名前に入れる",
+              "左右の数を足す",
+              "値を画面に表示する"
+            ],
+            "answer": 1,
+            "explanation": "= は代入です。まず右側の 10 が読まれ、その値が左側の名前 score に入ります。等しいかどうかを調べる記号ではありません。"
+          },
+          {
+            "id": "q-starter-014",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "var count = 2\ncount = 5\ncount = 1\nprint(count)",
+            "choices": [
+              "2",
+              "5",
+              "1",
+              "8"
+            ],
+            "answer": 2,
+            "explanation": "代入は上から順に実行され、そのたびに前の値が上書きされます。最後の代入である 1 が残るので 1 が表示されます。"
+          },
+          {
+            "id": "q-starter-015",
+            "difficulty": "Starter",
+            "prompt": "代入の書き方として正しい行はどれですか？",
+            "code": "var score = 0\n// 次のうち正しい書き方は？",
+            "choices": [
+              "10 = score",
+              "score = 10",
+              "score 10",
+              "let = score"
+            ],
+            "answer": 1,
+            "explanation": "= の左には名前、右には入れたい値が来ます。score = 10 だけが正しい形です。"
+          }
+        ]
+      },
+      {
+        "id": "starter-what-is-type",
+        "level": "Starter",
+        "title": "型とは何か",
+        "summary": "型は「その値が何の種類か」を表す。型が決まると、できる操作も決まる。",
+        "mental": "型は値に貼られた「種類のラベル」。ラベルが違えば、扱い方も許される操作も違う。",
+        "points": [
+          "型とは、値の種類のこと。",
+          "型が違えば、その値に対してできる操作も違う。",
+          "Swift は値を見て型を自動で判断する（型推論）。",
+          "名前の後に : 型名 と書けば、型を自分で明示できる（代表的な型名は次のレッスン）。"
+        ],
+        "code": "let userName: String = \"Yuki\"\nlet score: Int = 80",
+        "why": "型があるおかげで、意味の通らない操作を実行前に Swift が止めてくれる。エラーメッセージの多くは「型が合っていない」という指摘。",
+        "pitfall": "型を明示した名前には、その型の値しか入れられない。数の型に文字の値を入れることはできない。",
+        "questions": [
+          {
+            "id": "q-starter-016",
+            "difficulty": "Starter",
+            "prompt": "「型」の説明として正しいのはどれですか？",
+            "code": "let score: Int = 80",
+            "choices": [
+              "値に付けた名前のこと",
+              "値の種類のこと",
+              "値の個数のこと",
+              "値の表示方法のこと"
+            ],
+            "answer": 1,
+            "explanation": "型は値の種類です。名前（score）とは別の概念で、その値が数なのか文字なのかといった種類を表します。"
+          },
+          {
+            "id": "q-starter-017",
+            "difficulty": "Starter",
+            "prompt": "この行がエラーになる理由はどれですか？",
+            "code": "let score: Int = \"80\"",
+            "choices": [
+              "Int と明示した名前に文字の値を入れているから",
+              "print が無いから",
+              "let を使っているから",
+              ": を書いてはいけないから"
+            ],
+            "answer": 0,
+            "explanation": "Int は数の型です。\"80\" は文字の値なので、型が合わずエラーになります。見た目が数字でも \" \" で囲めば文字です。"
+          },
+          {
+            "id": "q-starter-018",
+            "difficulty": "Starter",
+            "prompt": "この行で gymName の型はどう決まりますか？",
+            "code": "let gymName = \"Fit24\"",
+            "choices": [
+              "書いた値から Swift が文字の型と判断する",
+              "型は決まらないままになる",
+              "常に数の型になる",
+              "型を書かないとエラーになる"
+            ],
+            "answer": 0,
+            "explanation": "型を書かなくても、Swift は代入された値から型を判断します。これを型推論と呼びます。"
+          }
+        ]
+      },
+      {
+        "id": "starter-basic-types",
+        "level": "Starter",
+        "title": "Int・Double・String・Bool",
+        "summary": "最初に覚える4つの型。整数・小数・文字列・真偽の使い分けを掴む。",
+        "mental": "この4つで日常のデータはほぼ表現できる。回数は Int、体重は Double、名前は String、会員かどうかは Bool。",
+        "points": [
+          "Int は整数の型（例：3、80、-1）。",
+          "Double は小数を含む数の型（例：62.5）。",
+          "String は文字列の型（例：\"Yuki\"）。",
+          "Bool は true か false の2つだけを取る型。"
+        ],
+        "code": "let count: Int = 3\nlet weight: Double = 62.5\nlet userName: String = \"Yuki\"\nlet isMember: Bool = true",
+        "why": "アプリのデータはこの4つの組み合わせで表される。API から届く値も、画面に出す値も、まずどの型かを見極めるところから始まる。",
+        "pitfall": "\"3\" は String で、3 は Int。数字に見えるかどうかではなく、\" \" があるかどうかで型が変わる。",
+        "questions": [
+          {
+            "id": "q-starter-019",
+            "difficulty": "Starter",
+            "prompt": "62.5 の型はどれですか？",
+            "code": "let weight = 62.5",
+            "choices": [
+              "Int",
+              "Double",
+              "String",
+              "Bool"
+            ],
+            "answer": 1,
+            "explanation": "小数点を含む数は Double と推論されます。Int は整数だけを扱う型です。"
+          },
+          {
+            "id": "q-starter-020",
+            "difficulty": "Starter",
+            "prompt": "\"3\" の型はどれですか？",
+            "code": "let value = \"3\"",
+            "choices": [
+              "Int",
+              "String",
+              "Double",
+              "Bool"
+            ],
+            "answer": 1,
+            "explanation": "\" \" で囲まれているので文字列、つまり String です。中身が数字に見えても数の型にはなりません。"
+          },
+          {
+            "id": "q-starter-021",
+            "difficulty": "Starter",
+            "prompt": "Bool 型が取れる値はどれですか？",
+            "code": "let isMember: Bool = true",
+            "choices": [
+              "0 か 1",
+              "true か false",
+              "どんな数でも",
+              "文字だけ"
+            ],
+            "answer": 1,
+            "explanation": "Bool は true と false の2つだけを取る型です。0 や 1 は Int の値であり、Bool ではありません。"
+          }
+        ]
+      },
+      {
+        "id": "starter-expressions",
+        "level": "Starter",
+        "title": "計算式と評価結果",
+        "summary": "式は計算されて1つの値になる。この「計算されて値になること」を評価と呼ぶ。",
+        "mental": "式は「まだ答えになっていない書きかけ」。評価されると1つの値に落ち着き、その値を名前に入れたり表示したりできる。",
+        "points": [
+          "式とは、計算されて1つの値になる書き方のこと。",
+          "評価とは、式を計算して1つの値にすること。",
+          "+ 足す、- 引く、* かける、/ わる。* と / が + と - より先に計算される。",
+          "評価結果は名前に入れたり、print で表示したりできる。"
+        ],
+        "code": "let sets = 3\nlet reps = 10\nlet total = sets * reps\nprint(total)",
+        "why": "画面に出す数値のほとんどは、その場で計算された評価結果。式のどこが先に計算されるかを読めれば、数値がずれる原因を追える。",
+        "pitfall": "* と / は + と - より先に計算される。順番を変えたいときは ( ) でまとめる。",
+        "questions": [
+          {
+            "id": "q-starter-022",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "print(2 + 3 * 4)",
+            "choices": [
+              "20",
+              "14",
+              "24",
+              "9"
+            ],
+            "answer": 1,
+            "explanation": "* が + より先に計算されます。3 * 4 = 12、それに 2 を足して 14 になります。"
+          },
+          {
+            "id": "q-starter-023",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "let sets = 3\nlet reps = 10\nprint(sets * reps)",
+            "choices": [
+              "3",
+              "10",
+              "30",
+              "310"
+            ],
+            "answer": 2,
+            "explanation": "sets には 3、reps には 10 が入っています。sets * reps は 3 * 10 と評価され 30 になります。"
+          },
+          {
+            "id": "q-starter-024",
+            "difficulty": "Starter",
+            "prompt": "「評価」の意味として正しいのはどれですか？",
+            "code": "let total = 3 * 10",
+            "choices": [
+              "式を計算して1つの値にすること",
+              "コードを画面に表示すること",
+              "名前を消すこと",
+              "型を書き換えること"
+            ],
+            "answer": 0,
+            "explanation": "評価とは式を計算して1つの値にすることです。3 * 10 は評価されて 30 という値になり、それが total に代入されます。"
+          }
+        ]
+      },
+      {
+        "id": "starter-comparison",
+        "level": "Starter",
+        "title": "比較・==・true・false",
+        "summary": "比較すると結果は必ず true か false になる。= と == の違いをここで確定させる。",
+        "mental": "比較は「質問」。答えは必ず true か false のどちらか。代入の = は動作、比較の == は質問。",
+        "points": [
+          "== は「左と右が等しいか」を確かめ、結果は true か false になる。",
+          "!= は「等しくないか」を確かめる。",
+          "> < >= <= は大小の比較で、結果も true か false。",
+          "= は代入、== は比較。1文字違いで意味がまったく違う。"
+        ],
+        "code": "let score = 80\nlet isPassed = score >= 70\nprint(isPassed)",
+        "why": "アプリの分岐はすべて true / false で決まる。比較の結果を正しく読めることが、次のレッスンの if の前提になる。",
+        "pitfall": "if score = 70 のように比較のつもりで = を書くのはよくある間違い。等しいか調べたいときは == 。（if は次のレッスンで学びます。）",
+        "questions": [
+          {
+            "id": "q-starter-025",
+            "difficulty": "Starter",
+            "prompt": "= と == の違いの説明として正しいのはどれですか？",
+            "code": "var score = 80\nprint(score == 80)",
+            "choices": [
+              "どちらも代入",
+              "= は代入、== は等しいか確かめる比較",
+              "= は比較、== は代入",
+              "どちらも比較"
+            ],
+            "answer": 1,
+            "explanation": "= は右の値を左の名前に入れる代入です。== は左右が等しいかを確かめ、true か false を返す比較です。"
+          },
+          {
+            "id": "q-starter-026",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "print(3 == 4)",
+            "choices": [
+              "true",
+              "false",
+              "3",
+              "エラーになる"
+            ],
+            "answer": 1,
+            "explanation": "== は「左と右が等しいか」を確かめる記号で、答えは true か false のどちらかになります。3 と 4 は等しくないので false になり、それが print で表示されます。"
+          },
+          {
+            "id": "q-starter-027",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "let count = 5\nprint(count != 5)",
+            "choices": [
+              "true",
+              "false",
+              "5",
+              "エラーになる"
+            ],
+            "answer": 1,
+            "explanation": "!= は「等しくないか」を調べます。count は 5 なので「等しくない」は成り立たず、false になります。"
+          }
+        ]
+      },
+      {
+        "id": "starter-if-else",
+        "level": "Starter",
+        "title": "if・else",
+        "summary": "条件が true のときだけ処理を実行する。それ以外は else 側を実行する。",
+        "mental": "if は分かれ道。条件が true なら右の道、false なら else の道。通るのはどちらか一方だけ。",
+        "points": [
+          "if の後ろには、true か false になる条件を書く。",
+          "条件が true のとき、直後の { } の中が実行される。",
+          "else を書くと、条件が false のときに else の { } が実行される。",
+          "if と else の両方が実行されることはない。"
+        ],
+        "code": "let score = 55\nif score >= 70 {\n  print(\"合格\")\n} else {\n  print(\"不合格\")\n}",
+        "why": "アプリの「ログイン済みなら〜」「記録が0件なら〜」といった振る舞いは、すべてこの分岐でできている。",
+        "pitfall": "条件は true / false になる式である必要がある。数や文字をそのまま条件に書くことはできない。",
+        "questions": [
+          {
+            "id": "q-starter-028",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "let score = 55\nif score >= 70 {\n  print(\"合格\")\n} else {\n  print(\"不合格\")\n}",
+            "choices": [
+              "合格",
+              "不合格",
+              "合格 と 不合格",
+              "何も表示されない"
+            ],
+            "answer": 1,
+            "explanation": "score は 55 なので score >= 70 は false です。よって else 側が実行され、不合格 だけが表示されます。"
+          },
+          {
+            "id": "q-starter-029",
+            "difficulty": "Starter",
+            "prompt": "else の役割として正しいのはどれですか？",
+            "code": "let isMember = true\nif isMember {\n  print(\"会員\")\n} else {\n  print(\"未登録\")\n}",
+            "choices": [
+              "条件が true のときに実行される",
+              "条件が false のときに実行される",
+              "条件を2回調べる",
+              "if を無効にする"
+            ],
+            "answer": 1,
+            "explanation": "else は条件が false だったときに実行される側です。true のときは if の { } 側だけが実行されます。"
+          },
+          {
+            "id": "q-starter-030",
+            "difficulty": "Starter",
+            "prompt": "if の書き方として正しい行はどれですか？",
+            "code": "let score = 80\n// 次のうち正しい書き方は？",
+            "choices": [
+              "if score = 70 {",
+              "if score >= 70 {",
+              "if (score >= 70",
+              "if score >= 70 then"
+            ],
+            "answer": 1,
+            "explanation": "条件には比較を書くので == や >= を使います。= は代入なので条件にはなりません。条件の後ろは { で始めます。C は閉じ括弧と { が無いため不完全です。Swiftでは if (score >= 70) { } のように条件を丸括弧で囲む書き方自体は可能です。"
+          }
+        ]
+      },
+      {
+        "id": "starter-braces-scope",
+        "level": "Starter",
+        "title": "{ } と Scope",
+        "summary": "{ } は処理のまとまりを表す。その中で作った名前は、外からは使えない。",
+        "mental": "{ } は「部屋」。部屋の中で作った名前は部屋の外に持ち出せない。この有効範囲を Scope と呼ぶ。",
+        "points": [
+          "{ } は処理のまとまり（ブロック）を表す記号。",
+          "{ } の中で let / var で作った名前は、その { } の中だけで使える。",
+          "この「名前が使える範囲」を Scope（スコープ）と呼ぶ。",
+          "if の { } も、後で学ぶ関数の { } も、同じく範囲を表している。"
+        ],
+        "code": "let count = 3\nif count > 0 {\n  let message = \"今日も行く\"\n  print(message)\n}",
+        "why": "「さっき作ったはずの名前が使えない」というエラーの正体はほぼこれ。どの { } の中にいるかを意識できると、コードの構造が見えてくる。",
+        "pitfall": "{ } の中で作った名前を外で使うとエラーになる。外でも使いたいなら、{ } の外側で名前を作る。",
+        "questions": [
+          {
+            "id": "q-starter-031",
+            "difficulty": "Starter",
+            "prompt": "このコードはどうなりますか？",
+            "code": "let count = 3\nif count > 0 {\n  let message = \"今日も行く\"\n}\nprint(message)",
+            "choices": [
+              "今日も行く と表示される",
+              "何も表示されない",
+              "message が { } の外では使えずエラーになる",
+              "空行が表示される"
+            ],
+            "answer": 2,
+            "explanation": "message は if の { } の中で作られたので、有効範囲はその { } の中だけです。外側の print では使えずエラーになります。"
+          },
+          {
+            "id": "q-starter-032",
+            "difficulty": "Starter",
+            "prompt": "{ } が表しているものはどれですか？",
+            "code": "if count > 0 {\n  print(count)\n}",
+            "choices": [
+              "処理のまとまりと、その中だけで有効な名前の範囲",
+              "計算の順番",
+              "文字の値",
+              "コメント"
+            ],
+            "answer": 0,
+            "explanation": "{ } は処理のまとまりを表し、同時にその中で作った名前が有効な範囲（Scope）も決めます。"
+          },
+          {
+            "id": "q-starter-033",
+            "difficulty": "Starter",
+            "prompt": "message を print できるようにするには、どの書き方が正しいですか？",
+            "code": "// message を if の外でも表示したい",
+            "choices": [
+              "if の { } の中で let message を作る",
+              "if の { } より前で let message を作る",
+              "print を { } の前に書く",
+              "{ } を2つ重ねる"
+            ],
+            "answer": 1,
+            "explanation": "外でも使いたい名前は、外側の範囲で作ります。if の前で作れば、if の中からも後ろからも使えます。"
+          }
+        ]
+      },
+      {
+        "id": "starter-nil",
+        "level": "Starter",
+        "title": "nilとは何か",
+        "summary": "nil は「値が無い」ことを表す。0 や \"\" のような「値がある状態」とは違う。",
+        "mental": "0 は「0という値がある」、\"\" は「長さ0の文字がある」。nil は「そもそも値が入っていない」。空の箱ではなく、箱そのものが空欄。",
+        "points": [
+          "nil は「値が存在しない」ことを表す特別な書き方。",
+          "0 や \"\" は値が存在している状態で、nil とは違う。",
+          "String や Int のような普通の型に nil を入れることはできない。",
+          "nil を入れられる型が Optional（次のレッスンで学ぶ）。"
+        ],
+        "code": "let nickname: String = \"Yuki\"\nlet emptyText: String = \"\"",
+        "why": "現実のデータには「まだ入力されていない」「見つからなかった」が必ずある。それを 0 や \"\" でごまかさず nil で表すのが Swift の考え方。",
+        "pitfall": "\"未入力を 0 で表す\" ようなやり方は、本当の 0 と区別できなくなる。無い状態は nil で表す。",
+        "questions": [
+          {
+            "id": "q-starter-034",
+            "difficulty": "Starter",
+            "prompt": "nil の意味として正しいのはどれですか？",
+            "code": "// nil が表すもの",
+            "choices": [
+              "値が存在しないこと",
+              "値が 0 であること",
+              "文字が空であること",
+              "エラーが起きたこと"
+            ],
+            "answer": 0,
+            "explanation": "nil は「値が存在しない」ことを表します。0 や空文字は値が存在している状態なので、nil とは別です。"
+          },
+          {
+            "id": "q-starter-035",
+            "difficulty": "Starter",
+            "prompt": "\"\" と nil の違いの説明として正しいのはどれですか？",
+            "code": "let emptyText: String = \"\"",
+            "choices": [
+              "どちらも同じ意味",
+              "\"\" は長さ0の文字という値、nil は値そのものが無い状態",
+              "\"\" のほうが nil より小さい",
+              "nil は文字の一種"
+            ],
+            "answer": 1,
+            "explanation": "\"\" は「長さ0の文字列」という値が存在している状態です。nil は値が存在しないことを表すので、意味が違います。"
+          },
+          {
+            "id": "q-starter-036",
+            "difficulty": "Starter",
+            "prompt": "この行がエラーになる理由はどれですか？",
+            "code": "let nickname: String = nil",
+            "choices": [
+              "String は値が必ずある型なので nil を入れられない",
+              "let ではなく var にすべきだから",
+              "nickname という名前が使えないから",
+              ": を書いたから"
+            ],
+            "answer": 0,
+            "explanation": "String 型は必ず文字の値を持ちます。nil を入れたい場合は、次のレッスンで学ぶ String? のような Optional の型が必要です。"
+          }
+        ]
+      },
+      {
+        "id": "starter-optional",
+        "level": "Starter",
+        "title": "Optional・String?",
+        "summary": "型の後ろの ? は「値があるか、nil かもしれない」という印。String? は String とは別の型。",
+        "mental": "String? は「中身が入っているかもしれない封筒」。封筒のままでは文字として使えない。中身を取り出す作業が必要になる。",
+        "points": [
+          "型名の後ろに ? を付けた型を Optional と呼ぶ。",
+          "String? は「String の値が入っているか、nil のどちらか」を表す型。",
+          "String? を String としてそのまま使うことはできない。",
+          "中身を安全に取り出す方法が次のレッスンの if let。"
+        ],
+        "code": "var nickname: String? = \"Yuki\"\nnickname = nil\nprint(nickname == nil)",
+        "why": "API の応答や未入力の項目は「無いかもしれない値」。Optional はそれを型の時点で明示し、うっかり使うことを Swift が防いでくれる。",
+        "pitfall": "String と String? は別の型。? を付け忘れて nil を入れようとしたり、逆に ? 付きのまま文字として使おうとするとエラーになる。",
+        "questions": [
+          {
+            "id": "q-starter-037",
+            "difficulty": "Starter",
+            "prompt": "String と String? の違いの説明として正しいのはどれですか？",
+            "code": "let a: String = \"Yuki\"\nlet b: String? = nil",
+            "choices": [
+              "同じ型の別名",
+              "String は必ず値がある型、String? は値があるか nil の型",
+              "String? は文字数が多い文字列の型",
+              "String? は数も入れられる型"
+            ],
+            "answer": 1,
+            "explanation": "String は必ず文字の値を持つ型です。String? は値があるか nil のどちらかを表す型で、両者は別の型です。"
+          },
+          {
+            "id": "q-starter-038",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "var nickname: String? = nil\nnickname = \"Yuki\"\nprint(nickname == nil)",
+            "choices": [
+              "true",
+              "false",
+              "Yuki",
+              "エラーになる"
+            ],
+            "answer": 1,
+            "explanation": "2行目で \"Yuki\" が代入され nil ではなくなっています。よって nickname == nil は false になります。"
+          },
+          {
+            "id": "q-starter-039",
+            "difficulty": "Starter",
+            "prompt": "型名の後ろの ? が意味するものはどれですか？",
+            "code": "var nickname: String?",
+            "choices": [
+              "値があるか nil かもしれないこと",
+              "値が必ずあること",
+              "値が必ず nil であること",
+              "型が決まっていないこと"
+            ],
+            "answer": 0,
+            "explanation": "型名の後ろの ? は Optional を表し、「その型の値が入っているか、nil のどちらか」という意味になります。だから String? はそのまま String として使えず、次のレッスンの if let で中身を取り出す必要があります。"
+          }
+        ]
+      },
+      {
+        "id": "starter-if-let",
+        "level": "Starter",
+        "title": "if letでOptionalを取り出す",
+        "summary": "if let は、Optional に中身があるときだけ取り出して使う書き方。",
+        "mental": "if let は「封筒を開けてみる」動作。中身があればその中身に名前を付けて { } の中で使え、無ければ else に進む。",
+        "points": [
+          "if let 新しい名前 = Optionalの値 と書くと、中身があるときだけ取り出せる。",
+          "取り出した名前は ? が付かない普通の型で、その { } の中だけで使える。",
+          "nil のときは { } は実行されず、else があれば else 側が実行される。",
+          "値がない場合でも、安全に処理を分けられます。"
+        ],
+        "code": "let nickname: String? = \"Yuki\"\nif let name = nickname {\n  print(name)\n} else {\n  print(\"未設定\")\n}",
+        "why": "Optional はそのままでは使えないため、実務のコードでは if let が絶えず登場する。取り出してから使う流れが Swift の基本作法。",
+        "pitfall": "取り出した名前（name）が使えるのは if の { } の中だけ。外で使うとエラーになる。",
+        "questions": [
+          {
+            "id": "q-starter-040",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "let nickname: String? = \"Yuki\"\nif let name = nickname {\n  print(name)\n} else {\n  print(\"未設定\")\n}",
+            "choices": [
+              "Yuki",
+              "未設定",
+              "nil",
+              "エラーになる"
+            ],
+            "answer": 0,
+            "explanation": "nickname には \"Yuki\" が入っているので中身の取り出しに成功し、name は \"Yuki\" になります。if 側が実行され Yuki が表示されます。"
+          },
+          {
+            "id": "q-starter-041",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "let nickname: String? = nil\nif let name = nickname {\n  print(name)\n} else {\n  print(\"未設定\")\n}",
+            "choices": [
+              "Yuki",
+              "未設定",
+              "nil",
+              "何も表示されない"
+            ],
+            "answer": 1,
+            "explanation": "nickname は nil なので中身を取り出せません。if の { } は実行されず、else 側の 未設定 が表示されます。"
+          },
+          {
+            "id": "q-starter-042",
+            "difficulty": "Starter",
+            "prompt": "if let で取り出した name の型はどれですか？",
+            "code": "let nickname: String? = \"Yuki\"\nif let name = nickname {\n  print(name)\n}",
+            "choices": [
+              "String?",
+              "String",
+              "Bool",
+              "型は決まらない"
+            ],
+            "answer": 1,
+            "explanation": "if let は中身を取り出すので、name は ? の付かない String になります。だから { } の中では普通の文字列として使えます。"
+          }
+        ]
+      },
+      {
+        "id": "starter-functions",
+        "level": "Starter",
+        "title": "関数の定義と実行",
+        "summary": "func で処理に名前を付ける。定義しただけでは動かず、呼び出したときに実行される。",
+        "mental": "関数は「登録した手順書」。書いた時点では棚に置いただけ。名前を呼んだときに初めて手順が実行される。",
+        "points": [
+          "func で始めると、処理のまとまりに名前を付けられる（関数の定義）。",
+          "処理の中身は { } の中に書く。",
+          "定義しただけでは実行されない。名前() と書いて呼び出すと実行される。",
+          "一度定義すれば、何度でも呼び出せる。"
+        ],
+        "code": "func showGym() {\n  print(\"Fit24\")\n}\nshowGym()",
+        "why": "同じ処理を何度も書かずに済み、名前が付くことで「何をする処理か」がコードを読むだけで分かるようになる。",
+        "pitfall": "定義と呼び出しは別物。定義だけ書いて呼び出しを忘れると、何も起きないまま終わる。",
+        "questions": [
+          {
+            "id": "q-starter-043",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "func showGym() {\n  print(\"Fit24\")\n}\nshowGym()",
+            "choices": [
+              "Fit24",
+              "showGym",
+              "何も表示されない",
+              "エラーになる"
+            ],
+            "answer": 0,
+            "explanation": "最後の showGym() で関数が呼び出され、{ } の中の print が実行されるので Fit24 が表示されます。"
+          },
+          {
+            "id": "q-starter-044",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "func showGym() {\n  print(\"Fit24\")\n}",
+            "choices": [
+              "Fit24",
+              "showGym",
+              "何も表示されない",
+              "エラーになる"
+            ],
+            "answer": 2,
+            "explanation": "定義しただけで呼び出していないため、{ } の中は実行されません。何も表示されずに終わります。"
+          },
+          {
+            "id": "q-starter-045",
+            "difficulty": "Starter",
+            "prompt": "定義した関数を実行する書き方はどれですか？",
+            "code": "func showGym() {\n  print(\"Fit24\")\n}\n// 実行するには？",
+            "choices": [
+              "showGym",
+              "showGym()",
+              "func showGym",
+              "print(showGym)"
+            ],
+            "answer": 1,
+            "explanation": "呼び出しは名前の後ろに ( ) を付けます。( ) が無いと呼び出しにはなりません。"
+          }
+        ]
+      },
+      {
+        "id": "starter-arguments-return",
+        "level": "Starter",
+        "title": "()・引数・return",
+        "summary": "( ) は関数の受け渡し口。渡す値を引数、返ってくる値を戻り値と呼び、return で返す。",
+        "mental": "関数は自動販売機。引数はお金を入れる口（( ) の中）、return は出てくる商品。",
+        "points": [
+          "関数定義の ( ) の中には、受け取る値（引数）を 名前: 型 の形で書く。",
+          "呼び出すときは ( ) の中に実際の値を渡す。",
+          "-> の後ろには返す値の型を書く。",
+          "return はその値を呼び出し元に返し、関数を終える。"
+        ],
+        "code": "func doubled(value: Int) -> Int {\n  return value * 2\n}\nprint(doubled(value: 5))",
+        "why": "引数と戻り値が分かると、関数を「入力を渡すと結果が返ってくる部品」として読めるようになる。これが実務のコードを読む中心になる。",
+        "pitfall": "-> で戻り値の型を書いたのに return を書かないとエラーになる。逆に戻り値が無い関数では return で値を返せない。",
+        "questions": [
+          {
+            "id": "q-starter-046",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "func doubled(value: Int) -> Int {\n  return value * 2\n}\nprint(doubled(value: 5))",
+            "choices": [
+              "5",
+              "10",
+              "value * 2",
+              "エラーになる"
+            ],
+            "answer": 1,
+            "explanation": "5 が引数 value に渡され、value * 2 が評価されて 10 が return されます。その戻り値が print されます。"
+          },
+          {
+            "id": "q-starter-047",
+            "difficulty": "Starter",
+            "prompt": "return の役割として正しいのはどれですか？",
+            "code": "func doubled(value: Int) -> Int {\n  return value * 2\n}",
+            "choices": [
+              "値を画面に表示する",
+              "計算結果を呼び出し元に返す",
+              "関数を定義する",
+              "引数を受け取る"
+            ],
+            "answer": 1,
+            "explanation": "return は計算した値を呼び出し元へ返し、その時点で関数を終えます。画面に表示するのは print の役割です。"
+          },
+          {
+            "id": "q-starter-048",
+            "difficulty": "Starter",
+            "prompt": "「引数」の説明として正しいのはどれですか？",
+            "code": "print(doubled(value: 5))",
+            "choices": [
+              "関数に渡す値",
+              "関数が返す値",
+              "関数の名前",
+              "関数の型"
+            ],
+            "answer": 0,
+            "explanation": "引数は関数に渡す値のことです。ここでは 5 が引数として渡されています。返ってくる値は戻り値と呼びます。"
+          }
+        ]
+      },
+      {
+        "id": "starter-property-method",
+        "level": "Starter",
+        "title": ".・Property・Method",
+        "summary": ". は「〜の」。値が持つデータが property、値が持つ動作が method。",
+        "mental": "値を「機能付きの道具」と見る。userName.count は「その文字列の文字数（データ）」、userName.uppercased() は「大文字にする動作」。",
+        "points": [
+          ". は「〜の」を表し、値が持つものにアクセスする記号。",
+          "property は値が持っているデータ（例：文字列の count は文字数）。",
+          "method は値に対して行う動作で、呼び出すので ( ) が付く。",
+          "( ) が付いていなければ property、付いていれば method と見分けられる。"
+        ],
+        "code": "let userName = \"Yuki\"\nprint(userName.count)\nprint(userName.uppercased())",
+        "why": "Swift の標準機能はほぼすべて property と method の形で提供される。この2つを見分けられると、初めて見るコードでも「データか動作か」を判断できる。",
+        "pitfall": "( ) を付けない場合は、動作を実行せずに『その動作そのもの』を指してしまい、期待した結果になりません。使う場所によっては型が合わずエラーになります。",
+        "questions": [
+          {
+            "id": "q-starter-049",
+            "difficulty": "Starter",
+            "prompt": "property と method の違いの説明として正しいのはどれですか？",
+            "code": "print(userName.count)\nprint(userName.uppercased())",
+            "choices": [
+              "property は動作、method はデータ",
+              "property は値が持つデータ、method は値に対する動作",
+              "どちらも同じもの",
+              "property は数値専用、method は文字専用"
+            ],
+            "answer": 1,
+            "explanation": "property は値が持っているデータで、method は値に対して行う動作です。method は呼び出すので ( ) が付きます。"
+          },
+          {
+            "id": "q-starter-050",
+            "difficulty": "Starter",
+            "prompt": "userName.count はどちらですか？",
+            "code": "let userName = \"Yuki\"\nprint(userName.count)",
+            "choices": [
+              "property（文字数というデータ）",
+              "method（数える動作）",
+              "型の名前",
+              "引数"
+            ],
+            "answer": 0,
+            "explanation": "count は ( ) が付いていないので property です。その文字列が持つ文字数というデータを表します。"
+          },
+          {
+            "id": "q-starter-051",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "print(\"Fit24\".count)",
+            "choices": [
+              "4",
+              "5",
+              "Fit24",
+              "エラーになる"
+            ],
+            "answer": 1,
+            "explanation": "\"Fit24\" は F, i, t, 2, 4 の5文字です。count は文字数を表す property なので 5 が表示されます。"
+          }
+        ]
+      },
+      {
+        "id": "starter-array-index",
+        "level": "Starter",
+        "title": "Array・Index",
+        "summary": "Array は順番の付いた複数の値。何番目かを表す番号が index で、0 から始まる。",
+        "mental": "Array は棚に並んだ値。棚の番号（index）は 0 から数える。存在しない番号を指すと実行時に止まる。",
+        "points": [
+          "Array は同じ型の値を順番に並べて持つ型で、[ ] で作る。",
+          "index は「何番目か」を表す番号で、0 から始まる。",
+          "配列名[番号] でその位置の値を取り出せる。",
+          ".count は要素の個数を表す property。範囲外の index を指定すると実行時にエラーで止まる。"
+        ],
+        "code": "let scores = [80, 65, 90]\nprint(scores[0])\nprint(scores.count)",
+        "why": "記録一覧、検索結果、履歴など、アプリの画面に並ぶものはほぼ Array。index の数え方を間違えると1件ずれたり落ちたりする。",
+        "pitfall": "index は 0 から始まるので、3個の要素がある Array の最後の index は 2。3 を指定すると実行時に止まる。",
+        "questions": [
+          {
+            "id": "q-starter-052",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "let scores = [80, 65, 90]\nprint(scores[1])",
+            "choices": [
+              "80",
+              "65",
+              "90",
+              "1"
+            ],
+            "answer": 1,
+            "explanation": "index は 0 から始まるので、scores[0] が 80、scores[1] が 65 です。よって 65 が表示されます。"
+          },
+          {
+            "id": "q-starter-053",
+            "difficulty": "Starter",
+            "prompt": "Array の最初の要素の index はどれですか？",
+            "code": "let scores = [80, 65, 90]",
+            "choices": [
+              "0",
+              "1",
+              "-1",
+              "要素数と同じ番号"
+            ],
+            "answer": 0,
+            "explanation": "Swift の Array の index は 0 から始まります。最初の要素は scores[0] で取り出します。"
+          },
+          {
+            "id": "q-starter-054",
+            "difficulty": "Starter",
+            "prompt": "このコードを実行するとどうなりますか？",
+            "code": "let scores = [80, 65, 90]\nprint(scores[3])",
+            "choices": [
+              "90 が表示される",
+              "0 が表示される",
+              "範囲外の index なので実行時にエラーで止まる",
+              "何も表示されずに続く"
+            ],
+            "answer": 2,
+            "explanation": "要素は3個で、使える index は 0・1・2 です。3 は範囲外なので、実行時にエラーになりプログラムが止まります。"
+          }
+        ]
+      },
+      {
+        "id": "starter-for-in",
+        "level": "Starter",
+        "title": "forで1つずつ取り出す",
+        "summary": "for は Array の値を先頭から1つずつ取り出して、同じ処理を繰り返す。",
+        "mental": "for は「棚の値を1つずつ手に取る」動作。取り出した値に名前が付き、その名前で { } の中の処理が回数分実行される。",
+        "points": [
+          "for 名前 in 配列 と書くと、先頭から順に1つずつ取り出せる。",
+          "取り出した値に付けた名前は、その { } の中だけで使える。",
+          "繰り返しの回数は要素の個数と同じ。",
+          "取り出される順番は Array に並んでいる順番のまま。"
+        ],
+        "code": "let counts = [2, 3, 1]\nfor count in counts {\n  print(count)\n}",
+        "why": "一覧の全件に同じ処理をする場面は非常に多い。index を自分で計算しなくても済むため、範囲外エラーも起きにくい。",
+        "pitfall": "取り出した名前（count）が使えるのは { } の中だけ。外で使うとエラーになる。",
+        "questions": [
+          {
+            "id": "q-starter-055",
+            "difficulty": "Starter",
+            "prompt": "このコードの出力はどれですか？",
+            "code": "let counts = [2, 3, 1]\nfor count in counts {\n  print(count)\n}",
+            "choices": [
+              "2 3 1 の順に3行",
+              "1 2 3 の順に3行",
+              "3 だけ",
+              "counts と1行"
+            ],
+            "answer": 0,
+            "explanation": "for は Array に並んでいる順番で1つずつ取り出します。2、3、1 の順に print されるので3行表示されます。"
+          },
+          {
+            "id": "q-starter-056",
+            "difficulty": "Starter",
+            "prompt": "このコードで print は何回実行されますか？",
+            "code": "let counts = [2, 3, 1]\nfor count in counts {\n  print(count)\n}",
+            "choices": [
+              "1回",
+              "2回",
+              "3回",
+              "6回"
+            ],
+            "answer": 2,
+            "explanation": "繰り返しの回数は要素の個数と同じです。要素が3個なので print は3回実行されます。"
+          },
+          {
+            "id": "q-starter-057",
+            "difficulty": "Starter",
+            "prompt": "for で取り出した count が使える範囲はどれですか？",
+            "code": "let counts = [2, 3, 1]\nfor count in counts {\n  print(count)\n}\nprint(count)",
+            "choices": [
+              "for の { } の中だけ",
+              "コード全体",
+              "for より前だけ",
+              "どこでも使えない"
+            ],
+            "answer": 0,
+            "explanation": "count は for の { } の中だけで有効です（Scope）。最後の print(count) は範囲外なのでエラーになります。"
+          }
+        ]
+      },
+      {
+        "id": "starter-context-matters",
+        "level": "Starter",
+        "title": "同じ記号でも文脈で意味が変わる",
+        "summary": "let・?・( )・{ } は、書かれる場所によって役割が変わる。文脈で読む習慣を付ける。",
+        "mental": "記号の意味は「暗記」ではなく「どこに書かれているか」で決まる。前後を見てから意味を決めるのが、コードを読める人の読み方。",
+        "points": [
+          "let は名前の宣言にも使うが、if let では Optional の中身の取り出しにも使う。",
+          "? は型名の後ろに付くと Optional を表します。Swift Starterで扱うのはこの使い方ですが、? は書かれる位置によって役割が変わる記号だと覚えておきましょう。",
+          "( ) は関数定義の引数リスト、関数の呼び出し、計算の順番のまとめ、の3つの使い方がある。",
+          "{ } は if・for・func いずれでも「処理のまとまりと有効範囲」を表す。どの範囲かは直前の行が決める。"
+        ],
+        "code": "let base: Int? = 3\nif let value = base {\n  print((value + 1) * 2)\n}",
+        "why": "同じ記号を毎回違う機能として覚えるとキリがない。「文脈で意味が決まる」と分かれば、初めて見る書き方でも前後から意味を推測できる。",
+        "pitfall": "記号を1つの意味だけで覚えると、別の文脈で出てきたときに読めなくなる。まず前後の行を見る。",
+        "questions": [
+          {
+            "id": "q-starter-058",
+            "difficulty": "Starter",
+            "prompt": "1行目の let と2行目の let の違いの説明として正しいのはどれですか？",
+            "code": "let base: Int? = 3\nif let value = base {\n  print(value)\n}",
+            "choices": [
+              "どちらも新しい名前に値を入れる宣言だが、2行目は Optional の中身を取り出す形",
+              "どちらもまったく同じ意味",
+              "1行目は取り出し、2行目は宣言",
+              "2行目の let は書かなくてもよい"
+            ],
+            "answer": 0,
+            "explanation": "1行目は値に名前を付ける普通の宣言です。2行目の if let は Optional の中身がある場合だけ取り出して名前を付ける形で、役割が違います。"
+          },
+          {
+            "id": "q-starter-059",
+            "difficulty": "Starter",
+            "prompt": "このコードの ( ) のうち、value + 1 を囲んでいるものの役割はどれですか？",
+            "code": "let value = 3\nprint((value + 1) * 2)",
+            "choices": [
+              "関数の呼び出し",
+              "引数リストの宣言",
+              "計算の順番をまとめる",
+              "Optional を表す"
+            ],
+            "answer": 2,
+            "explanation": "( ) は文脈で役割が変わります。ここでは先に value + 1 を計算させるためのまとまりで、結果 4 * 2 = 8 が表示されます。"
+          },
+          {
+            "id": "q-starter-060",
+            "difficulty": "Starter",
+            "prompt": "{ } の意味の説明として正しいのはどれですか？",
+            "code": "let isMember = true\nlet counts = [2, 3, 1]\nif isMember {\n  print(\"会員\")\n}\nfor count in counts {\n  print(count)\n}",
+            "choices": [
+              "if では条件、for では配列を表す",
+              "どちらも処理のまとまりと有効範囲を表し、何の範囲かは直前の行で決まる",
+              "if の { } だけが処理のまとまり",
+              "{ } は飾りで意味はない"
+            ],
+            "answer": 1,
+            "explanation": "{ } はいつでも「処理のまとまりとその中で有効な名前の範囲」を表します。それが条件付き実行なのか繰り返しなのかは、直前の if や for が決めます。"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "swift",
     "name": "Swift Language",
     "subtitle": "言語そのものを理解する",
