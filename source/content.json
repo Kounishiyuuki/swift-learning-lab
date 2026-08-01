@@ -7376,7 +7376,26 @@
               "mutating"
             ],
             "answer": 0,
-            "explanation": "throws関数はtryで呼ぶ。"
+            "explanation": "throws関数はtryで呼ぶ。",
+            "detail": {
+              "concept": "`throws` は「この関数は失敗してエラーを投げることがある」という宣言です。呼ぶ側はその可能性を無視できず、`try` を書いて「失敗しうる呼び出しである」ことを明示します。実際にエラーを受け止めるには do-catch で囲むか、自分も throws を付けて呼び出し元へ伝播させます。",
+              "whyCorrect": "try は「ここで失敗するかもしれない」という目印です。コードを読むだけで失敗しうる箇所が分かるため、エラー処理の漏れに気づきやすくなります。",
+              "otherChoices": [
+                {
+                  "choice": "await",
+                  "reason": "await は非同期関数の呼び出しに使う記号で、処理が一時中断されうる地点を示します。エラーとは別の話で、両方必要なら `try await` と書きます。"
+                },
+                {
+                  "choice": "weak",
+                  "reason": "weak は参照カウントを増やさない参照の指定で、メモリ管理のためのものです。"
+                },
+                {
+                  "choice": "mutating",
+                  "reason": "mutating は struct のメソッドが自身を書き換えることを示す指定です。"
+                }
+              ],
+              "takeaway": "throws には try、async には await。両方なら `try await`。"
+            }
           },
           {
             "id": "q-concurrency-002",
@@ -7390,7 +7409,36 @@
               "実行されない"
             ],
             "answer": 0,
-            "explanation": "scope終了時に実行。"
+            "explanation": "scope終了時に実行。",
+            "detail": {
+              "concept": "defer は「このスコープを抜ける直前に必ず実行する処理」を登録する仕組みです。正常に最後まで進んだ場合も、途中で return した場合も、エラーを投げて抜けた場合も実行されます。ファイルを閉じる、フラグを戻すといった後始末をまとめて書けます。",
+              "steps": [
+                "関数に入り、defer ブロックが「後で実行する処理」として登録される（この時点では実行されない）。",
+                "print(\"body\") が実行される。",
+                "関数を抜ける直前に、登録された defer の中身が実行され end が出力される。"
+              ],
+              "whyCorrect": "登録の順ではなく、スコープを抜けるタイミングで実行される点が defer の要点です。書く場所と実行される場所がずれます。",
+              "otherChoices": [
+                {
+                  "choice": "最初",
+                  "reason": "登録は最初に行われますが、実行は最後です。この順序の違いが defer の特徴です。"
+                },
+                {
+                  "choice": "compile時",
+                  "reason": "実行時の仕組みであり、ビルド時に何かが起きるわけではありません。"
+                },
+                {
+                  "choice": "実行されない",
+                  "reason": "スコープを抜ければ必ず実行されます。途中で return しても実行されます。"
+                }
+              ],
+              "example": {
+                "code": "func run() {\n    defer { print(\"end\") }\n    print(\"body\")\n}\nrun()",
+                "output": "body\nend",
+                "explanation": "defer は先に書かれていても、実行されるのはスコープを抜ける直前です。後始末を処理の近くに書けるのが利点です。"
+              },
+              "takeaway": "defer は「抜ける直前に必ず実行」。"
+            }
           }
         ]
       },
@@ -7422,7 +7470,26 @@
               "left/right"
             ],
             "answer": 0,
-            "explanation": "成功と失敗をenum caseで表す。"
+            "explanation": "成功と失敗をenum caseで表す。",
+            "detail": {
+              "concept": "Result は「成功したときの値」と「失敗したときのエラー」を 1 つの値として表す enum です。`.success(値)` と `.failure(エラー)` の 2 つの case を持ち、結果をその場で処理せずに保持したり、あとから受け渡したりできます。",
+              "whyCorrect": "成功と失敗を型で表すため、呼び出し側は switch で両方の場合を扱うことを強制されます。処理し忘れが起きにくくなります。",
+              "otherChoices": [
+                {
+                  "choice": "some/none",
+                  "reason": "Optional の内部表現の case 名です。値の有無を表すもので、失敗の理由は持てません。"
+                },
+                {
+                  "choice": "on/off",
+                  "reason": "Result の case 名ではありません。"
+                },
+                {
+                  "choice": "left/right",
+                  "reason": "Either 型を持つ他の言語での命名です。Swift の Result は success / failure です。"
+                }
+              ],
+              "takeaway": "Result は成功値と失敗理由を 1 つの値にまとめる。"
+            }
           },
           {
             "id": "q-concurrency-004",
@@ -7436,7 +7503,36 @@
               "compile error"
             ],
             "answer": 0,
-            "explanation": "保持Errorをthrowする。"
+            "explanation": "保持Errorをthrowする。",
+            "detail": {
+              "concept": "`get()` は Result から成功値を取り出すメソッドです。`.success` なら中の値を返し、`.failure` なら保持しているエラーを throw します。そのため呼び出しには try が必要で、do-catch と組み合わせて使います。",
+              "steps": [
+                "result が .success(値) なら、get() はその値をそのまま返す。",
+                "result が .failure(エラー) なら、get() はそのエラーを throw する。",
+                "呼び出し側は try で受け、catch でエラーを処理する。"
+              ],
+              "whyCorrect": "Result を throws の世界へ橋渡しするのが get() の役割です。switch で分岐する代わりに、do-catch で扱えるようになります。",
+              "otherChoices": [
+                {
+                  "choice": "nil固定",
+                  "reason": "nil を返す API ではありません。nil で表すなら Optional を使います。Result は失敗の理由まで保持します。"
+                },
+                {
+                  "choice": "0",
+                  "reason": "既定値で埋めることはありません。既定値が欲しい場合は自分で `?? 0` 相当の処理を書きます。"
+                },
+                {
+                  "choice": "compile error",
+                  "reason": "try を付ければ正しくコンパイルできます。"
+                }
+              ],
+              "example": {
+                "code": "enum LoadError: Error { case notFound }\nlet ok: Result<Int, Error> = .success(3)\nlet ng: Result<Int, Error> = .failure(LoadError.notFound)\ndo {\n    print(try ok.get())\n    print(try ng.get())\n} catch {\n    print(\"caught \\(error)\")\n}",
+                "output": "3\ncaught notFound",
+                "explanation": "成功なら値が返り、失敗なら保持していたエラーが投げられて catch に入ります。1 つ目の print は実行され、2 つ目は中断されます。"
+              },
+              "takeaway": "get() は成功なら値、失敗なら throw。"
+            }
           }
         ]
       },
@@ -7468,7 +7564,36 @@
               "let使用"
             ],
             "answer": 0,
-            "explanation": "ARCはstrong reference countに基づく。"
+            "explanation": "ARCはstrong reference countに基づく。",
+            "detail": {
+              "concept": "Swift は ARC（Automatic Reference Counting）でクラスのインスタンスを管理します。そのインスタンスを強く参照している変数の数が数えられていて、0 になった時点で解放されます。定期的に走査して回収する方式ではなく、参照が切れたその場で解放される点が特徴です。",
+              "steps": [
+                "MyClass() が作られ、obj が強く参照するので参照数は 1。",
+                "`obj = nil` で obj からの参照が外れ、参照数が 0 になる。",
+                "参照数が 0 になった時点で解放され、deinit があれば呼ばれる。"
+              ],
+              "whyCorrect": "解放の条件は「強い参照が 1 つも残っていないこと」です。weak や unowned の参照は数に含まれないため、それだけが残っていても解放されます。",
+              "otherChoices": [
+                {
+                  "choice": "1秒経つ",
+                  "reason": "時間経過では解放されません。参照が残っていれば残り続けます。"
+                },
+                {
+                  "choice": "GCが必ず検出",
+                  "reason": "Swift は走査型のガベージコレクタを使いません。参照数が 0 になった時点で決まったタイミングで解放されます。"
+                },
+                {
+                  "choice": "let使用",
+                  "reason": "let か var かは、その変数を後から差し替えられるかどうかの違いであり、解放の条件ではありません。"
+                }
+              ],
+              "example": {
+                "code": "final class Session {\n    deinit { print(\"released\") }\n}\nvar session: Session? = Session()\nprint(\"before\")\nsession = nil\nprint(\"after\")",
+                "output": "before\nreleased\nafter",
+                "explanation": "nil を代入した瞬間に参照数が 0 になり、その場で deinit が呼ばれます。解放のタイミングが確定している点が ARC の特徴です。"
+              },
+              "takeaway": "強い参照が 0 になった瞬間に解放される。"
+            }
           },
           {
             "id": "q-concurrency-006",
@@ -7482,7 +7607,32 @@
               "URL encoding"
             ],
             "answer": 0,
-            "explanation": "相互strong参照で解放されない。"
+            "explanation": "相互strong参照で解放されない。",
+            "detail": {
+              "concept": "2 つのインスタンスが互いを強く参照し合うと、どちらの参照数も 0 になりません。外部からの参照をすべて外しても両方が生き残り、メモリが解放されないままになります。これが強参照循環（strong reference cycle）です。",
+              "steps": [
+                "a が b を強く参照する。",
+                "b も a を強く参照する。",
+                "外部の変数を nil にしても、互いの参照が残るため参照数は 0 にならない。",
+                "どちらも解放されず、メモリ上に残り続ける。"
+              ],
+              "whyCorrect": "ARC は参照数だけを見るため、この輪を自動では検出できません。設計者が weak や unowned でどちらか一方の参照を弱めて断ち切る必要があります。",
+              "otherChoices": [
+                {
+                  "choice": "Int加算",
+                  "reason": "数値の計算はメモリ管理と関係ありません。"
+                },
+                {
+                  "choice": "Array sort",
+                  "reason": "並べ替えは値の操作であり、参照の循環とは無関係です。"
+                },
+                {
+                  "choice": "URL encoding",
+                  "reason": "文字列の変換処理であり、メモリ管理の問題ではありません。"
+                }
+              ],
+              "takeaway": "互いに強参照すると解放されない。片方を weak にして断つ。"
+            }
           }
         ]
       },
@@ -7514,7 +7664,31 @@
               "copy"
             ],
             "answer": 0,
-            "explanation": "zeroing weak referenceでnilになる。"
+            "explanation": "zeroing weak referenceでnilになる。",
+            "detail": {
+              "concept": "weak 参照は対象の参照数を増やしません。そのため対象が解放されうるので、weak な変数は必ず Optional になります。対象が解放されると、その変数は自動的に nil になります（zeroing weak reference）。解放済みの領域を指したままにならないため安全です。",
+              "whyCorrect": "自動的に nil になるので、使う前に if let などで確認すれば、すでに無くなった対象へアクセスする事故を防げます。",
+              "otherChoices": [
+                {
+                  "choice": "必ずcrash",
+                  "reason": "解放済みの領域を指したままにならないため、停止しません。unowned の場合は逆に、解放後にアクセスすると停止します。"
+                },
+                {
+                  "choice": "strongへ変化",
+                  "reason": "弱い参照が自動的に強い参照へ変わることはありません。"
+                },
+                {
+                  "choice": "copy",
+                  "reason": "参照であって複製ではありません。対象がコピーされることはありません。"
+                }
+              ],
+              "example": {
+                "code": "final class Owner {\n    deinit { print(\"released\") }\n}\nvar owner: Owner? = Owner()\nweak var weakOwner = owner\nprint(weakOwner == nil)\nowner = nil\nprint(weakOwner == nil)",
+                "output": "false\nreleased\ntrue",
+                "explanation": "強い参照が外れた時点で対象が解放され、weak 側は自動的に nil になります。だから weak は必ず Optional として宣言します。"
+              },
+              "takeaway": "weak は Optional。対象が消えると自動で nil。"
+            }
           },
           {
             "id": "q-concurrency-008",
@@ -7528,7 +7702,26 @@
               "MainActor必須"
             ],
             "answer": 0,
-            "explanation": "対象lifetimeがより長いと保証できる場合。"
+            "explanation": "対象lifetimeがより長いと保証できる場合。",
+            "detail": {
+              "concept": "unowned も参照数を増やしませんが、weak と違って Optional にはならず、自動的に nil にもなりません。「自分が生きている間、相手は必ず生きている」と保証できる場合にだけ使います。保証が崩れて解放済みの対象にアクセスすると、その時点でプログラムが停止します。",
+              "whyCorrect": "unowned は「相手のほうが自分より長生きする」という前提に依存します。子が親を参照するような、寿命の関係がはっきりしている場合に使います。",
+              "otherChoices": [
+                {
+                  "choice": "いつでもnil",
+                  "reason": "nil になり得るのは weak です。unowned は Optional ではないため nil を代入できません。"
+                },
+                {
+                  "choice": "値型だけ",
+                  "reason": "参照の話なので対象は参照型です。値型には参照カウントがありません。"
+                },
+                {
+                  "choice": "MainActor必須",
+                  "reason": "並行処理の指定とは無関係です。"
+                }
+              ],
+              "takeaway": "unowned は「相手が必ず生きている」前提。崩れると停止する。"
+            }
           }
         ]
       },
@@ -7560,7 +7753,32 @@
               "同期化"
             ],
             "answer": 0,
-            "explanation": "suspension point。"
+            "explanation": "suspension point。",
+            "detail": {
+              "concept": "await は「ここで待つかもしれない」ことを示す目印です。その地点で今の処理はいったん中断され（suspension point）、実行していたスレッドは解放されて他の作業に使われます。結果が用意できたら処理が再開されます。新しいスレッドが作られるわけではありません。",
+              "steps": [
+                "await の地点まで通常どおり実行される。",
+                "結果がまだ無ければ、この処理は中断され、スレッドは他の作業へ回される。",
+                "結果が用意できると、続きから再開される。",
+                "再開後のスレッドは、中断前と同じとは限らない。"
+              ],
+              "whyCorrect": "await は中断されうる地点の宣言です。中断中もスレッドが塞がらないため、少ないスレッドで多くの処理を並行に進められます。",
+              "otherChoices": [
+                {
+                  "choice": "必ずnew thread",
+                  "reason": "スレッドを新しく作る指示ではありません。むしろ待っている間はスレッドを手放します。"
+                },
+                {
+                  "choice": "Error無視",
+                  "reason": "エラーとは無関係です。エラーを扱うのは try です。"
+                },
+                {
+                  "choice": "同期化",
+                  "reason": "同期処理に変えるものではありません。非同期であることを明示する記号です。"
+                }
+              ],
+              "takeaway": "await は中断されうる地点。スレッド生成ではない。"
+            }
           },
           {
             "id": "q-concurrency-010",
@@ -7574,7 +7792,26 @@
               "load!()"
             ],
             "answer": 0,
-            "explanation": "throwとasyncの両方を扱う。"
+            "explanation": "throwとasyncの両方を扱う。",
+            "detail": {
+              "concept": "`async throws` は「非同期であり、かつ失敗しうる」関数です。呼ぶ側は両方の性質を明示する必要があり、`try await` と 2 つ並べて書きます。順序は try が先、await が後です。",
+              "whyCorrect": "await が中断されうる地点、try が失敗しうる呼び出しを示します。両方の性質があるため、両方を書きます。",
+              "otherChoices": [
+                {
+                  "choice": "await?だけ",
+                  "reason": "エラーを扱う指定が抜けています。throws である以上 try が必要です。また `await?` という記法はありません。"
+                },
+                {
+                  "choice": "weak load()",
+                  "reason": "weak はメモリ管理の指定で、関数呼び出しには使いません。"
+                },
+                {
+                  "choice": "load!()",
+                  "reason": "`!` は Optional の強制アンラップなどに使う記号で、非同期やエラーの扱いとは無関係です。"
+                }
+              ],
+              "takeaway": "`async throws` の呼び出しは `try await`。"
+            }
           }
         ]
       },
@@ -7606,7 +7843,37 @@
               "Auto Layout"
             ],
             "answer": 0,
-            "explanation": "独立処理を並行開始できる。"
+            "explanation": "独立処理を並行開始できる。",
+            "detail": {
+              "concept": "`async let` は非同期処理を「開始だけしておき、結果は後で受け取る」書き方です。2 つ書けば両方が同時に走り始めます。ただし互いの結果に依存する処理には使えません。前の結果を次に使う場合は、素直に `await` で順番に待ちます。",
+              "steps": [
+                "`async let a = loadA()` で loadA が走り始める（ここでは待たない）。",
+                "続けて `async let b = loadB()` も走り始める。",
+                "後で `await a` や `await b` と書いた時点で結果を受け取る。",
+                "2 つが独立しているため、合計時間は「両方の合計」ではなく「遅いほう」に近づく。"
+              ],
+              "whyCorrect": "独立した処理を同時に進めることが目的なので、依存関係の無い処理に向いています。",
+              "otherChoices": [
+                {
+                  "choice": "順番依存処理",
+                  "reason": "前の結果を次で使う処理は同時に始められません。順番に await します。"
+                },
+                {
+                  "choice": "同期定数だけ",
+                  "reason": "同期的な定数の計算に非同期の仕組みは不要です。"
+                },
+                {
+                  "choice": "Auto Layout",
+                  "reason": "画面のレイアウトとは無関係です。"
+                }
+              ],
+              "example": {
+                "code": "func load(_ name: String) async -> String { name }\n\nasync let first = load(\"A\")\nasync let second = load(\"B\")\nlet results = await [first, second]\nprint(results)",
+                "output": "[\"A\", \"B\"]",
+                "explanation": "2 つの処理は同時に開始され、await した時点で結果を受け取ります。受け取る順番はこちらが決めるため、結果の並びは安定します。"
+              },
+              "takeaway": "async let は独立した処理を同時に開始する。"
+            }
           },
           {
             "id": "q-concurrency-012",
@@ -7620,7 +7887,26 @@
               "HTTP不要"
             ],
             "answer": 0,
-            "explanation": "child taskがscopeに構造化される。"
+            "explanation": "child taskがscopeに構造化される。",
+            "detail": {
+              "concept": "Structured Concurrency は、非同期処理を親子関係のある構造として管理する考え方です。親のスコープを抜けるときには、その中で始めた子の処理がすべて完了（またはキャンセル）していることが保証されます。処理が迷子になって残り続けることを防げます。",
+              "whyCorrect": "スコープと寿命が対応するため、「どこで始まり、どこで終わるか」がコードの形から読み取れます。エラーやキャンセルも親子をたどって伝わります。",
+              "otherChoices": [
+                {
+                  "choice": "Taskが永久に残る",
+                  "reason": "むしろ逆で、スコープを抜けるときに残らないことが保証されます。構造の外で独立して走らせたい場合は非構造の Task を使います。"
+                },
+                {
+                  "choice": "ARC不要",
+                  "reason": "メモリ管理の仕組みは引き続き必要です。"
+                },
+                {
+                  "choice": "HTTP不要",
+                  "reason": "通信の有無とは無関係です。"
+                }
+              ],
+              "takeaway": "子タスクの寿命が親のスコープに収まる。"
+            }
           }
         ]
       },
@@ -7652,7 +7938,32 @@
               "thread kill保証"
             ],
             "answer": 0,
-            "explanation": "処理側が確認/反応する。"
+            "explanation": "処理側が確認/反応する。",
+            "detail": {
+              "concept": "`task.cancel()` は「もうこの処理は不要になった」という合図を立てるだけで、実行中の処理を強制的に止めるものではありません。処理側が `Task.isCancelled` を確認したり `try Task.checkCancellation()` を呼んだりして、自分から中断する必要があります。これを協調的キャンセルと呼びます。",
+              "steps": [
+                "cancel() が呼ばれ、そのタスクにキャンセル済みの印が付く。",
+                "実行中の処理はそのまま動き続ける。",
+                "処理側が確認する地点に来たときに初めて中断される。",
+                "確認する箇所が無ければ、最後まで実行されてしまう。"
+              ],
+              "whyCorrect": "強制停止だと、途中の状態が壊れたまま放置される危険があります。処理側が安全な地点で自ら止まる設計になっています。",
+              "otherChoices": [
+                {
+                  "choice": "任意命令を即強制終了",
+                  "reason": "任意の地点で強制的に打ち切ることはできません。確認する箇所が無ければ止まりません。"
+                },
+                {
+                  "choice": "app終了",
+                  "reason": "アプリ全体が終了することはありません。対象のタスクだけの話です。"
+                },
+                {
+                  "choice": "thread kill保証",
+                  "reason": "スレッドを強制終了する保証はありません。そもそもタスクとスレッドは 1 対 1 ではありません。"
+                }
+              ],
+              "takeaway": "cancel は「お願い」。処理側が確認しないと止まらない。"
+            }
           },
           {
             "id": "q-concurrency-014",
@@ -7666,7 +7977,26 @@
               "Git reset"
             ],
             "answer": 0,
-            "explanation": "cancel済みならErrorをthrowする。"
+            "explanation": "cancel済みならErrorをthrowする。",
+            "detail": {
+              "concept": "`try Task.checkCancellation()` は、キャンセル済みなら CancellationError を throw し、そうでなければ何もせずに次へ進むメソッドです。長い処理の途中に挟むことで、キャンセルへの反応点を作れます。",
+              "whyCorrect": "throw によって以降の処理が飛ばされ、呼び出し元まで一気に抜けられます。エラー処理の仕組みにそのまま乗るため、後始末も do-catch や defer で書けます。",
+              "otherChoices": [
+                {
+                  "choice": "Boolだけ",
+                  "reason": "真偽値だけを見たい場合は `Task.isCancelled` を使います。checkCancellation は throw する点が異なります。"
+                },
+                {
+                  "choice": "UIを閉じる",
+                  "reason": "画面操作とは無関係です。"
+                },
+                {
+                  "choice": "Git reset",
+                  "reason": "バージョン管理の操作とは無関係です。"
+                }
+              ],
+              "takeaway": "isCancelled は判定、checkCancellation は throw。"
+            }
           }
         ]
       },
@@ -7698,7 +8028,26 @@
               "取得不可"
             ],
             "answer": 0,
-            "explanation": "taskは並行実行される。"
+            "explanation": "taskは並行実行される。",
+            "detail": {
+              "concept": "TaskGroup に追加した子タスクは同時に走るため、終わる順番は処理内容や実行環境によって変わります。`for await value in group` で受け取れるのは、追加した順ではなく完了した順です。",
+              "whyCorrect": "並行に走る以上、どれが先に終わるかは保証できません。順序が重要なら、結果に索引や識別子を持たせて後から並べ替えるか、Dictionary に集めます。",
+              "otherChoices": [
+                {
+                  "choice": "必ず追加順",
+                  "reason": "追加順は保証されません。速く終わったものから届きます。"
+                },
+                {
+                  "choice": "必ず逆順",
+                  "reason": "逆順になる保証もありません。順序は不定です。"
+                },
+                {
+                  "choice": "取得不可",
+                  "reason": "結果は受け取れます。順序が保証されないだけです。"
+                }
+              ],
+              "takeaway": "TaskGroup の結果は完了順。順序が要るなら自分で並べ替える。"
+            }
           },
           {
             "id": "q-concurrency-016",
@@ -7712,7 +8061,26 @@
               "ARC解放"
             ],
             "answer": 0,
-            "explanation": "runtimeで数が決まる並行処理。"
+            "explanation": "runtimeで数が決まる並行処理。",
+            "detail": {
+              "concept": "`async let` は書いた数だけ処理を開始する固定的な書き方です。対して TaskGroup は、実行時に決まる個数の処理をループで追加できます。URL の配列を受け取って全件取得する、といった場面に向いています。",
+              "whyCorrect": "個数が実行時にしか分からない場合、`async let` では書き表せません。TaskGroup なら addTask をループで呼べます。",
+              "otherChoices": [
+                {
+                  "choice": "1個の同期計算だけ",
+                  "reason": "1 つの同期的な計算に並行処理の仕組みは不要です。そのまま書くほうが単純です。"
+                },
+                {
+                  "choice": "Auto Layout",
+                  "reason": "画面のレイアウトとは無関係です。"
+                },
+                {
+                  "choice": "ARC解放",
+                  "reason": "メモリの解放処理とは無関係です。"
+                }
+              ],
+              "takeaway": "個数が固定なら async let、可変なら TaskGroup。"
+            }
           }
         ]
       },
@@ -7744,7 +8112,31 @@
               "class継承"
             ],
             "answer": 0,
-            "explanation": "並行accessから内部stateを隔離する。"
+            "explanation": "並行accessから内部stateを隔離する。",
+            "detail": {
+              "concept": "複数の処理が同時に同じ可変データを読み書きすると、結果が壊れることがあります（データ競合）。actor は自分が持つ状態への出入り口を 1 つに絞り、同時に 1 つの処理しか中へ入れないようにします。この仕組みを isolation（隔離）と呼びます。",
+              "whyCorrect": "ロックを自分で書く代わりに、型の性質として安全性を確保できます。内部の状態は外から直接触れず、必ず actor のメソッド経由になります。",
+              "otherChoices": [
+                {
+                  "choice": "UI描画",
+                  "reason": "画面描画そのものを担う型ではありません。UI に関わるのは MainActor という特定の actor です。"
+                },
+                {
+                  "choice": "JSON encode",
+                  "reason": "データ変換は Codable の役割です。"
+                },
+                {
+                  "choice": "class継承",
+                  "reason": "actor は継承のための仕組みではありません。"
+                }
+              ],
+              "example": {
+                "code": "actor Counter {\n    private var value = 0\n    func increment() { value += 1 }\n    func current() -> Int { value }\n}\n\nlet counter = Counter()\nawait counter.increment()\nawait counter.increment()\nprint(await counter.current())",
+                "output": "2",
+                "explanation": "value は actor の外から直接触れません。increment も current も actor の中で 1 つずつ実行されるため、同時に呼ばれても値が壊れません。"
+              },
+              "takeaway": "actor は可変状態への同時アクセスを 1 つに絞る。"
+            }
           },
           {
             "id": "q-concurrency-018",
@@ -7758,7 +8150,26 @@
               "mutating"
             ],
             "answer": 0,
-            "explanation": "actor境界を越えるためawaitが必要な場合が多い。"
+            "explanation": "actor境界を越えるためawaitが必要な場合が多い。",
+            "detail": {
+              "concept": "actor の外からそのメソッドを呼ぶときは、actor の中に入る順番を待つ可能性があります。待ちが発生しうる以上、呼び出しは中断されうる地点になるため await が必要です。actor の内部から自分のメソッドを呼ぶ場合は、すでに中にいるので await は不要です。",
+              "whyCorrect": "境界を越える呼び出しは待つ可能性があるからです。await が付くことで、読み手にも「ここで他の処理に譲る可能性がある」と伝わります。",
+              "otherChoices": [
+                {
+                  "choice": "weak",
+                  "reason": "weak はメモリ管理の指定で、呼び出しには使いません。"
+                },
+                {
+                  "choice": "override",
+                  "reason": "override は継承したメソッドの上書きです。"
+                },
+                {
+                  "choice": "mutating",
+                  "reason": "mutating は struct のメソッドが自身を変更する指定です。actor には使いません。"
+                }
+              ],
+              "takeaway": "actor の外からの呼び出しには await。"
+            }
           }
         ]
       },
@@ -7790,7 +8201,26 @@
               "Optional化"
             ],
             "answer": 0,
-            "explanation": "MainActor isolationを付ける。"
+            "explanation": "MainActor isolationを付ける。",
+            "detail": {
+              "concept": "MainActor は「メインスレッドで実行される」特別な actor です。型やメソッドに `@MainActor` を付けると、その中の処理はメインスレッド上で行われることが保証されます。UI の更新はメインスレッドから行う必要があるため、画面に関わる型でよく使われます。",
+              "whyCorrect": "@MainActor は隔離先を MainActor に指定する印です。付けた型のプロパティやメソッドへは、外部から await 付きでアクセスすることになります。",
+              "otherChoices": [
+                {
+                  "choice": "new thread固定",
+                  "reason": "新しいスレッドを作る指定ではありません。既存のメインスレッドで動かす指定です。"
+                },
+                {
+                  "choice": "ARC停止",
+                  "reason": "メモリ管理は通常どおり働きます。"
+                },
+                {
+                  "choice": "Optional化",
+                  "reason": "値の有無を表す Optional とは無関係です。"
+                }
+              ],
+              "takeaway": "@MainActor はメインスレッドでの実行を保証する。"
+            }
           },
           {
             "id": "q-concurrency-020",
@@ -7804,7 +8234,26 @@
               "問題なし"
             ],
             "answer": 0,
-            "explanation": "MainActorを長時間占有する。"
+            "explanation": "MainActorを長時間占有する。",
+            "detail": {
+              "concept": "メインスレッドは画面の描画とユーザー操作の受け付けを担当します。ここで時間のかかる計算を行うと、その間は描画も入力処理も進まず、画面が固まったように見えます。重い処理は MainActor の外へ出し、結果を受け取るときだけメインに戻すのが基本です。",
+              "whyCorrect": "MainActor を長時間占有すると、UI の応答性が損なわれます。計算そのものが速くなるわけでもありません。",
+              "otherChoices": [
+                {
+                  "choice": "必ず高速化",
+                  "reason": "実行場所を変えても計算量は変わりません。むしろ他の作業を止めてしまいます。"
+                },
+                {
+                  "choice": "通信暗号化",
+                  "reason": "通信の保護とは無関係です。"
+                },
+                {
+                  "choice": "問題なし",
+                  "reason": "応答性の低下という明確な問題があります。"
+                }
+              ],
+              "takeaway": "重い処理をメインで回すと画面が固まる。"
+            }
           }
         ]
       },
@@ -7836,7 +8285,26 @@
               "Hashable同義"
             ],
             "answer": 0,
-            "explanation": "Concurrency domain間のtransfer safety。"
+            "explanation": "Concurrency domain間のtransfer safety。",
+            "detail": {
+              "concept": "Sendable は「この型の値は、並行処理の境界を越えて別の実行文脈へ安全に渡せる」ことを表す契約です。値型で中身もすべて Sendable なら安全に渡せます。可変な状態を持つクラスは、そのままでは安全とは言えません。",
+              "whyCorrect": "コンパイラはこの契約をもとに、危険な受け渡しを警告やエラーとして指摘します。実行してみるまで分からなかったデータ競合を、ビルド時に見つけられるようになります。",
+              "otherChoices": [
+                {
+                  "choice": "JSON保存",
+                  "reason": "データの保存や変換とは無関係です。それは Codable の役割です。"
+                },
+                {
+                  "choice": "View描画",
+                  "reason": "画面表示とは無関係です。"
+                },
+                {
+                  "choice": "Hashable同義",
+                  "reason": "Hashable は hash 値と等価比較の契約で、目的がまったく異なります。"
+                }
+              ],
+              "takeaway": "Sendable は「並行の境界を越えて渡して安全」の証明。"
+            }
           },
           {
             "id": "q-concurrency-022",
@@ -7850,7 +8318,26 @@
               "遅い"
             ],
             "answer": 0,
-            "explanation": "compilerの一部確認を開発者責任で迂回する。"
+            "explanation": "compilerの一部確認を開発者責任で迂回する。",
+            "detail": {
+              "concept": "`@unchecked Sendable` は「コンパイラの検査は通らないが、安全であることは自分が保証する」という宣言です。内部でロックを使って保護しているなど、コンパイラには読み取れない事情があるときに使います。裏を返せば、検査を外した分の責任が開発者側に移ります。",
+              "whyCorrect": "保証が誤っていても、コンパイラは警告してくれません。データ競合は再現しにくく発見が難しいため、安易に付けると原因究明が困難な不具合につながります。",
+              "otherChoices": [
+                {
+                  "choice": "compile不可",
+                  "reason": "コンパイル自体は通ります。通ってしまうことこそが注意すべき点です。"
+                },
+                {
+                  "choice": "UIKit専用",
+                  "reason": "特定の UI フレームワーク専用の仕組みではありません。"
+                },
+                {
+                  "choice": "遅い",
+                  "reason": "実行速度が落ちる指定ではありません。"
+                }
+              ],
+              "takeaway": "@unchecked は検査の免除。安全性の責任を自分で負う。"
+            }
           }
         ]
       },
@@ -7882,7 +8369,26 @@
               "Codable合成"
             ],
             "answer": 0,
-            "explanation": "callback形式をasyncへ変換する。"
+            "explanation": "callback形式をasyncへ変換する。",
+            "detail": {
+              "concept": "既存の API には、完了時にクロージャを呼び出す形式（コールバック）のものが数多くあります。Continuation は、そうした API を async/await の形へ橋渡しする仕組みです。`withCheckedContinuation` の中でコールバックを受け取り、`resume` で結果を返すと、呼び出し側は普通の await として書けます。",
+              "whyCorrect": "古い形式の API を、新しい非同期の書き方の中へ自然に取り込めます。呼び出し側のコードをコールバックの入れ子にせずに済みます。",
+              "otherChoices": [
+                {
+                  "choice": "Array sort",
+                  "reason": "並べ替えとは無関係です。"
+                },
+                {
+                  "choice": "Auto Layout",
+                  "reason": "画面のレイアウトとは無関係です。"
+                },
+                {
+                  "choice": "Codable合成",
+                  "reason": "データ変換の自動生成とは無関係です。"
+                }
+              ],
+              "takeaway": "Continuation はコールバック API を await の形に変換する。"
+            }
           },
           {
             "id": "q-concurrency-024",
@@ -7896,7 +8402,32 @@
               "main thread限定"
             ],
             "answer": 0,
-            "explanation": "async処理を正しく完了させるため1回resumeする。"
+            "explanation": "async処理を正しく完了させるため1回resumeする。",
+            "detail": {
+              "concept": "resume は「待っていた処理を再開させる」呼び出しです。再開は 1 回きりの出来事なので、ちょうど 1 回だけ呼ぶ必要があります。1 度も呼ばないと処理が永久に再開されず、2 回以上呼ぶと不正な状態になります。",
+              "steps": [
+                "await している処理が、Continuation を受け取って中断する。",
+                "コールバックが呼ばれたら resume で結果を渡し、処理を再開させる。",
+                "resume を呼ばないと、その処理はいつまでも再開されない。",
+                "2 回呼ぶと、すでに再開済みの処理をもう一度再開しようとして不正になる。"
+              ],
+              "whyCorrect": "`withCheckedContinuation` の checked は、この規則の違反を実行時に検出してくれることを意味します。コールバックが複数回呼ばれる API を橋渡しするときは特に注意が必要です。",
+              "otherChoices": [
+                {
+                  "choice": "何回でも",
+                  "reason": "複数回の呼び出しは規則違反です。checked 版では実行時に検出されます。"
+                },
+                {
+                  "choice": "呼ばなくてよい",
+                  "reason": "呼ばなければ再開されず、処理が止まったままになります。"
+                },
+                {
+                  "choice": "main thread限定",
+                  "reason": "特定のスレッドからの呼び出しに限定されてはいません。"
+                }
+              ],
+              "takeaway": "resume はちょうど 1 回。0 回でも 2 回でも壊れる。"
+            }
           }
         ]
       }
