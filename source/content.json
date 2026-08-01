@@ -8467,7 +8467,26 @@
               "Array"
             ],
             "answer": 0,
-            "explanation": "app Targetごとに製品設定を持つ。"
+            "explanation": "app Targetごとに製品設定を持つ。",
+            "detail": {
+              "concept": "Xcode の Project は入れ物で、その中の Target が「実際に作られる 1 つの成果物」（アプリ本体、テスト、拡張機能など）を表します。Bundle Identifier は成果物を一意に識別する文字列なので、Target 単位で持ちます。",
+              "whyCorrect": "アプリ本体とテストとウィジェットは別々の成果物なので、それぞれ別の Bundle Identifier を持ちます。設定は Target ごとに管理されます。",
+              "otherChoices": [
+                {
+                  "choice": "Git branch",
+                  "reason": "ソースコードの履歴を分ける仕組みで、成果物の設定とは無関係です。"
+                },
+                {
+                  "choice": "Function",
+                  "reason": "コードの中の処理の単位で、アプリの識別子とは関係ありません。"
+                },
+                {
+                  "choice": "Array",
+                  "reason": "値を並べて持つデータ型です。"
+                }
+              ],
+              "takeaway": "成果物の単位が Target。識別子は Target ごと。"
+            }
           },
           {
             "id": "q-dev-002",
@@ -8481,7 +8500,26 @@
               "HTTP status"
             ],
             "answer": 0,
-            "explanation": "Run/Test/Profile等のactionを構成する。"
+            "explanation": "Run/Test/Profile等のactionを構成する。",
+            "detail": {
+              "concept": "Scheme は「何を、どの設定で、どう動かすか」をまとめた実行手順です。どの Target をビルドするか、Debug と Release のどちらの Build Configuration を使うか、Run / Test / Profile それぞれで何をするかを持ちます。",
+              "whyCorrect": "Target が成果物、Configuration が設定の組、Scheme がその組み合わせと実行方法を束ねる、という役割分担です。",
+              "otherChoices": [
+                {
+                  "choice": "JSON key",
+                  "reason": "データ形式のキー名で、ビルド設定とは無関係です。"
+                },
+                {
+                  "choice": "継承",
+                  "reason": "型どうしの関係であり、ビルドの構成とは別です。"
+                },
+                {
+                  "choice": "HTTP status",
+                  "reason": "通信の応答を表す番号です。"
+                }
+              ],
+              "takeaway": "Scheme は「どの Target をどの設定で動かすか」の束。"
+            }
           }
         ]
       },
@@ -8513,7 +8551,26 @@
               "Cleanだけ"
             ],
             "answer": 0,
-            "explanation": "1つのsyntax/type errorが後続解析を崩す場合がある。"
+            "explanation": "1つのsyntax/type errorが後続解析を崩す場合がある。",
+            "detail": {
+              "concept": "コンパイラは 1 つの誤りを見つけた後も解析を続けようとするため、根本原因から派生した二次的なエラーが大量に出ることがあります。特に括弧の閉じ忘れや型の食い違いは、以降の解釈をすべて狂わせます。",
+              "whyCorrect": "最初のエラーが根本原因であることが多く、それを直すと後続のエラーがまとめて消えることがよくあります。上から順に、1 つ直しては再ビルドするのが速い進め方です。",
+              "otherChoices": [
+                {
+                  "choice": "最後のwarningだけ",
+                  "reason": "警告は重要な手がかりになることもありますが、ビルドを止めているのはエラーです。まずエラーを解消します。"
+                },
+                {
+                  "choice": "全部無視",
+                  "reason": "エラーを無視するとビルド自体が完了しません。"
+                },
+                {
+                  "choice": "Cleanだけ",
+                  "reason": "クリーンビルドが有効な場面もありますが、書いたコード自体の誤りは消えません。"
+                }
+              ],
+              "takeaway": "エラーは上から 1 つずつ。根本原因が派生エラーを量産する。"
+            }
           },
           {
             "id": "q-dev-004",
@@ -8527,7 +8584,26 @@
               "Git削除"
             ],
             "answer": 0,
-            "explanation": "候補なので意図を理解して使う。"
+            "explanation": "候補なので意図を理解して使う。",
+            "detail": {
+              "concept": "Fix-it はコンパイラが提案する修正候補です。多くの場合は妥当ですが、あくまで「型の辻褄を合わせる」提案であり、書き手の意図まで理解しているわけではありません。",
+              "whyCorrect": "たとえば Optional の扱いで `!` を付ける提案が出ることがありますが、それは型を通すだけで、nil のときに停止する危険は残ります。提案の意味を理解してから適用します。",
+              "otherChoices": [
+                {
+                  "choice": "必ず全部適用",
+                  "reason": "無条件に適用すると、意図と違う修正が入り、別の不具合の原因になります。"
+                },
+                {
+                  "choice": "絶対使わない",
+                  "reason": "有用な提案も多いため、使わないと決める必要はありません。"
+                },
+                {
+                  "choice": "Git削除",
+                  "reason": "バージョン管理の操作とは無関係です。"
+                }
+              ],
+              "takeaway": "Fix-it は提案。意味を理解してから適用する。"
+            }
           }
         ]
       },
@@ -8559,7 +8635,26 @@
               "Git submodule"
             ],
             "answer": 0,
-            "explanation": "通常Targetがcompile module単位。"
+            "explanation": "通常Targetがcompile module単位。",
+            "detail": {
+              "concept": "Module はコンパイルとアクセス制御の単位です。通常は 1 つの Target が 1 つの Module になり、その中の Swift ファイルどうしは import なしで互いを参照できます（既定の internal で見えるため）。",
+              "whyCorrect": "同じ Target のファイルは同じ Module に属するため、他のファイルで定義した型をそのまま使えます。別 Module のものを使うときだけ import が必要です。",
+              "otherChoices": [
+                {
+                  "choice": "必ず別Module",
+                  "reason": "ファイルごとに Module が分かれることはありません。"
+                },
+                {
+                  "choice": "同じclass",
+                  "reason": "ファイルと型は別の概念です。1 ファイルに複数の型を書けます。"
+                },
+                {
+                  "choice": "Git submodule",
+                  "reason": "バージョン管理上の仕組みで、コンパイル単位とは別です。"
+                }
+              ],
+              "takeaway": "通常は Target = Module。同じ Module 内は import 不要。"
+            }
           },
           {
             "id": "q-dev-006",
@@ -8573,7 +8668,26 @@
               "UI layout"
             ],
             "answer": 0,
-            "explanation": "Moduleの公開宣言を使えるようにする。"
+            "explanation": "Moduleの公開宣言を使えるようにする。",
+            "detail": {
+              "concept": "import は「別の Module が公開している API を、このファイルから使えるようにする」宣言です。公開されていない（internal 以下の）宣言は import しても見えません。",
+              "whyCorrect": "Foundation や SwiftUI のような外部 Module の機能を使うには import が必要です。逆に言えば、import 行を見ればそのファイルが何に依存しているかが分かります。",
+              "otherChoices": [
+                {
+                  "choice": "Git commit",
+                  "reason": "バージョン管理の操作とは無関係です。"
+                },
+                {
+                  "choice": "DB migration",
+                  "reason": "データベースの構造変更とは無関係です。"
+                },
+                {
+                  "choice": "UI layout",
+                  "reason": "画面配置とは無関係です。"
+                }
+              ],
+              "takeaway": "import は他 Module の公開 API を使うための宣言。"
+            }
           }
         ]
       },
@@ -8605,7 +8719,26 @@
               "README"
             ],
             "answer": 0,
-            "explanation": "Package.swiftでpackage構成を定義。"
+            "explanation": "Package.swiftでpackage構成を定義。",
+            "detail": {
+              "concept": "Swift Package Manager では、パッケージの構成を Package.swift というファイルに Swift のコードとして書きます。名前、対応プラットフォーム、依存パッケージ、Target の構成などをここで宣言します。",
+              "whyCorrect": "設定ファイルが Swift コードなので、型チェックが効き、補完も使えます。この 1 ファイルがパッケージの定義そのものです。",
+              "otherChoices": [
+                {
+                  "choice": "Podfileだけ",
+                  "reason": "別の依存管理ツールで使う設定ファイルです。SwiftPM の manifest ではありません。"
+                },
+                {
+                  "choice": "Info.plist",
+                  "reason": "アプリの実行時設定を書くファイルで、パッケージ構成の定義ではありません。"
+                },
+                {
+                  "choice": "README",
+                  "reason": "人向けの説明文書であり、ビルドには使われません。"
+                }
+              ],
+              "takeaway": "SwiftPM の設定は Package.swift。"
+            }
           },
           {
             "id": "q-dev-008",
@@ -8619,7 +8752,26 @@
               "Bundle IDだけ"
             ],
             "answer": 0,
-            "explanation": "test対象moduleをdependencyにする。"
+            "explanation": "test対象moduleをdependencyにする。",
+            "detail": {
+              "concept": "テスト用の Target は、検証したいコードを import して使う必要があります。そのため Package.swift の testTarget では、テスト対象の Target を dependencies に指定します。",
+              "whyCorrect": "依存として宣言することで、テストコードから対象 Module の公開 API を呼べるようになります。宣言しなければ import できません。",
+              "otherChoices": [
+                {
+                  "choice": "Git remote",
+                  "reason": "コードの置き場所の話であり、ビルド時の依存関係ではありません。"
+                },
+                {
+                  "choice": "Simulator",
+                  "reason": "実行環境であって、ビルドの依存対象ではありません。"
+                },
+                {
+                  "choice": "Bundle IDだけ",
+                  "reason": "成果物の識別子であり、依存関係の指定ではありません。"
+                }
+              ],
+              "takeaway": "testTarget はテスト対象 Target に依存させる。"
+            }
           }
         ]
       },
@@ -8651,7 +8803,26 @@
               "HTTP body"
             ],
             "answer": 0,
-            "explanation": "解決versionを記録する。"
+            "explanation": "解決versionを記録する。",
+            "detail": {
+              "concept": "Package.swift には「1.2.0 以上」のような範囲で依存を書くことが多いため、解決される実際のバージョンは時期によって変わり得ます。Package.resolved は、実際に選ばれたバージョンを記録しておくファイルです。",
+              "whyCorrect": "これをリポジトリに含めておくと、他の開発者や CI がまったく同じバージョンでビルドできます。「自分の環境では動く」という食い違いを防げます。",
+              "otherChoices": [
+                {
+                  "choice": "UI色",
+                  "reason": "見た目の設定とは無関係です。"
+                },
+                {
+                  "choice": "Keychain保存",
+                  "reason": "資格情報の保存とは無関係です。"
+                },
+                {
+                  "choice": "HTTP body",
+                  "reason": "通信内容とは無関係です。"
+                }
+              ],
+              "takeaway": "Package.resolved は解決済みバージョンの記録＝再現性。"
+            }
           },
           {
             "id": "q-dev-010",
@@ -8665,7 +8836,26 @@
               "作者icon"
             ],
             "answer": 0,
-            "explanation": "保守/security costも評価する。"
+            "explanation": "保守/security costも評価する。",
+            "detail": {
+              "concept": "外部パッケージの導入は、機能を得る代わりに保守の負担とリスクも引き受ける決定です。更新が止まっていないか、ライセンスが自分の用途に合うか、脆弱性への対応があるか、そもそも自分で書けない規模かを検討します。",
+              "whyCorrect": "依存は増えるほど、ビルド時間・アップデート追従・セキュリティ対応の負担が増えます。人気だけでは判断材料になりません。",
+              "otherChoices": [
+                {
+                  "choice": "星数だけ",
+                  "reason": "人気の指標にはなりますが、更新状況やライセンス適合を保証しません。"
+                },
+                {
+                  "choice": "README色",
+                  "reason": "見た目は品質と無関係です。"
+                },
+                {
+                  "choice": "作者icon",
+                  "reason": "作者の見た目は判断材料になりません。"
+                }
+              ],
+              "takeaway": "依存は資産でなく負債にもなる。必要性・保守・ライセンス・安全性で判断。"
+            }
           }
         ]
       },
@@ -8697,7 +8887,26 @@
               "Git push"
             ],
             "answer": 0,
-            "explanation": "呼び出し先内部へ進む。"
+            "explanation": "呼び出し先内部へ進む。",
+            "detail": {
+              "concept": "デバッガの実行制御には、Step Over（現在の行を実行して次の行へ）、Step Into（その行で呼んでいる関数の中へ入る）、Step Out（今の関数を抜けるまで進む）があります。",
+              "whyCorrect": "Step Into は呼び出し先の内部で何が起きているかを追うための操作です。原因が自分の書いた関数の中にあるときに使います。",
+              "otherChoices": [
+                {
+                  "choice": "次行だけ",
+                  "reason": "現在の行を実行して次の行へ進むのは Step Over です。呼び出し先の中には入りません。"
+                },
+                {
+                  "choice": "app終了",
+                  "reason": "実行を終了する操作ではありません。"
+                },
+                {
+                  "choice": "Git push",
+                  "reason": "バージョン管理の操作とは無関係です。"
+                }
+              ],
+              "takeaway": "Step Into は呼び出し先の内部へ。Step Over は入らない。"
+            }
           },
           {
             "id": "q-dev-012",
@@ -8711,7 +8920,26 @@
               "Auto Layout"
             ],
             "answer": 0,
-            "explanation": "停止中の値を確認する。"
+            "explanation": "停止中の値を確認する。",
+            "detail": {
+              "concept": "LLDB はデバッガで、ブレークポイントで停止しているときにコマンドを打てます。`po`（print object）は式を評価して、その値の説明を表示します。停止している時点の実際の値を確認できます。",
+              "whyCorrect": "print を仕込んで再ビルドしなくても、止まっている場所で値を調べられます。仮説の検証を素早く回せます。",
+              "otherChoices": [
+                {
+                  "choice": "package更新",
+                  "reason": "依存パッケージの更新はビルド設定側の操作です。"
+                },
+                {
+                  "choice": "署名",
+                  "reason": "配布のための署名とは無関係です。"
+                },
+                {
+                  "choice": "Auto Layout",
+                  "reason": "画面配置の調整とは無関係です。"
+                }
+              ],
+              "takeaway": "po は停止中の値を確認するコマンド。"
+            }
           }
         ]
       },
@@ -8743,7 +8971,26 @@
               "JSON encode"
             ],
             "answer": 0,
-            "explanation": "network/database等で分類できる。"
+            "explanation": "network/database等で分類できる。",
+            "detail": {
+              "concept": "Logger は subsystem（どのアプリ・コンポーネントか）と category（どの機能か）でログを分類できます。分類しておくと、大量のログの中から目的の領域だけを絞り込めます。",
+              "whyCorrect": "network、database、ui のように category を分けておくと、不具合の調査時に該当領域のログだけを追えます。print と違い、後から絞り込める点が実務では効きます。",
+              "otherChoices": [
+                {
+                  "choice": "必ず高速",
+                  "reason": "分類は検索性のためであり、実行速度のためではありません。"
+                },
+                {
+                  "choice": "ARC制御",
+                  "reason": "メモリ管理とは無関係です。"
+                },
+                {
+                  "choice": "JSON encode",
+                  "reason": "データ変換とは無関係です。"
+                }
+              ],
+              "takeaway": "category はログを後から絞り込むための分類。"
+            }
           },
           {
             "id": "q-dev-014",
@@ -8757,7 +9004,26 @@
               "件数"
             ],
             "answer": 0,
-            "explanation": "秘密情報漏洩につながる。"
+            "explanation": "秘密情報漏洩につながる。",
+            "detail": {
+              "concept": "ログは端末に残り、クラッシュレポートや解析基盤へ送られることもあります。開発中に見たい情報と、外部に出てはいけない情報は区別する必要があります。認証情報や個人情報はログに残すべきではありません。",
+              "whyCorrect": "トークンやパスワードがログに出ると、端末を調べられた場合やレポート経由で漏れる可能性があります。開発者向けのログと、利用者に見せるエラーメッセージも別物として設計します。利用者には次の行動が分かる表現を、開発者向けには原因究明に必要な情報を残します。",
+              "otherChoices": [
+                {
+                  "choice": "処理開始",
+                  "reason": "処理の開始・終了は流れを追うのに有用で、秘密情報ではありません。"
+                },
+                {
+                  "choice": "error種別",
+                  "reason": "エラーの種類は原因究明に必要な情報です。"
+                },
+                {
+                  "choice": "件数",
+                  "reason": "件数のような統計値は通常問題ありません。"
+                }
+              ],
+              "takeaway": "資格情報はログに出さない。開発用ログと利用者向け表示は別物。"
+            }
           }
         ]
       },
@@ -8789,7 +9055,26 @@
               "Git blame"
             ],
             "answer": 0,
-            "explanation": "CPU時間を分析する。"
+            "explanation": "CPU時間を分析する。",
+            "detail": {
+              "concept": "Instruments は実行中のアプリを計測するツール群です。Time Profiler は一定間隔で実行中の位置を記録し、どの関数に CPU 時間が集中しているかを示します。推測ではなく計測で原因を特定するための道具です。",
+              "whyCorrect": "「遅い気がする」ではなく、実際に時間を使っている箇所を数値で確認できます。最適化はここで根拠を得てから行います。",
+              "otherChoices": [
+                {
+                  "choice": "Calendar",
+                  "reason": "暦の計算を扱う型で、計測ツールではありません。"
+                },
+                {
+                  "choice": "JSONDecoder",
+                  "reason": "データ変換を行う型です。"
+                },
+                {
+                  "choice": "Git blame",
+                  "reason": "行ごとの変更履歴を見るコマンドで、実行時の性能は分かりません。"
+                }
+              ],
+              "takeaway": "遅さの原因は Time Profiler で計測してから直す。"
+            }
           },
           {
             "id": "q-dev-016",
@@ -8803,7 +9088,26 @@
               "FormatStyle"
             ],
             "answer": 0,
-            "explanation": "object graphを可視化する。"
+            "explanation": "object graphを可視化する。",
+            "detail": {
+              "concept": "Memory Graph Debugger は、その時点で存在しているオブジェクトと、それらの参照関係を図として表示します。解放されるはずのオブジェクトが残っている場合、どこから参照されているかを辿れます。",
+              "whyCorrect": "強参照循環はコードを読むだけでは見つけにくいため、実際の参照関係を可視化して確認します。",
+              "otherChoices": [
+                {
+                  "choice": "URLComponents",
+                  "reason": "URL を組み立てる型で、メモリの調査には使えません。"
+                },
+                {
+                  "choice": "Package.resolved",
+                  "reason": "依存バージョンの記録ファイルです。"
+                },
+                {
+                  "choice": "FormatStyle",
+                  "reason": "表示用の整形を行う仕組みです。"
+                }
+              ],
+              "takeaway": "参照循環の調査は Memory Graph。"
+            }
           }
         ]
       },
@@ -8835,7 +9139,26 @@
               "#available"
             ],
             "answer": 0,
-            "explanation": "#expectで条件を検証。"
+            "explanation": "#expectで条件を検証。",
+            "detail": {
+              "concept": "Swift Testing では `@Test` を付けた関数がテストになり、`#expect(条件)` で条件の成立を検証します。#expect は macro なので、失敗時に式の中身を分解して「何が何と等しくなかったか」を示せます。",
+              "whyCorrect": "検証の中心となる記法が #expect です。失敗しても以降の行は続けて実行されるため、1 回の実行で複数の問題を見つけられます。",
+              "otherChoices": [
+                {
+                  "choice": "#if",
+                  "reason": "コンパイル時に条件でコードを切り替える指示で、テストの検証ではありません。"
+                },
+                {
+                  "choice": "#selector",
+                  "reason": "メソッドを実行時に指定する仕組みで、テスト専用ではありません。"
+                },
+                {
+                  "choice": "#available",
+                  "reason": "実行環境の対応状況を判定する条件で、テストの検証とは別です。"
+                }
+              ],
+              "takeaway": "検証は #expect。"
+            }
           },
           {
             "id": "q-dev-018",
@@ -8849,7 +9172,26 @@
               "ARC retain"
             ],
             "answer": 0,
-            "explanation": "必要値がない場合testをそこで失敗させられる。"
+            "explanation": "必要値がない場合testをそこで失敗させられる。",
+            "detail": {
+              "concept": "`#require` は「これが満たされなければ、この先を続けても意味がない」という前提を表します。失敗するとその時点でテストを終了させます。Optional の中身を取り出しつつ、取り出せなければ失敗にする、という使い方が典型です。",
+              "whyCorrect": "前提が崩れた状態で続けると、無関係な失敗が大量に出て原因が分かりにくくなります。#expect が「記録して続行」、#require が「そこで打ち切り」と使い分けます。",
+              "otherChoices": [
+                {
+                  "choice": "通信開始",
+                  "reason": "通信の開始とは無関係です。"
+                },
+                {
+                  "choice": "UI layout",
+                  "reason": "画面配置とは無関係です。"
+                },
+                {
+                  "choice": "ARC retain",
+                  "reason": "メモリ管理とは無関係です。"
+                }
+              ],
+              "takeaway": "#expect は続行、#require は前提が崩れたら打ち切り。"
+            }
           }
         ]
       },
@@ -8881,7 +9223,26 @@
               "Network不要"
             ],
             "answer": 0,
-            "explanation": "同じtest logicを複数dataへ適用。"
+            "explanation": "同じtest logicを複数dataへ適用。",
+            "detail": {
+              "concept": "Parameterized Test は、同じテストロジックに複数の入力を順に適用する仕組みです。入力ごとにテスト関数をコピーする必要がなく、どの入力で失敗したかも個別に報告されます。",
+              "whyCorrect": "1 つの振る舞いを多くの入力で確かめたいとき、記述量を増やさずに網羅性を上げられます。",
+              "otherChoices": [
+                {
+                  "choice": "UI自動生成",
+                  "reason": "画面が自動生成されることはありません。"
+                },
+                {
+                  "choice": "必ずserial",
+                  "reason": "順番に実行されると決まっているわけではありません。"
+                },
+                {
+                  "choice": "Network不要",
+                  "reason": "通信の要否とは無関係です。"
+                }
+              ],
+              "takeaway": "同じ検証を複数の入力で回すのが Parameterized Test。"
+            }
           },
           {
             "id": "q-dev-020",
@@ -8895,7 +9256,26 @@
               "本番DBだけ"
             ],
             "answer": 0,
-            "explanation": "境界/失敗条件も含める。"
+            "explanation": "境界/失敗条件も含める。",
+            "detail": {
+              "concept": "不具合は「ちょうど 0 件」「上限ちょうど」「空」「想定外の入力」といった境界付近で起きやすいものです。正常な値だけを試すテストは、最も壊れやすい部分を素通りします。",
+              "whyCorrect": "正常系に加えて境界値と異常系を含めることで、実際に起きる不具合を捕まえられます。",
+              "otherChoices": [
+                {
+                  "choice": "正常値1個だけ",
+                  "reason": "正常値だけでは、境界での取りこぼしを検出できません。"
+                },
+                {
+                  "choice": "randomだけ",
+                  "reason": "毎回結果が変わると、失敗の再現ができません。乱数を使うなら種を固定します。"
+                },
+                {
+                  "choice": "本番DBだけ",
+                  "reason": "本番データを使うと、テストが外部状態に依存し、結果が安定しません。個人情報の扱いの問題もあります。"
+                }
+              ],
+              "takeaway": "正常値 + 境界 + 異常系。"
+            }
           }
         ]
       },
@@ -8927,7 +9307,26 @@
               "log文字列"
             ],
             "answer": 0,
-            "explanation": "test用に安定したidentifierを付けられる。"
+            "explanation": "test用に安定したidentifierを付けられる。",
+            "detail": {
+              "concept": "UI テストは画面の要素を探して操作します。表示中の文言で探すと、文言の変更や多言語対応で壊れます。accessibilityIdentifier はテスト用に付ける安定した識別子で、表示テキストとは独立しています。",
+              "whyCorrect": "識別子は利用者には見えず、翻訳や文言変更の影響も受けないため、テストが壊れにくくなります。",
+              "otherChoices": [
+                {
+                  "choice": "memory address",
+                  "reason": "実行のたびに変わる値であり、要素の指定には使えません。"
+                },
+                {
+                  "choice": "array indexだけ",
+                  "reason": "並び順が変わると別の要素を指してしまいます。"
+                },
+                {
+                  "choice": "log文字列",
+                  "reason": "ログは画面要素の指定手段ではありません。"
+                }
+              ],
+              "takeaway": "UI テストの要素指定は accessibilityIdentifier。"
+            }
           },
           {
             "id": "q-dev-022",
@@ -8941,7 +9340,26 @@
               "ARC問題"
             ],
             "answer": 0,
-            "explanation": "起動/操作が必要で遅い。"
+            "explanation": "起動/操作が必要で遅い。",
+            "detail": {
+              "concept": "UI テストはアプリを実際に起動し、画面遷移や操作を経て検証します。1 件あたりの実行時間が長く、アニメーションや通信の影響で結果が不安定にもなりやすい形式です。Unit Test は対象を直接呼ぶため高速で安定します。",
+              "whyCorrect": "細かいロジックの検証は Unit Test に任せ、UI テストは主要な導線の確認に絞るのが現実的です。テスト全体の実行時間と安定性が変わります。",
+              "otherChoices": [
+                {
+                  "choice": "SwiftではUI Test不可",
+                  "reason": "UI テストは実施可能です。標準の仕組みが用意されています。"
+                },
+                {
+                  "choice": "JSON不可",
+                  "reason": "データ形式の扱いとは無関係です。"
+                },
+                {
+                  "choice": "ARC問題",
+                  "reason": "メモリ管理の問題ではありません。"
+                }
+              ],
+              "takeaway": "UI テストは遅く不安定。ロジックは Unit Test へ。"
+            }
           }
         ]
       },
@@ -8973,7 +9391,31 @@
               "ARC不要"
             ],
             "answer": 0,
-            "explanation": "test doubleへ置換しやすい。"
+            "explanation": "test doubleへ置換しやすい。",
+            "detail": {
+              "concept": "Dependency Injection は、必要なものを内部で自分で作るのではなく、外から渡してもらう設計です。イニシャライザで受け取る形（Initializer Injection）にすると、その型が何に依存しているかが宣言を見るだけで分かります。",
+              "whyCorrect": "依存が引数として現れるため、テスト時には本物の代わりに制御可能な実装を渡せます。内部で直接 URLSession を作っていると差し替えられません。",
+              "otherChoices": [
+                {
+                  "choice": "必ずSingleton",
+                  "reason": "むしろ共有インスタンスへの直接依存を避ける手段です。Singleton を強制しません。"
+                },
+                {
+                  "choice": "UI自動生成",
+                  "reason": "画面が自動生成されることはありません。"
+                },
+                {
+                  "choice": "ARC不要",
+                  "reason": "メモリ管理は通常どおり必要です。"
+                }
+              ],
+              "example": {
+                "code": "protocol UserLoading {\n    func load() -> String\n}\nstruct APIUserLoader: UserLoading {\n    func load() -> String { \"from API\" }\n}\nstruct StubUserLoader: UserLoading {\n    func load() -> String { \"stub\" }\n}\nstruct ViewModel {\n    let loader: UserLoading\n    func title() -> String { \"User: \\(loader.load())\" }\n}\nprint(ViewModel(loader: APIUserLoader()).title())\nprint(ViewModel(loader: StubUserLoader()).title())",
+                "output": "User: from API\nUser: stub",
+                "explanation": "ViewModel のコードは一切変えずに、渡す実装だけを差し替えています。テストでは StubUserLoader を渡せば、通信なしで結果を固定できます。"
+              },
+              "takeaway": "依存は外から渡す。差し替えられることがテスト容易性になる。"
+            }
           },
           {
             "id": "q-dev-024",
@@ -8987,7 +9429,26 @@
               "署名"
             ],
             "answer": 0,
-            "explanation": "testでnetwork/DBの不確定要素を制御する。"
+            "explanation": "testでnetwork/DBの不確定要素を制御する。",
+            "detail": {
+              "concept": "Test Double は、テスト中に本物の代わりに使う代替実装の総称です（Stub、Mock、Fake など）。通信・データベース・時刻のように、結果が外部要因で変わるものを固定し、テストの結果を安定させます。",
+              "whyCorrect": "本物の API を呼ぶと、ネットワーク状況やサーバー側のデータで結果が変わり、失敗の原因がコードなのか環境なのか判別できません。代替に差し替えれば、検証したい条件だけを再現できます。",
+              "otherChoices": [
+                {
+                  "choice": "production APIを必ず呼ぶ",
+                  "reason": "本番 API を呼ぶと、結果が不安定になるうえ、実際のデータに影響を与える危険もあります。"
+                },
+                {
+                  "choice": "Git操作",
+                  "reason": "バージョン管理の操作とは無関係です。"
+                },
+                {
+                  "choice": "署名",
+                  "reason": "配布時の署名とは無関係です。"
+                }
+              ],
+              "takeaway": "外部要因を固定し、検証したい条件を再現するための代替実装。"
+            }
           }
         ]
       },
@@ -9019,7 +9480,26 @@
               "JSON禁止"
             ],
             "answer": 0,
-            "explanation": "test/変更しやすい。"
+            "explanation": "test/変更しやすい。",
+            "detail": {
+              "concept": "画面のコードが直接 URLSession を呼ぶと、UI の都合と通信の都合が 1 か所に混ざります。API クライアント層を挟むと、画面は「データを取得する」という関心だけを持ち、通信方式やエンドポイントの詳細は隠れます。",
+              "whyCorrect": "通信の実装を差し替えてもテストできるようになり、エンドポイントの変更が画面側へ波及しません。責務の境界を作るのが目的です。",
+              "otherChoices": [
+                {
+                  "choice": "通信無料",
+                  "reason": "通信の費用や速度は変わりません。構造の話です。"
+                },
+                {
+                  "choice": "SwiftUI不要",
+                  "reason": "特定の UI フレームワークが不要になるわけではありません。"
+                },
+                {
+                  "choice": "JSON禁止",
+                  "reason": "データ形式が禁止されることはありません。"
+                }
+              ],
+              "takeaway": "画面は「何が欲しいか」だけを知る。通信の詳細は隠す。"
+            }
           },
           {
             "id": "q-dev-026",
@@ -9033,7 +9513,26 @@
               "Git branch"
             ],
             "answer": 0,
-            "explanation": "外部data構造との境界。"
+            "explanation": "外部data構造との境界。",
+            "detail": {
+              "concept": "DTO は外部とやり取りする形をそのまま表す型です。API のレスポンスや保存形式に合わせた構造を持ち、アプリ内部で扱いやすい形（Domain Model）へは変換して渡します。",
+              "whyCorrect": "外部形式の都合を DTO に閉じ込めることで、API 仕様が変わっても影響が変換部分に留まります。",
+              "otherChoices": [
+                {
+                  "choice": "UI layout",
+                  "reason": "画面配置は UI 層の責務です。"
+                },
+                {
+                  "choice": "ARC管理",
+                  "reason": "メモリ管理は言語の仕組みが担います。"
+                },
+                {
+                  "choice": "Git branch",
+                  "reason": "バージョン管理とは無関係です。"
+                }
+              ],
+              "takeaway": "DTO は外部形式との境界にある型。"
+            }
           }
         ]
       },
@@ -9065,7 +9564,26 @@
               "README"
             ],
             "answer": 0,
-            "explanation": "credentialはKeychain等へ。"
+            "explanation": "credentialはKeychain等へ。",
+            "detail": {
+              "concept": "認証トークンは「利用者が本人であることを示した結果」を持ち歩くための値です（本人確認が認証、その人に何を許すかが認可）。漏れると他人がなりすませるため、暗号化された保護領域である Keychain に保存します。",
+              "whyCorrect": "Keychain は OS が保護する保存領域で、他アプリや単純な閲覧から守られます。なお、端末上に置いた値は解析され得るため、「クライアントに置けば完全に秘密にできる」とは考えません。重要な判断はサーバー側で行います。",
+              "otherChoices": [
+                {
+                  "choice": "UserDefaults平文",
+                  "reason": "保護されない領域なので、資格情報の保存先としては不適切です。"
+                },
+                {
+                  "choice": "console log",
+                  "reason": "ログは端末やレポートに残るため、トークンを出力してはいけません。"
+                },
+                {
+                  "choice": "README",
+                  "reason": "リポジトリに書けば履歴として残り、共有されてしまいます。"
+                }
+              ],
+              "takeaway": "資格情報は Keychain。端末側の値は完全には秘匿できない。"
+            }
           },
           {
             "id": "q-dev-028",
@@ -9079,7 +9597,26 @@
               "URLComponents"
             ],
             "answer": 0,
-            "explanation": "構造化永続dataに向く。"
+            "explanation": "構造化永続dataに向く。",
+            "detail": {
+              "concept": "条件を指定した検索や、モデル同士の関連（1 対多など）を扱いたい場合、単純な key-value 保存では足りません。SwiftData のような永続化の仕組みは、モデル定義・検索条件・関連をまとめて扱えます。",
+              "whyCorrect": "構造化されたデータを、条件付きで取り出したり関連をたどったりする用途に向いています。設定値 1 つの保存とは要求が異なります。",
+              "otherChoices": [
+                {
+                  "choice": "print",
+                  "reason": "画面やコンソールへの出力であり、保存の手段ではありません。"
+                },
+                {
+                  "choice": "Setだけ",
+                  "reason": "重複のない集合を表すメモリ上のデータ型で、永続化はしません。"
+                },
+                {
+                  "choice": "URLComponents",
+                  "reason": "URL を組み立てる型です。"
+                }
+              ],
+              "takeaway": "検索や関連が要るなら key-value でなく永続化フレームワーク。"
+            }
           }
         ]
       },
@@ -9111,7 +9648,26 @@
               "@objc"
             ],
             "answer": 0,
-            "explanation": "@ModelがPersistentModel準拠等を生成する。"
+            "explanation": "@ModelがPersistentModel準拠等を生成する。",
+            "detail": {
+              "concept": "`@Model` は SwiftData のマクロで、付けたクラスを永続化の対象にします。コンパイル時に、保存に必要な準拠や内部処理が展開されます。手書きすると多くなる定型コードを自動生成する仕組みです。",
+              "whyCorrect": "クラス定義に @Model を付けるだけで、保存対象のモデルとして扱えるようになります。",
+              "otherChoices": [
+                {
+                  "choice": "@State",
+                  "reason": "SwiftUI で画面が持つ一時的な状態を表す仕組みで、永続化とは別です。"
+                },
+                {
+                  "choice": "@Test",
+                  "reason": "テスト関数を示す属性です。"
+                },
+                {
+                  "choice": "@objc",
+                  "reason": "Objective-C から見えるようにする指定で、永続化とは無関係です。"
+                }
+              ],
+              "takeaway": "SwiftData の保存対象は @Model。"
+            }
           },
           {
             "id": "q-dev-030",
@@ -9125,7 +9681,26 @@
               "Logger"
             ],
             "answer": 0,
-            "explanation": "ModelContextがmodel操作context。"
+            "explanation": "ModelContextがmodel操作context。",
+            "detail": {
+              "concept": "ModelContainer が保存領域そのもの、ModelContext がその領域に対する作業単位です。追加・削除・取得といった操作は ModelContext を通して行い、変更をまとめて保存します。",
+              "whyCorrect": "insert / delete / fetch はいずれも ModelContext のメソッドです。変更をいったん context に溜めて保存する流れになっています。",
+              "otherChoices": [
+                {
+                  "choice": "URLSession",
+                  "reason": "通信を行う型であり、永続化の操作窓口ではありません。"
+                },
+                {
+                  "choice": "Calendar",
+                  "reason": "暦の計算を扱う型です。"
+                },
+                {
+                  "choice": "Logger",
+                  "reason": "ログ出力の仕組みです。"
+                }
+              ],
+              "takeaway": "保存操作の窓口は ModelContext。"
+            }
           }
         ]
       },
@@ -9157,7 +9732,26 @@
               "@Published"
             ],
             "answer": 0,
-            "explanation": "@Queryがpersistent modelをfetchし変更と同期する。"
+            "explanation": "@Queryがpersistent modelをfetchし変更と同期する。",
+            "detail": {
+              "concept": "`@Query` は SwiftUI のビューの中で、保存済みモデルを取得するための Property Wrapper です。単に一度取得するだけでなく、データが変わると画面が自動的に更新されます。",
+              "whyCorrect": "取得と変更の追従が結び付いているため、保存後に自分で再取得して画面を更新する処理を書かずに済みます。",
+              "otherChoices": [
+                {
+                  "choice": "@Binding",
+                  "reason": "他が持つ状態への読み書きの通り道を表す仕組みで、データの取得は行いません。"
+                },
+                {
+                  "choice": "@AppStorageだけ",
+                  "reason": "小さな設定値をキー指定で読み書きする仕組みで、モデルの検索はできません。"
+                },
+                {
+                  "choice": "@Published",
+                  "reason": "変更を通知するための仕組みですが、保存済みモデルの取得を担うものではありません。"
+                }
+              ],
+              "takeaway": "@Query は取得と画面更新の追従をまとめて担う。"
+            }
           },
           {
             "id": "q-dev-032",
@@ -9171,7 +9765,26 @@
               "Git filter"
             ],
             "answer": 0,
-            "explanation": "query条件を表すMacro。"
+            "explanation": "query条件を表すMacro。",
+            "detail": {
+              "concept": "`#Predicate` は取得条件を Swift の式として書けるマクロです。文字列で条件を書く方式と違い、プロパティ名の誤りや型の食い違いをコンパイル時に検出できます。",
+              "whyCorrect": "条件を型安全に表現できる点が要点です。実行してみるまで気づけない綴り間違いを、ビルド時に防げます。",
+              "otherChoices": [
+                {
+                  "choice": "JSON encode",
+                  "reason": "データ形式への変換とは無関係です。"
+                },
+                {
+                  "choice": "animation",
+                  "reason": "画面の動きの表現とは無関係です。"
+                },
+                {
+                  "choice": "Git filter",
+                  "reason": "バージョン管理の絞り込みとは無関係です。"
+                }
+              ],
+              "takeaway": "#Predicate は取得条件を型安全に書くための仕組み。"
+            }
           }
         ]
       },
@@ -9203,7 +9816,26 @@
               "UI色"
             ],
             "answer": 0,
-            "explanation": "既存storeの安全なmigrationが必要。"
+            "explanation": "既存storeの安全なmigrationが必要。",
+            "detail": {
+              "concept": "リリース後は、利用者の端末に既存のデータが存在します。モデルの構造（schema）を変えると、古い形式で保存されたデータをどう読み替えるかを決めておかなければ、アプリが起動できなくなったりデータを失ったりします。",
+              "whyCorrect": "設計時に考えるべきは「新しい形をどう定義するか」だけでなく「既存データをどう移行するか」です。移行の道筋が無い変更は利用者のデータを壊します。",
+              "otherChoices": [
+                {
+                  "choice": "Xcode theme",
+                  "reason": "開発環境の見た目の設定であり、利用者のデータとは無関係です。"
+                },
+                {
+                  "choice": "Git username",
+                  "reason": "バージョン管理の設定であり、無関係です。"
+                },
+                {
+                  "choice": "UI色",
+                  "reason": "画面の配色であり、データ移行とは無関係です。"
+                }
+              ],
+              "takeaway": "schema 変更の主題は既存データの移行。"
+            }
           },
           {
             "id": "q-dev-034",
@@ -9217,7 +9849,26 @@
               "SwiftDataはmigration不要"
             ],
             "answer": 0,
-            "explanation": "user dataを消せないためmigration設計が必要。"
+            "explanation": "user dataを消せないためmigration設計が必要。",
+            "detail": {
+              "concept": "開発中は、保存領域を削除して作り直せば新しい schema で動きます。しかし本番では、その操作は利用者のデータを消すことに直結します。移行処理を設計して、既存データを新しい形へ変換する必要があります。",
+              "whyCorrect": "利用者のデータは失われてはいけないものなので、削除は代替になりません。開発中の手段をそのまま本番に持ち込まないことが重要です。",
+              "otherChoices": [
+                {
+                  "choice": "完全に同じ",
+                  "reason": "結果はまったく異なります。片方はデータを保ち、片方は失います。"
+                },
+                {
+                  "choice": "必ず推奨",
+                  "reason": "本番では推奨されません。"
+                },
+                {
+                  "choice": "SwiftDataはmigration不要",
+                  "reason": "移行は必要です。不要になることはありません。"
+                }
+              ],
+              "takeaway": "本番で store 削除は移行の代わりにならない。"
+            }
           }
         ]
       },
@@ -9249,7 +9900,26 @@
               "public/private"
             ],
             "answer": 0,
-            "explanation": "sceneのlifecycle state。"
+            "explanation": "sceneのlifecycle state。",
+            "detail": {
+              "concept": "scenePhase は画面（scene）の状態を表します。active は前面で操作できる状態、inactive は前面だが一時的に操作を受け付けない状態（通知の表示中など）、background は背面へ回った状態です。",
+              "whyCorrect": "この 3 つの状態を見て、背面へ回るときに保存する、前面に戻ったら再取得する、といった処理を書きます。",
+              "otherChoices": [
+                {
+                  "choice": "GET/POST",
+                  "reason": "通信の要求方法を表すもので、画面の状態ではありません。"
+                },
+                {
+                  "choice": "success/failureだけ",
+                  "reason": "処理の成否を表す区分で、画面の状態ではありません。"
+                },
+                {
+                  "choice": "public/private",
+                  "reason": "アクセス範囲を表す指定で、画面の状態ではありません。"
+                }
+              ],
+              "takeaway": "scenePhase は active / inactive / background。"
+            }
           },
           {
             "id": "q-dev-036",
@@ -9263,7 +9933,26 @@
               "Tuple"
             ],
             "answer": 0,
-            "explanation": "対応するusage descriptionが必要。"
+            "explanation": "対応するusage descriptionが必要。",
+            "detail": {
+              "concept": "カメラや位置情報のような、利用者のプライバシーに関わる機能を使うには、Info.plist に「なぜ必要か」を説明する文言を書く必要があります。この文言は許可を求めるダイアログにそのまま表示されます。",
+              "whyCorrect": "説明が無いと、要求した時点でアプリが停止します。利用者が判断できるように理由を示すことが求められています。",
+              "otherChoices": [
+                {
+                  "choice": "Package.resolved",
+                  "reason": "依存バージョンの記録であり、権限とは無関係です。"
+                },
+                {
+                  "choice": "Hashable",
+                  "reason": "データ構造の契約であり、権限とは無関係です。"
+                },
+                {
+                  "choice": "Tuple",
+                  "reason": "複数の値の組であり、権限とは無関係です。"
+                }
+              ],
+              "takeaway": "プライバシー機能には利用理由の説明文が必須。"
+            }
           }
         ]
       },
@@ -9295,7 +9984,26 @@
               "JSONDecoder"
             ],
             "answer": 0,
-            "explanation": "Targetのcapability/entitlementを設定する。"
+            "explanation": "Targetのcapability/entitlementを設定する。",
+            "detail": {
+              "concept": "Push 通知や iCloud のような OS の機能を使うには、アプリにその権限（entitlement）が付与されている必要があります。Xcode では Target の Signing & Capabilities で追加すると、必要な設定と証明書側の対応がまとめて行われます。",
+              "whyCorrect": "コード上で有効にできるものではなく、成果物に紐づく設定として宣言する必要があります。",
+              "otherChoices": [
+                {
+                  "choice": "Array initializer",
+                  "reason": "コード上のデータ作成であり、権限の設定ではありません。"
+                },
+                {
+                  "choice": "LLDBだけ",
+                  "reason": "デバッガであり、権限の設定は行いません。"
+                },
+                {
+                  "choice": "JSONDecoder",
+                  "reason": "データ変換を行う型です。"
+                }
+              ],
+              "takeaway": "OS 機能の利用は Signing & Capabilities で宣言する。"
+            }
           },
           {
             "id": "q-dev-038",
@@ -9309,7 +10017,26 @@
               "DB専用"
             ],
             "answer": 0,
-            "explanation": "App Store Connect経由でbeta buildを配布する。"
+            "explanation": "App Store Connect経由でbeta buildを配布する。",
+            "detail": {
+              "concept": "TestFlight は、公開前のビルドを限られた対象者へ配布して試してもらう仕組みです。実際の端末・実際の利用状況で、公開前に問題を見つけられます。",
+              "whyCorrect": "手元やシミュレータでは再現しない問題を、配布前の段階で確認できます。審査を経て多数の利用者へ届く前の安全網です。",
+              "otherChoices": [
+                {
+                  "choice": "syntax checkだけ",
+                  "reason": "コードの文法確認はビルド時に行われます。配布の仕組みとは別です。"
+                },
+                {
+                  "choice": "Git hosting",
+                  "reason": "ソースコードの保管場所を提供する仕組みではありません。"
+                },
+                {
+                  "choice": "DB専用",
+                  "reason": "データ保存の仕組みではありません。"
+                }
+              ],
+              "takeaway": "TestFlight は公開前のベータ配布。"
+            }
           }
         ]
       },
@@ -9341,7 +10068,26 @@
               "Protocol最大化"
             ],
             "answer": 0,
-            "explanation": "依存方向と責務を整理する。"
+            "explanation": "依存方向と責務を整理する。",
+            "detail": {
+              "concept": "責務分離は、それぞれの部分が「1 つのことだけを担当する」ように分ける設計です。画面表示、データ取得、業務ロジックが混ざっていると、1 か所の変更が全体に波及し、テストも全体を起動しないと書けません。",
+              "whyCorrect": "境界を引くと、変更の影響がその内側に留まり、依存を差し替えて部分だけをテストできるようになります。ファイル数は結果として増えることもありますが、それ自体は目的ではありません。",
+              "otherChoices": [
+                {
+                  "choice": "file数を増やすだけ",
+                  "reason": "分割はファイル数を増やすこと自体が目的ではありません。増えても整理されていなければ意味がありません。"
+                },
+                {
+                  "choice": "必ず高速",
+                  "reason": "速度が上がる保証はありません。目的は変更のしやすさです。"
+                },
+                {
+                  "choice": "Protocol最大化",
+                  "reason": "抽象化は必要な箇所に絞るべきで、増やすほど良いわけではありません。過剰な抽象化は読みにくさを生みます。"
+                }
+              ],
+              "takeaway": "境界を引く目的は、影響の局所化とテスト容易性。"
+            }
           },
           {
             "id": "q-dev-040",
@@ -9355,7 +10101,32 @@
               "public model"
             ],
             "answer": 0,
-            "explanation": "履歴に残るためsecretをcommitしない。"
+            "explanation": "履歴に残るためsecretをcommitしない。",
+            "detail": {
+              "concept": "commit はローカルの履歴に変更を記録する操作、push はその履歴をリモートへ公開する操作です。重要なのは、commit した時点でその内容が履歴に残るという点で、後のコミットで削除しても過去の履歴からは取り出せてしまいます。",
+              "steps": [
+                "秘密情報を含むファイルを commit すると、その内容が履歴として残る。",
+                "後で削除して commit しても、削除前のコミットには内容が残っている。",
+                "push すると、その履歴ごとリモートへ共有される。",
+                "取り除くには履歴の書き換えが必要になり、共有済みなら流出は取り消せない。"
+              ],
+              "whyCorrect": "履歴に残る性質があるため、そもそも入れないことが唯一確実な対策です。設定ファイルは .gitignore で除外し、値は環境変数や安全な保管先から与えます。漏れてしまった場合は、削除より先に該当する資格情報を無効化して差し替えます。",
+              "otherChoices": [
+                {
+                  "choice": "README",
+                  "reason": "説明文書はリポジトリに含めるべきものです。"
+                },
+                {
+                  "choice": "test名",
+                  "reason": "テストコードは共有して価値のあるものです。"
+                },
+                {
+                  "choice": "public model",
+                  "reason": "公開してよいモデル定義は通常のソースコードです。"
+                }
+              ],
+              "takeaway": "commit した時点で履歴に残る。秘密情報は最初から入れない。"
+            }
           }
         ]
       }
