@@ -5955,7 +5955,26 @@
               "Actor"
             ],
             "answer": 0,
-            "explanation": "Dictionary KeyはHashable。"
+            "explanation": "Dictionary KeyはHashable。",
+            "detail": {
+              "concept": "Dictionary はキーから値を素早く探すための型です。探すときはキーの hash 値（値を要約した整数）で候補を絞り、その後 == で本当に同じキーかを確定します。Hashable はこの 2 つの能力をまとめて要求する契約で、Equatable を継承しているため == も使えます。",
+              "whyCorrect": "hash 値の生成と等価比較の両方が揃って初めて、キーによる検索が成立します。String や Int が Key によく使われるのは、これらが標準で Hashable に準拠しているからです。",
+              "otherChoices": [
+                {
+                  "choice": "View",
+                  "reason": "SwiftUI で画面の見た目を表す契約です。データ構造のキー条件とは関係がありません。"
+                },
+                {
+                  "choice": "Error",
+                  "reason": "throw して投げられる値が満たす契約です。エラー表現のためのもので、検索には使われません。"
+                },
+                {
+                  "choice": "Actor",
+                  "reason": "並行処理で可変な状態を保護する型の種類です。キーの条件ではありません。"
+                }
+              ],
+              "takeaway": "Dictionary の Key と Set の要素は Hashable。"
+            }
           },
           {
             "id": "q-foundation-002",
@@ -5969,7 +5988,26 @@
               "body"
             ],
             "answer": 0,
-            "explanation": "安定したidentifier idを提供する。"
+            "explanation": "安定したidentifier idを提供する。",
+            "detail": {
+              "concept": "Identifiable は「この値を一意に識別できる id を持つ」ことを表す契約です。SwiftUI の List や ForEach は、要素の並びが変わったときに「どれが同じ要素か」を id で判断して差分更新を行います。",
+              "whyCorrect": "要求されるのは id という名前のプロパティ 1 つです。型は Hashable であれば Int でも String でも UUID でも構いません。",
+              "otherChoices": [
+                {
+                  "choice": "name",
+                  "reason": "name は識別子として使えることもありますが、Identifiable が名前として要求するプロパティではありません。同名の別要素があると識別できません。"
+                },
+                {
+                  "choice": "hash",
+                  "reason": "hash は Hashable が扱う概念です。hash 値は衝突しうるため、一意な識別子としては使えません。"
+                },
+                {
+                  "choice": "body",
+                  "reason": "body は SwiftUI の View が要求するプロパティで、画面の内容を返します。"
+                }
+              ],
+              "takeaway": "Identifiable が求めるのは id ひとつ。"
+            }
           }
         ]
       },
@@ -6001,7 +6039,26 @@
               "Error+Sendable"
             ],
             "answer": 1,
-            "explanation": "CodableはEncodableとDecodableのtypealias。"
+            "explanation": "CodableはEncodableとDecodableのtypealias。",
+            "detail": {
+              "concept": "Foundation は Swift 言語そのものには無い「アプリを作るための土台」を提供します。その 1 つが JSON などの外部表現との変換です。Encodable は「Swift の値を外部表現へ書き出せる」、Decodable は「外部表現から Swift の値を作れる」契約で、Codable はその 2 つをまとめた別名（typealias）です。",
+              "whyCorrect": "`typealias Codable = Encodable & Decodable` と定義されているため、Codable と書けば両方向の変換が可能になります。片方だけでよいなら Encodable か Decodable を個別に書けます。",
+              "otherChoices": [
+                {
+                  "choice": "Equatable+Hashable",
+                  "reason": "等価比較と hash 値生成の契約です。データ変換とは別の目的です。"
+                },
+                {
+                  "choice": "View+Identifiable",
+                  "reason": "SwiftUI の画面表現と識別の契約で、JSON 変換とは無関係です。"
+                },
+                {
+                  "choice": "Error+Sendable",
+                  "reason": "エラー表現と並行処理の安全性の契約です。"
+                }
+              ],
+              "takeaway": "Codable = Encodable（書き出し）+ Decodable（読み込み）。"
+            }
           },
           {
             "id": "q-foundation-004",
@@ -6015,7 +6072,37 @@
               "User(data)"
             ],
             "answer": 1,
-            "explanation": "JSONDecoderでDecodable型へdecodeする。"
+            "explanation": "JSONDecoderでDecodable型へdecodeする。",
+            "detail": {
+              "concept": "JSON の byte 列（Data）から Swift の値を作るのは JSONDecoder の役割です。`decode(User.self, from: data)` は「User という型として data を読み解く」という意味で、第 1 引数に型そのもの（`.self`）、第 2 引数に元データを渡します。データの向きは JSON → Swift です。",
+              "steps": [
+                "サーバーなどから受け取った JSON が Data（byte 列）として手元にある。",
+                "JSONDecoder に「どの型として読むか」と「元の Data」を渡す。",
+                "各キーが型のプロパティに対応付けられ、User の値が組み立てられる。",
+                "形が合わない場合は例外が投げられるため、呼び出しに try が必要になる。"
+              ],
+              "whyCorrect": "decode は Decodable な型を作る方向の API です。失敗しうるため try と組み合わせて使います。",
+              "otherChoices": [
+                {
+                  "choice": "JSONEncoder().encode(User.self)",
+                  "reason": "JSONEncoder は Swift の値から JSON を作る逆方向の API です。また encode に渡すのは型ではなく値です。"
+                },
+                {
+                  "choice": "String(data)",
+                  "reason": "String(data:encoding:) は byte 列を文字列として解釈するだけで、型のプロパティへの対応付けは行いません。"
+                },
+                {
+                  "choice": "User(data)",
+                  "reason": "User に Data を受け取る初期化が自動で用意されることはありません。自分で定義すれば別ですが、標準の手段ではありません。"
+                }
+              ],
+              "example": {
+                "code": "import Foundation\n\nstruct User: Codable { let id: Int; let name: String }\n\ndo {\n    let encoder = JSONEncoder()\n    encoder.outputFormatting = .sortedKeys\n    let data = try encoder.encode(User(id: 1, name: \"Yuki\"))\n    print(String(decoding: data, as: UTF8.self))\n    let back = try JSONDecoder().decode(User.self, from: data)\n    print(back.name)\n} catch {\n    print(\"failed\")\n}",
+                "output": "{\"id\":1,\"name\":\"Yuki\"}\nYuki",
+                "explanation": "encode で Swift の値 → JSON、decode で JSON → Swift の値と、両方向を 1 つの型で扱えます。sortedKeys はキーの順を安定させる指定です。"
+              },
+              "takeaway": "decode は JSON → Swift、encode は Swift → JSON。"
+            }
           }
         ]
       },
@@ -6047,7 +6134,26 @@
               "HTTP header"
             ],
             "answer": 0,
-            "explanation": "外部key名とSwift property名を対応付ける。"
+            "explanation": "外部key名とSwift property名を対応付ける。",
+            "detail": {
+              "concept": "JSON のキー名は snake_case（user_id）、Swift のプロパティ名は camelCase（userID）というように、命名規則が食い違うことがよくあります。CodingKeys は「この Swift のプロパティは JSON のこのキーに対応する」という対応表を書くための仕組みです。",
+              "whyCorrect": "`case userID = \"user_id\"` は、内部では userID、外部の JSON では user_id という名前で扱うことを指定します。これにより Swift 側の命名を崩さずに外部仕様へ合わせられます。",
+              "otherChoices": [
+                {
+                  "choice": "暗号化",
+                  "reason": "CodingKeys は名前の対応付けだけを行い、内容を保護する機能はありません。"
+                },
+                {
+                  "choice": "Optional化",
+                  "reason": "値の有無を表す Optional は型の後ろの `?` で指定します。CodingKeys とは別です。"
+                },
+                {
+                  "choice": "HTTP header",
+                  "reason": "通信時に付加する情報は URLRequest 側で設定します。データの構造とは別の層です。"
+                }
+              ],
+              "takeaway": "CodingKeys は Swift 名と JSON キー名の対応表。"
+            }
           },
           {
             "id": "q-foundation-006",
@@ -6061,7 +6167,26 @@
               "UIKit専用"
             ],
             "answer": 0,
-            "explanation": "外部形式との境界を作れる。"
+            "explanation": "外部形式との境界を作れる。",
+            "detail": {
+              "concept": "DTO（Data Transfer Object）は外部とのやり取りの形をそのまま写した型、Domain Model はアプリ内部で扱いやすい形に整えた型です。2 つを分けると、API の仕様変更の影響を変換部分だけに閉じ込められます。",
+              "whyCorrect": "API のキー名や構造が変わっても、修正するのは DTO と変換処理だけで済み、画面やロジックが使う Domain Model は変えずに済みます。境界を 1 か所に集める設計です。",
+              "otherChoices": [
+                {
+                  "choice": "必ず通信速度倍",
+                  "reason": "型を分けても通信の速さは変わりません。目的は変更の影響範囲を狭めることです。"
+                },
+                {
+                  "choice": "Codable不要",
+                  "reason": "むしろ DTO 側が Codable に準拠します。Codable が不要になるわけではありません。"
+                },
+                {
+                  "choice": "UIKit専用",
+                  "reason": "特定の UI フレームワークとは無関係な設計の話です。"
+                }
+              ],
+              "takeaway": "DTO は外部の形、Domain Model は内部の形。変換点が防波堤になる。"
+            }
           }
         ]
       },
@@ -6093,7 +6218,26 @@
               "View"
             ],
             "answer": 0,
-            "explanation": "Dataはbyte列。"
+            "explanation": "Dataはbyte列。",
+            "detail": {
+              "concept": "Data は「意味を持たない byte（8 ビットの数値）の並び」を表す型です。JSON も画像もファイルの中身も、通信や保存の場面ではすべて byte 列として扱われます。どう解釈するかは受け取った側が決めます。",
+              "whyCorrect": "Data 自体は中身の種類を知りません。JSON として読むなら JSONDecoder、文字列として読むなら String(decoding:as:)、画像として読むなら画像用の型に渡す、というように解釈方法を指定します。",
+              "otherChoices": [
+                {
+                  "choice": "必ずJSON",
+                  "reason": "JSON はあくまで解釈のしかたの 1 つです。Data には画像や音声も入ります。"
+                },
+                {
+                  "choice": "必ずString",
+                  "reason": "文字として解釈できるとは限りません。文字コードを指定して初めて文字列になります。"
+                },
+                {
+                  "choice": "View",
+                  "reason": "画面の表現とは無関係です。"
+                }
+              ],
+              "takeaway": "Data は中身を問わない byte 列。解釈は使う側が決める。"
+            }
           },
           {
             "id": "q-foundation-008",
@@ -6107,7 +6251,31 @@
               "UIKit専用"
             ],
             "answer": 0,
-            "explanation": "encodingを指定してStringとして解釈できる。"
+            "explanation": "encodingを指定してStringとして解釈できる。",
+            "detail": {
+              "concept": "byte 列を文字列にするには「どの文字コードで解釈するか」を指定する必要があります。同じ byte 列でも UTF-8 と別の符号化方式では違う文字になるためです。`String(data:encoding:)` は解釈に失敗する可能性があるので String? を返します。",
+              "whyCorrect": "encoding に .utf8 を指定することで、byte 列を UTF-8 の文字列として読み解けます。失敗しうる点を踏まえ、if let などで取り出すか、失敗しない `String(decoding:as:)` を使います。",
+              "otherChoices": [
+                {
+                  "choice": "不可",
+                  "reason": "文字コードを指定すれば変換できます。不可能ではありません。"
+                },
+                {
+                  "choice": "JSONDecoder専用",
+                  "reason": "JSONDecoder を使わずに単なる文字列として読む用途でも使えます。"
+                },
+                {
+                  "choice": "UIKit専用",
+                  "reason": "Foundation の API であり、UI フレームワークに限定されません。"
+                }
+              ],
+              "example": {
+                "code": "import Foundation\n\nlet data = Data(\"Gym\".utf8)\nprint(data.count)\nif let text = String(data: data, encoding: .utf8) {\n    print(text)\n}\nprint(String(decoding: data, as: UTF8.self))",
+                "output": "3\nGym\nGym",
+                "explanation": "文字列 → Data、Data → 文字列の両方向です。String(data:encoding:) は失敗しうるので Optional、String(decoding:as:) は不正な byte を置換文字に変えて必ず成功します。"
+              },
+              "takeaway": "byte 列 → 文字列には文字コードの指定が要る。"
+            }
           }
         ]
       },
@@ -6139,7 +6307,26 @@
               "TimeZoneだけ"
             ],
             "answer": 0,
-            "explanation": "Dateは時間軸上の一点。"
+            "explanation": "Dateは時間軸上の一点。",
+            "detail": {
+              "concept": "Date は「時間軸上の一点」、つまり世界共通の特定の瞬間を表す値です。表示用の文字列や、年月日といった暦の情報は含んでいません。同じ Date でも、どの地域・どの暦で見るかによって「何年何月何日何時」は変わります。",
+              "whyCorrect": "Date は瞬間そのもの、Calendar と TimeZone がその瞬間を暦の上でどう読むかを決め、フォーマッタが表示用の文字列を作ります。役割がはっきり分かれています。",
+              "otherChoices": [
+                {
+                  "choice": "必ず日本時間文字列",
+                  "reason": "表示用の文字列は Date から別途組み立てます。Date 自身は文字列を保持しません。"
+                },
+                {
+                  "choice": "calendar画面",
+                  "reason": "画面の部品ではありません。値としての時刻です。"
+                },
+                {
+                  "choice": "TimeZoneだけ",
+                  "reason": "TimeZone は瞬間を地域の時刻として読むための情報で、Date とは別の型です。"
+                }
+              ],
+              "takeaway": "Date は瞬間の値。表示文字列は別に作る。"
+            }
           },
           {
             "id": "q-foundation-010",
@@ -6153,7 +6340,31 @@
               "計算不可"
             ],
             "answer": 0,
-            "explanation": "暦ruleを考慮できる。"
+            "explanation": "暦ruleを考慮できる。",
+            "detail": {
+              "concept": "暦の上での「翌日」は、必ずしも 24 時間後とは限りません。夏時間の切り替わりがある地域では 23 時間や 25 時間になる日があり、うるう秒や暦の違いも存在します。Calendar はこうした規則を踏まえて日付計算を行います。",
+              "whyCorrect": "`Calendar.current.date(byAdding:.day, value: 1, to:)` は暦の規則に従って翌日を求めます。自分で秒数を足すより安全です。",
+              "otherChoices": [
+                {
+                  "choice": "86400秒固定",
+                  "reason": "1 日を 86400 秒固定として足す方法は、夏時間のある地域で 1 時間ずれる原因になります。時間の間隔としては正しくても、暦の上の「翌日」とは一致しないことがあります。"
+                },
+                {
+                  "choice": "文字列+1",
+                  "reason": "日付を文字列として扱って加算するのは、桁上がりや月末の処理を自前で実装することになり誤りの元です。"
+                },
+                {
+                  "choice": "計算不可",
+                  "reason": "Calendar を使えば計算できます。"
+                }
+              ],
+              "example": {
+                "code": "import Foundation\n\nvar calendar = Calendar(identifier: .gregorian)\ncalendar.timeZone = TimeZone(secondsFromGMT: 0) ?? calendar.timeZone\nlet base = Date(timeIntervalSince1970: 0)\nif let next = calendar.date(byAdding: .day, value: 1, to: base) {\n    print(Int(next.timeIntervalSince1970))\n}",
+                "output": "86400",
+                "explanation": "UTC では 1 日がちょうど 86400 秒なのでこの値になりますが、夏時間のある地域では同じ計算でも秒数が変わります。だから暦の計算は Calendar に任せます。"
+              },
+              "takeaway": "日付の加算は Calendar に任せる。86400 秒固定は危険。"
+            }
           }
         ]
       },
@@ -6185,7 +6396,26 @@
               "Git管理"
             ],
             "answer": 0,
-            "explanation": "値を用途/地域に応じて表示形式へ変換。"
+            "explanation": "値を用途/地域に応じて表示形式へ変換。",
+            "detail": {
+              "concept": "FormatStyle は値を「人に見せるための文字列」へ変換する仕組みです。通貨記号の位置、桁区切り、小数点の記号などは国や言語で異なるため、Locale の情報に基づいて整形します。",
+              "whyCorrect": "`price.formatted(.currency(code: \"JPY\"))` は金額を通貨表示に整えます。自前で文字列を組み立てるより、地域ごとの慣習に正しく従えます。",
+              "otherChoices": [
+                {
+                  "choice": "DB作成",
+                  "reason": "データの保存先を作る機能ではありません。表示のための変換です。"
+                },
+                {
+                  "choice": "Actor化",
+                  "reason": "並行処理での状態保護とは無関係です。"
+                },
+                {
+                  "choice": "Git管理",
+                  "reason": "バージョン管理とは無関係です。"
+                }
+              ],
+              "takeaway": "FormatStyle は表示用の整形。地域差を吸収する。"
+            }
           },
           {
             "id": "q-foundation-012",
@@ -6199,7 +6429,26 @@
               "Locale固定"
             ],
             "answer": 0,
-            "explanation": "dataとpresentationを分離する。"
+            "explanation": "dataとpresentationを分離する。",
+            "detail": {
+              "concept": "同じ時刻でも、表示は地域・言語・画面によって変わります。そこで内部では Date のまま保持し、画面に出す直前だけ文字列へ整形するのが基本方針です。データと表示（presentation）を分ける考え方です。",
+              "whyCorrect": "Date のまま持っていれば、比較・並べ替え・差分計算がそのまま行えます。文字列にしてしまうと、それらの操作のたびに解析し直す必要が生じます。",
+              "otherChoices": [
+                {
+                  "choice": "常にStringだけ",
+                  "reason": "文字列だけで保持すると、比較や計算のたびに解析が必要になり、地域を変えた表示にも対応できません。"
+                },
+                {
+                  "choice": "TimeZone無視",
+                  "reason": "TimeZone を無視すると、日付の境界がずれて別の日として扱われる不具合が起きます。"
+                },
+                {
+                  "choice": "Locale固定",
+                  "reason": "特定の Locale に固定すると、他の言語環境の利用者に合わない表示になります。"
+                }
+              ],
+              "takeaway": "内部は Date、表示の直前だけ文字列へ。"
+            }
           }
         ]
       },
@@ -6231,7 +6480,31 @@
               "Dataだけ"
             ],
             "answer": 0,
-            "explanation": "URLComponentsとURLQueryItemを使う。"
+            "explanation": "URLComponentsとURLQueryItemを使う。",
+            "detail": {
+              "concept": "URL には使える文字が決められており、空白や日本語、`&` `=` などの記号はそのままでは使えません。安全に扱うには percent encoding（%20 のような置き換え）が必要です。URLComponents は URL を「scheme・host・path・query」といった部品に分けて扱い、この変換を自動で行います。",
+              "whyCorrect": "URLQueryItem で名前と値を渡せば、必要な文字だけが適切に変換されます。文字列連結では書き手が変換漏れを起こしがちです。",
+              "otherChoices": [
+                {
+                  "choice": "Calendar",
+                  "reason": "暦の計算を扱う型で、URL とは無関係です。"
+                },
+                {
+                  "choice": "Set",
+                  "reason": "重複のない集合を表す型です。URL の組み立てには使いません。"
+                },
+                {
+                  "choice": "Dataだけ",
+                  "reason": "Data は byte 列で、URL の構造は扱いません。"
+                }
+              ],
+              "example": {
+                "code": "import Foundation\n\nvar components = URLComponents(string: \"https://example.com/search\")\ncomponents?.queryItems = [URLQueryItem(name: \"q\", value: \"leg day\")]\nif let url = components?.url {\n    print(url.absoluteString)\n}",
+                "output": "https://example.com/search?q=leg%20day",
+                "explanation": "値に含まれる空白が %20 へ自動変換されています。文字列連結ではこの変換を自分で行う必要があり、漏れると壊れた URL になります。"
+              },
+              "takeaway": "query の組み立ては URLComponents + URLQueryItem。"
+            }
           },
           {
             "id": "q-foundation-014",
@@ -6245,7 +6518,26 @@
               "理由なし"
             ],
             "answer": 0,
-            "explanation": "構造化APIでencodingを扱う方が安全。"
+            "explanation": "構造化APIでencodingを扱う方が安全。",
+            "detail": {
+              "concept": "検索語などの値には、空白・記号・日本語が入り得ます。これらを変換せずに URL へ連結すると、区切り記号として解釈されたり、そもそも URL として無効になったりします。値が外部由来の場合、意図しない書き換えを招く危険もあります。",
+              "whyCorrect": "文字列連結は「値の中身が安全である」という前提に依存します。URLComponents を使えばその前提が不要になり、変換漏れによる不具合を構造的に防げます。",
+              "otherChoices": [
+                {
+                  "choice": "+禁止",
+                  "reason": "`+` による文字列連結自体は文法として正しく、禁止されているわけではありません。問題は変換の欠落です。"
+                },
+                {
+                  "choice": "URLはInt",
+                  "reason": "URL は数値ではありません。"
+                },
+                {
+                  "choice": "理由なし",
+                  "reason": "変換漏れという明確な理由があります。"
+                }
+              ],
+              "takeaway": "URL を文字列連結で作らない。変換漏れが壊れる原因になる。"
+            }
           }
         ]
       },
@@ -6277,7 +6569,26 @@
               "Git branch"
             ],
             "answer": 0,
-            "explanation": "bodyのmedia typeを示す。"
+            "explanation": "bodyのmedia typeを示す。",
+            "detail": {
+              "concept": "HTTP ヘッダは、本体（body）に添える補足情報です。Content-Type はその中でも「body をどの形式として解釈すべきか」を示すもので、`application/json` なら受け取った側は JSON として解析します。",
+              "whyCorrect": "同じ byte 列でも、形式の宣言が違えばサーバー側の解釈が変わります。JSON を送っているのに Content-Type を付け忘れると、正しく解析されず失敗する原因になります。",
+              "otherChoices": [
+                {
+                  "choice": "通信速度",
+                  "reason": "通信の速さを伝えるヘッダではありません。"
+                },
+                {
+                  "choice": "OS",
+                  "reason": "クライアントの環境を伝えるのは User-Agent などの別のヘッダです。"
+                },
+                {
+                  "choice": "Git branch",
+                  "reason": "バージョン管理とは無関係です。"
+                }
+              ],
+              "takeaway": "Content-Type は body の形式の宣言。"
+            }
           },
           {
             "id": "q-foundation-016",
@@ -6291,7 +6602,32 @@
               "response無し"
             ],
             "answer": 1,
-            "explanation": "network成功とHTTP成功は別。"
+            "explanation": "network成功とHTTP成功は別。",
+            "detail": {
+              "concept": "URLSession が例外を投げるのは、接続できない・タイムアウトしたなど「通信そのものが成立しなかった」場合です。サーバーに届いて 404 や 500 が返ってきた場合、通信としては成功しているため例外は投げられません。この 2 つは別の層の話です。",
+              "steps": [
+                "リクエストを送り、レスポンスを受け取る。",
+                "ここで例外が出なければ「サーバーまで届いて返事が来た」ことだけが分かる。",
+                "返事の中身が成功か失敗かは、HTTPURLResponse の statusCode を見て判断する。",
+                "2xx 以外ならアプリ側でエラーとして扱う。"
+              ],
+              "whyCorrect": "ネットワークの成功と、HTTP としての成功は別々に確認する必要があります。statusCode の確認を省くと、エラーページの本文を正常なデータとして解析しようとして失敗します。",
+              "otherChoices": [
+                {
+                  "choice": "必ず200",
+                  "reason": "404 や 500 でも通信自体は成功しているため、例外は投げられません。200 とは限りません。"
+                },
+                {
+                  "choice": "必ず404",
+                  "reason": "特定の値に決まることはありません。サーバーの応答次第です。"
+                },
+                {
+                  "choice": "response無し",
+                  "reason": "レスポンスは data と一緒に必ず返ります。"
+                }
+              ],
+              "takeaway": "例外が出ない ≠ HTTP 成功。statusCode を必ず確認する。"
+            }
           }
         ]
       },
@@ -6323,7 +6659,31 @@
               "URL作成"
             ],
             "answer": 0,
-            "explanation": "statusが200以上300未満かpattern matchingしている。"
+            "explanation": "statusが200以上300未満かpattern matchingしている。",
+            "detail": {
+              "concept": "`~=` はパターンマッチ演算子で、左辺のパターンに右辺の値が含まれるかを判定します。`200..<300` は 200 以上 300 未満の範囲なので、`200..<300 ~= statusCode` は「statusCode が 2xx か」の判定になります。switch の case で範囲を書いたときも内部でこの演算子が使われています。",
+              "whyCorrect": "HTTP の成功を表すのは 200 番台全体です。200 だけを見ると、204（成功だが本文なし）や 201（作成成功）を誤ってエラー扱いしてしまいます。",
+              "otherChoices": [
+                {
+                  "choice": "300以上だけ",
+                  "reason": "`..<` は上限を含まないため、300 以上は範囲外です。判定しているのは 2xx です。"
+                },
+                {
+                  "choice": "String化",
+                  "reason": "文字列への変換とは無関係です。"
+                },
+                {
+                  "choice": "URL作成",
+                  "reason": "URL の生成とは無関係です。"
+                }
+              ],
+              "example": {
+                "code": "let range = 200..<300\nprint(range ~= 204)\nprint(range ~= 404)\nprint(range ~= 300)",
+                "output": "true\nfalse\nfalse",
+                "explanation": "204 は 2xx なので成功、404 は範囲外、300 は上限に含まれないため false です。`..<` が上限を含まない点がここで効いています。"
+              },
+              "takeaway": "成功判定は 200 だけでなく 200..<300 で行う。"
+            }
           },
           {
             "id": "q-foundation-018",
@@ -6337,7 +6697,26 @@
               "Set"
             ],
             "answer": 0,
-            "explanation": "Decodable型へdecodeする。"
+            "explanation": "Decodable型へdecodeする。",
+            "detail": {
+              "concept": "URLSession が返すのは Data、つまり byte 列です。アプリの中で扱うには、その byte 列を Swift の型に対応付ける必要があり、JSON 形式ならその役割を担うのが JSONDecoder です。データの向きは ネットワーク → Data → Swift の型 です。",
+              "whyCorrect": "受け取った Data を decode に渡すことで、キーがプロパティへ対応付けられた型の値になります。以降は型として安全に扱えます。",
+              "otherChoices": [
+                {
+                  "choice": "Calendar",
+                  "reason": "暦の計算を行う型で、データ変換は行いません。"
+                },
+                {
+                  "choice": "FileManager",
+                  "reason": "ファイルの読み書きや管理を行う型です。JSON の解析はしません。"
+                },
+                {
+                  "choice": "Set",
+                  "reason": "重複のない集合を表す型で、変換の機能はありません。"
+                }
+              ],
+              "takeaway": "受信した Data は JSONDecoder で型へ変換する。"
+            }
           }
         ]
       },
@@ -6369,7 +6748,26 @@
               "Git repo"
             ],
             "answer": 0,
-            "explanation": "Documentsは保持すべき文書dataの代表的保存先。"
+            "explanation": "Documentsは保持すべき文書dataの代表的保存先。",
+            "detail": {
+              "concept": "iOS アプリは sandbox と呼ばれる専用の領域の中でだけファイルを読み書きできます。その中に用途別の場所があり、Documents はユーザーが作った・ユーザーにとって価値のあるデータを置く場所です。バックアップの対象にもなります。",
+              "whyCorrect": "ユーザー生成のデータは失われると困るため、消えては困るものを置く Documents が適切です。",
+              "otherChoices": [
+                {
+                  "choice": "必ず/tmpだけ",
+                  "reason": "一時領域はシステムの判断で削除されます。保持したいデータの置き場所には向きません。"
+                },
+                {
+                  "choice": "任意のsystem folder",
+                  "reason": "sandbox の外にある任意の場所へは書き込めません。"
+                },
+                {
+                  "choice": "Git repo",
+                  "reason": "バージョン管理の場所であり、アプリの実行時の保存先ではありません。"
+                }
+              ],
+              "takeaway": "残すべきユーザーデータは Documents。"
+            }
           },
           {
             "id": "q-foundation-020",
@@ -6383,7 +6781,26 @@
               "signing certificate"
             ],
             "answer": 0,
-            "explanation": "削除されても再取得できるdata向け。"
+            "explanation": "削除されても再取得できるdata向け。",
+            "detail": {
+              "concept": "Caches は「無くても再び用意できるデータ」を置く場所です。端末の空き容量が少なくなると、システムの判断で中身が削除されることがあります。削除されても再取得や再生成ができる前提で使います。",
+              "whyCorrect": "サムネイル画像やダウンロード済みの一時データのように、消えても再度取得すれば済むものが適しています。消えたら困るデータを置くと復旧できません。",
+              "otherChoices": [
+                {
+                  "choice": "唯一の重要data",
+                  "reason": "そこにしか無い重要なデータは、削除される可能性のある場所に置くべきではありません。Documents などを使います。"
+                },
+                {
+                  "choice": "password平文",
+                  "reason": "認証情報を平文で保存すること自体が不適切です。Keychain のような保護された仕組みを使います。"
+                },
+                {
+                  "choice": "signing certificate",
+                  "reason": "証明書は開発・配布の仕組みで扱うもので、アプリのキャッシュ領域に置くものではありません。"
+                }
+              ],
+              "takeaway": "Caches は消えてもよいデータ専用。"
+            }
           }
         ]
       },
@@ -6415,7 +6832,26 @@
               "動画"
             ],
             "answer": 0,
-            "explanation": "軽量設定値向け。"
+            "explanation": "軽量設定値向け。",
+            "detail": {
+              "concept": "UserDefaults は少量の設定値を key と value の組で保存する仕組みです。アプリ起動時に内容が読み込まれる前提の作りなので、大きなデータを入れるとメモリと起動時間を圧迫します。",
+              "whyCorrect": "ダークモードの有無や並び順の選択のような、数値・文字列・真偽値といった小さな値の保存に向いています。",
+              "otherChoices": [
+                {
+                  "choice": "大量画像",
+                  "reason": "画像のような大きなデータはファイルとして保存し、パスや識別子だけを残すのが適切です。"
+                },
+                {
+                  "choice": "password平文",
+                  "reason": "保護されていない領域なので、認証情報の平文保存には使えません。Keychain を使います。"
+                },
+                {
+                  "choice": "動画",
+                  "reason": "動画も同様に大きすぎます。ファイルとして扱います。"
+                }
+              ],
+              "takeaway": "UserDefaults は小さな設定値だけ。大きなデータと秘密情報は別。"
+            }
           },
           {
             "id": "q-foundation-022",
@@ -6429,7 +6865,26 @@
               "README"
             ],
             "answer": 0,
-            "explanation": "credentialはKeychain等を検討。"
+            "explanation": "credentialはKeychain等を検討。",
+            "detail": {
+              "concept": "Keychain は OS が提供する保護された保存領域で、暗号化された状態で認証情報を保持します。UserDefaults やファイルに平文で保存した場合と違い、他のアプリや単純な閲覧から保護されます。",
+              "whyCorrect": "トークンやパスワードのような資格情報は Keychain のような保護された仕組みに保存します。なお、アプリに埋め込んだ値はいずれ解析され得るため、「クライアントに置けば秘密が守られる」とは考えないことも重要です。本当に秘匿すべき処理はサーバー側に置きます。",
+              "otherChoices": [
+                {
+                  "choice": "UserDefaults平文",
+                  "reason": "保護されていないため、認証情報の保存先としては不適切です。"
+                },
+                {
+                  "choice": "print log",
+                  "reason": "ログに出力すると、端末やクラッシュレポートに残り、開発者以外の目に触れる可能性があります。"
+                },
+                {
+                  "choice": "README",
+                  "reason": "リポジトリに書き込むと、履歴として残り共有されてしまいます。"
+                }
+              ],
+              "takeaway": "資格情報は Keychain。そもそも端末側の秘密は完全には守れない。"
+            }
           }
         ]
       },
@@ -6461,7 +6916,26 @@
               "Auto Layout"
             ],
             "answer": 0,
-            "explanation": "broadcast用途。"
+            "explanation": "broadcast用途。",
+            "detail": {
+              "concept": "NotificationCenter は「送り手が受け手を知らないまま、出来事を broadcast する」仕組みです。1 つの通知に対して受け手が 0 人でも複数人でも成り立ち、送り手側のコードは変わりません。",
+              "whyCorrect": "キーボードの表示やアプリの状態変化など、誰が関心を持つか送り手には分からない出来事の通知に向いています。",
+              "otherChoices": [
+                {
+                  "choice": "型継承",
+                  "reason": "型の継承関係とは無関係な、実行時の通知の仕組みです。"
+                },
+                {
+                  "choice": "JSON decode",
+                  "reason": "JSON の解析は Codable と JSONDecoder の役割です。"
+                },
+                {
+                  "choice": "Auto Layout",
+                  "reason": "画面のレイアウトとは関係ありません。"
+                }
+              ],
+              "takeaway": "NotificationCenter は 1 対多の broadcast。"
+            }
           },
           {
             "id": "q-foundation-024",
@@ -6475,7 +6949,26 @@
               "ARC停止"
             ],
             "answer": 0,
-            "explanation": "event flowが暗黙的になりやすい。"
+            "explanation": "event flowが暗黙的になりやすい。",
+            "detail": {
+              "concept": "NotificationCenter は送り手と受け手が直接つながらない分、コードを読んだだけでは「誰が誰に影響しているか」が見えません。また通知に添える値は型が固定されないことが多く、受け取り側で型を確認する手間が生じます。",
+              "whyCorrect": "依存関係が暗黙的になり、通知を追いかけないと処理の流れが分かりません。関係が固定的なら、delegate や直接の呼び出し、状態の共有といった明示的な手段のほうが追跡しやすくなります。",
+              "otherChoices": [
+                {
+                  "choice": "必ずcompile error",
+                  "reason": "多用してもコンパイルは通ります。だからこそ問題に気づきにくいと言えます。"
+                },
+                {
+                  "choice": "通信不能",
+                  "reason": "通信の可否とは無関係です。"
+                },
+                {
+                  "choice": "ARC停止",
+                  "reason": "メモリ管理が止まることはありません。ただし解除し忘れると不要な購読が残ることはあります。"
+                }
+              ],
+              "takeaway": "便利だが依存関係が見えなくなる。関係が固定なら明示的な手段を。"
+            }
           }
         ]
       },
@@ -6507,7 +7000,31 @@
               "Dateへ自動変換"
             ],
             "answer": 0,
-            "explanation": "入力全体とのmatchを確認する。"
+            "explanation": "入力全体とのmatchを確認する。",
+            "detail": {
+              "concept": "正規表現の照合には範囲の違いがあります。wholeMatch は「入力全体がパターンに一致するか」、firstMatch は「どこかに一致する部分があるか」を調べます。入力の検証には、余計な文字が混ざっていないことを確認できる wholeMatch が向いています。",
+              "whyCorrect": "`\\d{4}-\\d{2}-\\d{2}` に対して wholeMatch を使えば、日付だけで構成された文字列かどうかを判定できます。前後に別の文字があれば一致しません。",
+              "otherChoices": [
+                {
+                  "choice": "先頭1文字だけ",
+                  "reason": "先頭 1 文字だけを見る API ではありません。全体を対象とします。"
+                },
+                {
+                  "choice": "HTTP通信",
+                  "reason": "通信とは無関係です。"
+                },
+                {
+                  "choice": "Dateへ自動変換",
+                  "reason": "一致の判定を行うだけで、日付の型へ変換はしません。変換は別途行います。"
+                }
+              ],
+              "example": {
+                "code": "import Foundation\n\ndo {\n    let pattern = try Regex(#\"\\d{4}-\\d{2}-\\d{2}\"#)\n    print(\"2026-07-24\".wholeMatch(of: pattern) != nil)\n    print(\"x2026-07-24\".wholeMatch(of: pattern) != nil)\n    print(\"x2026-07-24\".firstMatch(of: pattern) != nil)\n} catch {\n    print(\"invalid pattern\")\n}",
+                "output": "true\nfalse\ntrue",
+                "explanation": "余計な文字が付くと wholeMatch は一致しませんが、firstMatch は部分一致するため true になります。ここでは文字列からパターンを作っていますが、新しい言語モードでは設問のような /.../ というリテラル記法も使えます。"
+              },
+              "takeaway": "検証は wholeMatch、抽出は firstMatch。"
+            }
           },
           {
             "id": "q-foundation-026",
@@ -6521,7 +7038,26 @@
               "UI限定"
             ],
             "answer": 0,
-            "explanation": "境界条件をtestする。"
+            "explanation": "境界条件をtestする。",
+            "detail": {
+              "concept": "正規表現は短く書けても、境界の挙動が直感と食い違いやすい記法です。「一致してほしい例」だけでなく「一致してほしくない例（反例）」も含めて確認しないと、通しすぎ・弾きすぎに気づけません。",
+              "whyCorrect": "具体例と反例を並べて検証することで、意図した範囲だけを受け付けているかを確認できます。テストとして残せば、後から式を変えたときの崩れにも気づけます。",
+              "otherChoices": [
+                {
+                  "choice": "1行へ詰める",
+                  "reason": "1 行に詰めても読みやすくはなりません。複雑なものは RegexBuilder で分解するほうが保守しやすくなります。"
+                },
+                {
+                  "choice": "force unwrap",
+                  "reason": "Optional を無理に外す書き方は、一致しなかった場合に停止する原因になります。"
+                },
+                {
+                  "choice": "UI限定",
+                  "reason": "正規表現は入力検証やログ解析など、画面以外でも広く使われます。"
+                }
+              ],
+              "takeaway": "正規表現は「通る例」と「通らない例」の両方で確認する。"
+            }
           }
         ]
       },
@@ -6553,7 +7089,31 @@
               "Optional化"
             ],
             "answer": 0,
-            "explanation": "要素要求まで評価を遅らせる。"
+            "explanation": "要素要求まで評価を遅らせる。",
+            "detail": {
+              "concept": "通常の map は、その場ですべての要素を変換した新しい配列を作ります。lazy を挟むと変換は即座に行われず、実際に要素が必要になった時点で 1 つずつ計算されます。先頭数件しか使わない場合や、途中で打ち切る場合に無駄な計算を避けられます。",
+              "whyCorrect": "評価が必要になるまで遅らせるのが lazy の本質です。並列に実行されるわけではなく、あくまで「いつ計算するか」を変える最適化です。",
+              "otherChoices": [
+                {
+                  "choice": "必ず並列化",
+                  "reason": "実行を並列化する機能ではありません。処理の順番は変わらず、タイミングだけが遅れます。"
+                },
+                {
+                  "choice": "DB保存",
+                  "reason": "保存とは無関係です。"
+                },
+                {
+                  "choice": "Optional化",
+                  "reason": "値の有無を表す Optional とは関係ありません。"
+                }
+              ],
+              "example": {
+                "code": "var evaluated = 0\nlet doubled = (1...100).lazy.map { (value: Int) -> Int in\n    evaluated += 1\n    return value * 2\n}\nprint(doubled.first ?? 0)\nprint(evaluated)",
+                "output": "2\n1",
+                "explanation": "100 要素あっても、先頭 1 件しか使わなければ変換は 1 回しか実行されません。lazy を外すと 100 回実行されます。"
+              },
+              "takeaway": "lazy は「必要になるまで計算しない」。並列化ではない。"
+            }
           },
           {
             "id": "q-foundation-028",
@@ -6567,7 +7127,26 @@
               "HTTP通信"
             ],
             "answer": 0,
-            "explanation": "より強い走査/indexの保証を持つ。"
+            "explanation": "より強い走査/indexの保証を持つ。",
+            "detail": {
+              "concept": "Sequence は「先頭から順に 1 回ずつ取り出せる」ことだけを保証します。Collection はそれに加えて、何度でも走査できること、位置を表す index があること、count を有限時間で得られることなどを保証します。",
+              "whyCorrect": "index による位置指定のアクセスは Collection 以降で使える能力です。Sequence だけでは一度きりの走査しか保証されないため、添字アクセスができません。",
+              "otherChoices": [
+                {
+                  "choice": "必ずSet",
+                  "reason": "Set は Collection の 1 つですが、Collection が Set になるわけではありません。Array も Collection です。"
+                },
+                {
+                  "choice": "必ず参照型",
+                  "reason": "Array は struct であり値型です。参照型である必要はありません。"
+                },
+                {
+                  "choice": "HTTP通信",
+                  "reason": "通信の機能とは無関係です。"
+                }
+              ],
+              "takeaway": "Collection は Sequence に index と再走査を足したもの。"
+            }
           }
         ]
       },
@@ -6599,7 +7178,26 @@
               "ARC無効"
             ],
             "answer": 0,
-            "explanation": "外部仕様との境界を作れる。"
+            "explanation": "外部仕様との境界を作れる。",
+            "detail": {
+              "concept": "API のレスポンス形式は、こちらの都合とは無関係に変わることがあります。DTO を挟むと、その変化を受け止める層が 1 か所に定まり、アプリ内部のモデルはそのままで済みます。",
+              "whyCorrect": "変換処理という明確な境界を置くことで、外部仕様の変更が内部へ波及しにくくなります。テストのときも、DTO の解析と内部ロジックを別々に検証できます。",
+              "otherChoices": [
+                {
+                  "choice": "必ずcode量削減",
+                  "reason": "型が増えるため、コード量はむしろ増えることが多いです。得られるのは変更に強い構造です。"
+                },
+                {
+                  "choice": "UI自動生成",
+                  "reason": "UI が自動生成されることはありません。"
+                },
+                {
+                  "choice": "ARC無効",
+                  "reason": "メモリ管理とは無関係です。"
+                }
+              ],
+              "takeaway": "DTO は外部変更の受け止め役。内部モデルを守る。"
+            }
           },
           {
             "id": "q-foundation-030",
@@ -6613,7 +7211,31 @@
               "indexはUUID"
             ],
             "answer": 0,
-            "explanation": "並べ替えでindexは変わる。"
+            "explanation": "並べ替えでindexは変わる。",
+            "detail": {
+              "concept": "index は「今この並びの中で何番目にあるか」という位置の情報で、並べ替えや削除で簡単に変わります。ID は「それがどの要素なのか」を表す同一性の情報で、並び順が変わっても要素に付いて回ります。",
+              "whyCorrect": "位置と同一性は別の概念です。選択中の要素を index で覚えていると、並べ替えた瞬間に別の要素を指してしまいます。ID で覚えていれば正しく追随します。",
+              "otherChoices": [
+                {
+                  "choice": "常に同じ",
+                  "reason": "並べ替えを行えば一致しなくなります。常に同じではありません。"
+                },
+                {
+                  "choice": "IDは表示位置",
+                  "reason": "ID は表示上の位置を表しません。位置を表すのは index です。"
+                },
+                {
+                  "choice": "indexはUUID",
+                  "reason": "index は整数の位置であり、UUID のような識別子ではありません。"
+                }
+              ],
+              "example": {
+                "code": "struct Exercise: Identifiable { let id: Int; let name: String }\nvar exercises = [Exercise(id: 10, name: \"squat\"), Exercise(id: 20, name: \"bench\")]\nprint(exercises[0].id)\nexercises.reverse()\nprint(exercises[0].id)",
+                "output": "10\n20",
+                "explanation": "同じ index 0 でも、並べ替えの前後で別の要素を指しています。要素を特定したいときは index ではなく id を使います。"
+              },
+              "takeaway": "index は位置、ID は同一性。並べ替えで差が出る。"
+            }
           }
         ]
       },
@@ -6645,7 +7267,37 @@
               "未定義"
             ],
             "answer": 0,
-            "explanation": "Arrayは値semantics。"
+            "explanation": "Arrayは値semantics。",
+            "detail": {
+              "concept": "Array は struct であり値型です。代入すると論理的には中身がコピーされ、以降は互いに独立します。片方に要素を追加しても、もう片方の要素数は変わりません。",
+              "steps": [
+                "a は [1, 2]。",
+                "`var b = a` で b は a と独立した値になる。",
+                "b.append(3) は b 側だけを変更する。",
+                "a は [1, 2] のまま。"
+              ],
+              "whyCorrect": "値型のコピーは独立しているため、意図しない共有による書き換えが起きません。",
+              "otherChoices": [
+                {
+                  "choice": "[1,2,3]",
+                  "reason": "b 側の結果です。参照型であればこうなりますが、Array は値型です。"
+                },
+                {
+                  "choice": "nil",
+                  "reason": "配列が nil になることはありません。"
+                },
+                {
+                  "choice": "未定義",
+                  "reason": "動作は仕様として明確に定まっています。"
+                }
+              ],
+              "example": {
+                "code": "var a = [1, 2]\nvar b = a\nb.append(3)\nprint(a)\nprint(b)",
+                "output": "[1, 2]\n[1, 2, 3]",
+                "explanation": "代入した時点では中身を共有していますが、b を変更した瞬間に実際のコピーが作られ、a は影響を受けません。"
+              },
+              "takeaway": "Array の代入は独立したコピーとして振る舞う。"
+            }
           },
           {
             "id": "q-foundation-032",
@@ -6659,7 +7311,32 @@
               "JSON化"
             ],
             "answer": 0,
-            "explanation": "値semanticsを保ちつつcopy costを抑える。"
+            "explanation": "値semanticsを保ちつつcopy costを抑える。",
+            "detail": {
+              "concept": "Copy-on-Write（COW）は、代入のたびに実際のコピーを作るのではなく、内部の記憶領域を共有しておき、どちらかが変更された瞬間に初めて本物のコピーを作る最適化です。利用者から見た振る舞いは値型のコピーそのままで、コストだけが下がります。",
+              "steps": [
+                "`var b = a` の時点では、a と b が同じ記憶領域を共有している（コピーはまだ発生しない）。",
+                "b に変更が加わる直前に、共有されているかどうかが確認される。",
+                "共有されていれば、その時点で b 用の複製が作られる。",
+                "以降 b への変更は a に影響しない。"
+              ],
+              "whyCorrect": "大きな配列を代入しただけで毎回全要素を複製していては非効率です。COW により、読み取るだけなら複製せず、変更するときだけ複製します。",
+              "otherChoices": [
+                {
+                  "choice": "必ず参照型化",
+                  "reason": "参照型に変わるわけではありません。値型の振る舞いを保ったままコストを下げる仕組みです。"
+                },
+                {
+                  "choice": "非同期化",
+                  "reason": "非同期処理とは無関係です。"
+                },
+                {
+                  "choice": "JSON化",
+                  "reason": "データ変換とは無関係です。"
+                }
+              ],
+              "takeaway": "COW は「変更するまでコピーしない」。値型の意味は変わらない。"
+            }
           }
         ]
       }
