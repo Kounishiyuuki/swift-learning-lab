@@ -10698,7 +10698,26 @@
               "Gitを管理"
             ],
             "answer": 1,
-            "explanation": "UIViewControllerは画面に関するView階層や表示ライフサイクルなどを管理する中心クラス。"
+            "explanation": "UIViewControllerは画面に関するView階層や表示ライフサイクルなどを管理する中心クラス。",
+            "detail": {
+              "concept": "UIKit は命令的（imperative）で、出来事に応じて処理を書くイベント駆動の枠組みです。UIViewController は 1 つの画面分の View 階層を持ち、表示・非表示に伴う節目（ライフサイクル）で呼ばれるメソッドを提供します。View の組み立てと、表示に応じた準備・後始末をまとめる場所です。",
+              "whyCorrect": "担当するのは画面まわりの View 階層と、その表示に伴う節目の処理です。ここに業務ロジックや通信処理まで詰め込むと肥大化するため、別の型へ分けるのが一般的な設計です。",
+              "otherChoices": [
+                {
+                  "choice": "データベースだけを管理",
+                  "reason": "データ保存を担当する型ではありません。分離して別の層に置きます。"
+                },
+                {
+                  "choice": "Swiftコンパイラを実行",
+                  "reason": "ビルドの仕組みとは無関係です。"
+                },
+                {
+                  "choice": "Gitを管理",
+                  "reason": "バージョン管理とは無関係です。"
+                }
+              ],
+              "takeaway": "画面の View 階層と表示ライフサイクルの担当。ロジックは別に置く。"
+            }
           },
           {
             "id": "q-uikit-002",
@@ -10712,7 +10731,26 @@
               "Protocolを作る"
             ],
             "answer": 0,
-            "explanation": "UIViewControllerが持つviewDidLoadをサブクラスでオーバーライドして独自処理を追加している。"
+            "explanation": "UIViewControllerが持つviewDidLoadをサブクラスでオーバーライドして独自処理を追加している。",
+            "detail": {
+              "concept": "override は、親クラスが用意しているメソッドを子クラスで置き換える指定です。UIViewController は viewDidLoad のような節目のメソッドを持っており、それを自分のクラスで上書きして独自の処理を書きます。多くの場合、`super.viewDidLoad()` を呼んで親の処理も実行します。",
+              "whyCorrect": "呼ばれるタイミングは UIKit 側が決めており、こちらは中身だけを差し替えます。これがイベント駆動の基本的な形です。",
+              "otherChoices": [
+                {
+                  "choice": "Optionalにする",
+                  "reason": "値の有無を表す Optional とは無関係です。"
+                },
+                {
+                  "choice": "非同期化する",
+                  "reason": "非同期の指定は async です。"
+                },
+                {
+                  "choice": "Protocolを作る",
+                  "reason": "protocol を定義する構文とは別です。"
+                }
+              ],
+              "takeaway": "override は親のメソッドを置き換える。呼ぶのは UIKit 側。"
+            }
           }
         ]
       },
@@ -10744,7 +10782,26 @@
               "init(coder:)"
             ],
             "answer": 1,
-            "explanation": "viewWillAppearは画面が表示される直前に呼ばれる。戻ってきた際の更新などに使われることが多い。"
+            "explanation": "viewWillAppearは画面が表示される直前に呼ばれる。戻ってきた際の更新などに使われることが多い。",
+            "detail": {
+              "concept": "ライフサイクルのメソッドは呼ばれる回数が違います。viewDidLoad は View が読み込まれた後の 1 回だけ、viewWillAppear は画面が表示されるたびに毎回呼ばれます。他の画面から戻ってきたときにも呼ばれます。",
+              "whyCorrect": "「表示されるたびに最新化したい」処理は、毎回呼ばれる viewWillAppear に置きます。viewDidLoad に書くと、戻ってきたときに更新されません。",
+              "otherChoices": [
+                {
+                  "choice": "viewDidLoad",
+                  "reason": "最初の 1 回しか呼ばれないため、再表示時の更新には使えません。初期設定向けです。"
+                },
+                {
+                  "choice": "deinit",
+                  "reason": "破棄される直前の後始末で、表示のたびには呼ばれません。"
+                },
+                {
+                  "choice": "init(coder:)",
+                  "reason": "生成時の初期化であり、表示のたびには呼ばれません。"
+                }
+              ],
+              "takeaway": "viewDidLoad は 1 回、viewWillAppear は表示のたび。"
+            }
           },
           {
             "id": "q-uikit-004",
@@ -10758,7 +10815,26 @@
               "Auto Layoutを無効にする"
             ],
             "answer": 1,
-            "explanation": "viewDidLoadはViewロード完了後の初期セットアップに使われる。表示のたびに呼ばれる前提にはしない。"
+            "explanation": "viewDidLoadはViewロード完了後の初期セットアップに使われる。表示のたびに呼ばれる前提にはしない。",
+            "detail": {
+              "concept": "viewDidLoad は、View 階層が読み込まれた直後に 1 度だけ呼ばれます。サブビューの追加や制約の設定、変化しない初期設定など、1 回で済む準備に適しています。",
+              "whyCorrect": "1 回だけという性質があるため、初期構築に向いています。ここに毎回更新したい処理を書くと、再表示時に反映されません。",
+              "otherChoices": [
+                {
+                  "choice": "画面表示のたび必ず呼ばれる",
+                  "reason": "表示のたびに呼ばれるのは viewWillAppear です。viewDidLoad は 1 回だけです。"
+                },
+                {
+                  "choice": "アプリ終了時だけ呼ばれる",
+                  "reason": "終了時のメソッドではありません。"
+                },
+                {
+                  "choice": "Auto Layoutを無効にする",
+                  "reason": "レイアウトの仕組みを無効化するものではありません。"
+                }
+              ],
+              "takeaway": "viewDidLoad は 1 回きりの初期設定用。"
+            }
           }
         ]
       },
@@ -10790,7 +10866,26 @@
               "isUserInteractionEnabled"
             ],
             "answer": 1,
-            "explanation": "Autoresizing Maskから自動生成される制約との競合を避けるため false にするのが基本。"
+            "explanation": "Autoresizing Maskから自動生成される制約との競合を避けるため false にするのが基本。",
+            "detail": {
+              "concept": "UIKit の View は、既定では自身の frame（位置と大きさの直接指定）から自動的に制約が生成される設定になっています。コードで Auto Layout の制約を張る場合、この自動生成が競合するため、`translatesAutoresizingMaskIntoConstraints` を false にして無効化します。",
+              "whyCorrect": "無効化しないと、自動生成された制約と自分で書いた制約が両立せず、レイアウトが壊れたり警告が出たりします。コードで制約を書くときの定型です。",
+              "otherChoices": [
+                {
+                  "choice": "isHidden",
+                  "reason": "表示・非表示の切り替えで、制約とは無関係です。"
+                },
+                {
+                  "choice": "clipsToBounds",
+                  "reason": "はみ出した部分を切り取る設定で、制約とは無関係です。"
+                },
+                {
+                  "choice": "isUserInteractionEnabled",
+                  "reason": "操作を受け付けるかどうかの設定です。"
+                }
+              ],
+              "takeaway": "コードで制約を張るなら translatesAutoresizingMaskIntoConstraints = false。"
+            }
           },
           {
             "id": "q-uikit-006",
@@ -10804,7 +10899,32 @@
               "高さを16にする"
             ],
             "answer": 1,
-            "explanation": "leadingAnchor同士の関係にconstant 16を設定しているため、親Viewのleadingから16pt離す。"
+            "explanation": "leadingAnchor同士の関係にconstant 16を設定しているため、親Viewのleadingから16pt離す。",
+            "detail": {
+              "concept": "Auto Layout の制約は、単独の値ではなく「2 つのアンカー（基準点）どうしの関係」を表します。`label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16)` は「label の先頭側の端を、view の先頭側の端から 16pt 離した位置に合わせる」という関係です。",
+              "steps": [
+                "基準にするのは label の leadingAnchor（先頭側の端）。",
+                "相手は view の leadingAnchor（親の先頭側の端）。",
+                "equalTo なので両者を一致させるが、constant で 16pt ずらす。",
+                "結果として、label の先頭が親の先頭から 16pt 内側に置かれる。"
+              ],
+              "whyCorrect": "制約は位置や大きさを直接指定するのではなく、関係として表現します。だから画面サイズが変わっても関係が保たれます。",
+              "otherChoices": [
+                {
+                  "choice": "labelの幅を16にする",
+                  "reason": "幅を決めるのは widthAnchor です。leadingAnchor は水平方向の位置の基準です。"
+                },
+                {
+                  "choice": "labelを中央にする",
+                  "reason": "中央に置くには centerXAnchor どうしを合わせます。"
+                },
+                {
+                  "choice": "高さを16にする",
+                  "reason": "高さを決めるのは heightAnchor です。"
+                }
+              ],
+              "takeaway": "制約は「どのアンカーとどのアンカーの関係か」で読む。"
+            }
           }
         ]
       },
@@ -10836,7 +10956,31 @@
               "SwiftUIへ変換する"
             ],
             "answer": 0,
-            "explanation": "Delegateはprotocolなどで定義した契約を通じ、イベントや判断を別オブジェクトへ委譲する設計。"
+            "explanation": "Delegateはprotocolなどで定義した契約を通じ、イベントや判断を別オブジェクトへ委譲する設計。",
+            "detail": {
+              "concept": "Delegate は、ある処理や判断を別のオブジェクトに任せる設計です。任せる側は protocol で「こういう場面で、こう尋ねる／知らせる」という契約だけを定め、実際の中身は任された側が書きます。UIKit の多くの部品がこの形で拡張点を提供しています。",
+              "whyCorrect": "部品側は誰が担当するかを知らずに済み、担当側は必要なメソッドだけを実装すれば済みます。`weak var delegate` になっているのは、部品と担当が互いを強く参照して解放されなくなるのを防ぐためです。",
+              "otherChoices": [
+                {
+                  "choice": "必ず配列を作る",
+                  "reason": "データ構造とは無関係な設計の話です。"
+                },
+                {
+                  "choice": "画面を自動保存する",
+                  "reason": "保存機能を提供する仕組みではありません。"
+                },
+                {
+                  "choice": "SwiftUIへ変換する",
+                  "reason": "別のフレームワークへの変換とは無関係です。"
+                }
+              ],
+              "example": {
+                "code": "protocol FormViewDelegate: AnyObject {\n    func formDidSubmit(_ text: String)\n}\nfinal class FormView {\n    weak var delegate: FormViewDelegate?\n    func submit(_ text: String) { delegate?.formDidSubmit(text) }\n}\nfinal class ScreenVC: FormViewDelegate {\n    func formDidSubmit(_ text: String) { print(\"received \\(text)\") }\n}\nlet screen = ScreenVC()\nlet form = FormView()\nform.delegate = screen\nform.submit(\"leg day\")",
+                "output": "received leg day",
+                "explanation": "FormView は誰が受け取るかを知らず、契約どおり delegate に知らせるだけです。受け手を差し替えても FormView のコードは変わりません。"
+              },
+              "takeaway": "Delegate は「判断や通知を任せる相手」を protocol で決める。"
+            }
           },
           {
             "id": "q-uikit-008",
@@ -10850,7 +10994,32 @@
               "Codable"
             ],
             "answer": 0,
-            "explanation": "UIControl系ではTarget-Actionが代表的。イベント発生時に指定したactionが呼ばれる。"
+            "explanation": "UIControl系ではTarget-Actionが代表的。イベント発生時に指定したactionが呼ばれる。",
+            "detail": {
+              "concept": "Target-Action は、UIControl 系の部品でイベントと処理を結び付ける仕組みです。target（誰に）、action（どのメソッドを）、controlEvents（どの出来事のときに）の 3 つを登録します。実際に呼ばれるとき、多くの場合は sender として発生元の部品が渡されます。",
+              "steps": [
+                "addTarget で「self の指定メソッドを、.touchUpInside のときに呼ぶ」と登録する。",
+                "利用者がボタンを押して離す。",
+                "登録しておいたメソッドが呼ばれる。",
+                "引数を受け取る形にしておけば、どのボタンから来たかを sender で判別できる。"
+              ],
+              "whyCorrect": "UIButton のようなコントロールの標準的なイベント処理の形です。1 つのメソッドを複数のボタンで共有し、sender で分岐することもできます。",
+              "otherChoices": [
+                {
+                  "choice": "ARCのみ",
+                  "reason": "メモリ管理の仕組みであり、イベント処理の仕組みではありません。"
+                },
+                {
+                  "choice": "Generics",
+                  "reason": "型を抽象化する仕組みで、イベントとは無関係です。"
+                },
+                {
+                  "choice": "Codable",
+                  "reason": "データ変換の契約であり、イベントとは無関係です。"
+                }
+              ],
+              "takeaway": "target（誰に）・action（何を）・event（いつ）の 3 点セット。"
+            }
           }
         ]
       },
@@ -10882,7 +11051,26 @@
               "Auto Layoutを無効にするため"
             ],
             "answer": 1,
-            "explanation": "画面外のセルを再利用してView生成・メモリコストを抑えるのが基本。"
+            "explanation": "画面外のセルを再利用してView生成・メモリコストを抑えるのが基本。",
+            "detail": {
+              "concept": "一覧に 1000 件あっても、同時に画面へ映るのは十数件です。すべての行の View を作ると、生成の時間もメモリも無駄になります。そこで画面外へ出たセルを使い回し、中身だけ差し替える方式を取ります。これが再利用です。",
+              "whyCorrect": "生成回数を画面に映る分だけに抑えられるため、スクロールが滑らかになり、メモリ使用量も一定に保てます。",
+              "otherChoices": [
+                {
+                  "choice": "すべてのセルを同時生成するため",
+                  "reason": "全件を同時に生成するのは、まさに再利用が避けようとしている状態です。"
+                },
+                {
+                  "choice": "ネット通信を行うため",
+                  "reason": "通信とは無関係です。"
+                },
+                {
+                  "choice": "Auto Layoutを無効にするため",
+                  "reason": "レイアウトの仕組みとは無関係です。"
+                }
+              ],
+              "takeaway": "見えている分だけ作って使い回す。"
+            }
           },
           {
             "id": "q-uikit-010",
@@ -10896,7 +11084,31 @@
               "IDを毎フレーム変える"
             ],
             "answer": 0,
-            "explanation": "セルは別データ用に再利用されるため、画像・ラベル・選択状態など必要な表示状態をconfigure時に確実に更新する。"
+            "explanation": "セルは別データ用に再利用されるため、画像・ラベル・選択状態など必要な表示状態をconfigure時に確実に更新する。",
+            "detail": {
+              "concept": "再利用されたセルには、前に表示していたデータの状態が残っています。画像・テキスト・選択状態・折りたたみの有無などを毎回すべて設定し直さないと、別のデータの見た目が混ざって表示されます。",
+              "whyCorrect": "「変わる可能性のある表示要素はすべて設定する」のが原則です。条件分岐で片方の場合しか設定していないと、もう片方の状態が残ります。非同期で画像を読み込む場合は、返ってきた時点でセルが別データ用になっていないかの確認も必要です。",
+              "otherChoices": [
+                {
+                  "choice": "一度設定したら変更しない",
+                  "reason": "一度きりの設定では、使い回された次のデータに前の内容が残ります。"
+                },
+                {
+                  "choice": "必ずglobal変数を使う",
+                  "reason": "どこからでも触れる値の使用は、状態管理をさらに難しくします。"
+                },
+                {
+                  "choice": "IDを毎フレーム変える",
+                  "reason": "識別子は再利用の種類を表すもので、頻繁に変えるものではありません。"
+                }
+              ],
+              "example": {
+                "code": "struct Item { let name: String; let isDone: Bool }\nfinal class Cell {\n    var title = \"\"\n    var badge = \"\"\n    func configure(with item: Item) {\n        title = item.name\n        badge = item.isDone ? \"done\" : \"-\"\n    }\n}\nlet cell = Cell()\ncell.configure(with: Item(name: \"squat\", isDone: true))\nprint(\"\\(cell.title)/\\(cell.badge)\")\ncell.configure(with: Item(name: \"bench\", isDone: false))\nprint(\"\\(cell.title)/\\(cell.badge)\")",
+                "output": "squat/done\nbench/-",
+                "explanation": "badge を else 側でも必ず設定し直しているため、前の done が残りません。else を書き忘れると、2 回目でも done が表示されたままになります。"
+              },
+              "takeaway": "再利用セルは毎回すべての表示要素を設定し直す。"
+            }
           }
         ]
       },
@@ -10928,7 +11140,26 @@
               "Auto Layoutを禁止する"
             ],
             "answer": 0,
-            "explanation": "UIHostingControllerはSwiftUI Viewをホストし、UIKitのViewController階層へ組み込むために使える。"
+            "explanation": "UIHostingControllerはSwiftUI Viewをホストし、UIKitのViewController階層へ組み込むために使える。",
+            "detail": {
+              "concept": "UIHostingController は、SwiftUI の View を内部に抱えた UIViewController です。UIKit 側から見れば普通の ViewController として扱えるため、既存の画面遷移や階層へそのまま組み込めます。",
+              "whyCorrect": "既存の UIKit アプリに、新しい画面だけ SwiftUI で作って差し込む、といった段階的な移行に使えます。",
+              "otherChoices": [
+                {
+                  "choice": "UIKitを削除する",
+                  "reason": "既存の仕組みを取り除くものではありません。共存のための橋渡しです。"
+                },
+                {
+                  "choice": "JSONを保存する",
+                  "reason": "保存機能とは無関係です。"
+                },
+                {
+                  "choice": "Auto Layoutを禁止する",
+                  "reason": "レイアウトの仕組みを禁止するものではありません。"
+                }
+              ],
+              "takeaway": "SwiftUI の画面を UIKit の階層へ入れる橋。"
+            }
           },
           {
             "id": "q-uikit-012",
@@ -10942,7 +11173,26 @@
               "Optionalを削除する"
             ],
             "answer": 0,
-            "explanation": "UIViewRepresentableはUIKitのUIViewをSwiftUIのView階層へ組み込むための橋渡し。"
+            "explanation": "UIViewRepresentableはUIKitのUIViewをSwiftUIのView階層へ組み込むための橋渡し。",
+            "detail": {
+              "concept": "UIViewRepresentable は、UIKit の UIView を SwiftUI の View として扱えるようにする protocol です。makeUIView で生成し、updateUIView で SwiftUI 側の状態変化を反映します。UIHostingController とはちょうど逆向きの橋渡しです。",
+              "whyCorrect": "SwiftUI にまだ対応する部品が無い場合や、既存の UIKit 製ビューを再利用したい場合に使います。",
+              "otherChoices": [
+                {
+                  "choice": "classをenumに変換する",
+                  "reason": "型の種類を変換する仕組みではありません。"
+                },
+                {
+                  "choice": "GitHubへpushする",
+                  "reason": "バージョン管理の操作とは無関係です。"
+                },
+                {
+                  "choice": "Optionalを削除する",
+                  "reason": "値の有無を表す Optional とは無関係です。"
+                }
+              ],
+              "takeaway": "UIView を SwiftUI で使う橋。UIHostingController とは逆向き。"
+            }
           }
         ]
       }
