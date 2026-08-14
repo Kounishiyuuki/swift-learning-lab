@@ -1,4 +1,3008 @@
 {
   "version": 1,
-  "challenges": []
+  "challenges": [
+    {
+      "id": "practice-starter-001",
+      "track": "starter",
+      "lessonId": "starter-let-var",
+      "type": "matching",
+      "difficulty": 1,
+      "title": "let・var・= の役割を対応づける",
+      "prompt": "Swiftの「値を置いておく箱」に関する用語と、その意味を対応させてください。",
+      "skills": [
+        "syntax",
+        "types"
+      ],
+      "content": {
+        "left": [
+          {
+            "id": "l1",
+            "label": "let"
+          },
+          {
+            "id": "l2",
+            "label": "var"
+          },
+          {
+            "id": "l3",
+            "label": "="
+          },
+          {
+            "id": "l4",
+            "label": "score"
+          }
+        ],
+        "right": [
+          {
+            "id": "r1",
+            "label": "あとから値を変えられる名前を作る"
+          },
+          {
+            "id": "r2",
+            "label": "一度決めたら値を変えられない名前を作る"
+          },
+          {
+            "id": "r3",
+            "label": "右側の値を左の名前に入れる"
+          },
+          {
+            "id": "r4",
+            "label": "プログラマが決めた名前そのもの"
+          },
+          {
+            "id": "r5",
+            "label": "画面に文字を表示する命令"
+          }
+        ]
+      },
+      "solution": {
+        "pairs": {
+          "l1": "r2",
+          "l2": "r1",
+          "l3": "r3",
+          "l4": "r4"
+        }
+      },
+      "hints": [
+        "まず「変えられるか / 変えられないか」で2つに分けて考えます。",
+        "`=` は数学のイコール（等しい）ではありません。右で計算した結果を左に入れる指示です。",
+        "`let score = 10` の4つの部分は「変えない宣言」「名前」「入れる指示」「値」に分かれます。`score` は言語のキーワードではありません。"
+      ],
+      "explanation": "letは値を変えない名前、varは変えられる名前を作ります。=は「等しい」ではなく「右の値を左の名前に入れる」代入の指示です。scoreはSwiftが決めたキーワードではなく、書く人が自由に決めた名前です。",
+      "detail": {
+        "concept": "変数宣言は『変えられるかどうか(let/var)』『名前』『代入(=)』『値』の4つの部品でできています。この分解ができると、あとで出てくるほぼすべてのコードが読めるようになります。",
+        "steps": [
+          "`let score = 10` を左から読むと、まず `let` が「これから作る名前は変更しない」と宣言している。",
+          "次の `score` は名前。Swiftが用意した単語ではなく、書く人が付けた識別子。",
+          "`=` は代入。右側 `10` を評価してから、その結果を `score` に入れる。",
+          "結果として、以降 `score` と書けば `10` が取り出せる。"
+        ],
+        "whyCorrect": "letは再代入を禁止する宣言、varは許可する宣言で、両者の違いは「あとで値を入れ替えられるか」だけです。=は左右が等しいという主張ではなく、右から左へ値を移す動作なので、`score = score + 1` のような一見おかしい式も成り立ちます。",
+        "commonMistakes": [
+          "`=` を数学の等号だと思い込むと、`x = x + 1` が矛盾に見えて読めなくなります。実際は「今のxに1を足した値を、新しくxに入れる」動作です。",
+          "`let` を「変数」と覚えると、あとで再代入しようとして 'Cannot assign to value' のコンパイルエラーになります。"
+        ],
+        "takeaway": "let/varは「変えられるか」、=は「右の値を左に入れる」。この2点だけで代入の行はすべて読めます。",
+        "example": {
+          "code": "var score = 10\nscore = score + 5\nprint(score)",
+          "output": "15",
+          "explanation": "varなので再代入できます。右辺 score + 5 が先に計算されて15になり、その15がscoreに入ります。"
+        }
+      },
+      "seriesId": "starter-letvar",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-starter-002",
+      "track": "starter",
+      "lessonId": "starter-let-var",
+      "type": "fillBlank",
+      "difficulty": 1,
+      "title": "変わる値と変わらない値を書き分ける",
+      "prompt": "税率は途中で変わらず、合計金額は計算のたびに変わります。それぞれに合うキーワードを選んでください。",
+      "skills": [
+        "syntax"
+      ],
+      "content": {
+        "template": "{{1}} taxRate = 0.1\n{{2}} total = 1000\ntotal = total + 200\nprint(total)",
+        "blanks": [
+          {
+            "id": "1",
+            "options": [
+              "let",
+              "var",
+              "func",
+              "if"
+            ]
+          },
+          {
+            "id": "2",
+            "options": [
+              "var",
+              "let",
+              "return",
+              "for"
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "1": "let",
+          "2": "var"
+        }
+      },
+      "hints": [
+        "あとの行で値が書き換えられているのはどちらの名前かを探してください。",
+        "書き換えられる名前は「変更を許可する宣言」で作る必要があります。書き換えない名前は変更を禁止したままにします。",
+        "3行目に `total = total + 200` があります。この行が成立するには、totalが変更可能な宣言でなければなりません。taxRateは一度も書き換えられていません。"
+      ],
+      "explanation": "taxRateはこのコードの中で一度も書き換えられないのでletが適切です。totalは3行目で再代入されるため、変更を許可するvarでなければコンパイルエラーになります。迷ったらまずletで書き、書き換えが必要になったときだけvarに変えるのがSwiftの基本方針です。",
+      "detail": {
+        "concept": "let（定数）とvar（変数）の使い分けは、コードを読む人に「この値はあとで変わるのか」を伝えるための情報でもあります。Swiftはlet優先で書くのが標準です。",
+        "steps": [
+          "1行目のtaxRateは、以降どこにも代入がない。つまり変更されない値。",
+          "2行目のtotalは、3行目で `total = total + 200` と再代入されている。",
+          "再代入がある名前をletで宣言すると、コンパイル時に 'Cannot assign to value: total is a let constant' となる。",
+          "したがって taxRate は let、total は var。"
+        ],
+        "whyCorrect": "letは再代入を禁止するため、書き換えのないtaxRateに使えば「この値は固定」と保証できます。totalは加算した結果を入れ直す必要があるので、再代入を許可するvarでなければ3行目が通りません。",
+        "commonMistakes": [
+          "すべてvarで書いてしまうと、本来変わらないはずの値がどこかで書き換わってもコンパイラが警告してくれません。",
+          "letにしたまま再代入すると、実行以前にビルドが失敗します。エラーメッセージは 'Cannot assign to value' です。"
+        ],
+        "takeaway": "まずletで書き、再代入が必要になった行が出てきたときだけvarに変える。",
+        "example": {
+          "code": "let taxRate = 0.1\nvar total = 1000\ntotal = total + 200\nprint(Double(total) * taxRate)",
+          "output": "120.0",
+          "explanation": "letのtaxRateは読み出すだけ、varのtotalは書き換えられます。役割の違いが宣言に表れています。"
+        }
+      },
+      "seriesId": "starter-letvar",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-starter-003",
+      "track": "starter",
+      "lessonId": "starter-assignment",
+      "type": "bugHunt",
+      "difficulty": 1,
+      "title": "letなのに書き換えている行を見つける",
+      "prompt": "このコードはビルドできません。原因になっている行を選んでください。",
+      "skills": [
+        "syntax",
+        "debugging"
+      ],
+      "content": {
+        "lines": [
+          {
+            "id": "l1",
+            "code": "let count = 3"
+          },
+          {
+            "id": "l2",
+            "code": "var message = \"start\""
+          },
+          {
+            "id": "l3",
+            "code": "message = \"running\""
+          },
+          {
+            "id": "l4",
+            "code": "count = count + 1"
+          },
+          {
+            "id": "l5",
+            "code": "print(message, count)"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "l4",
+        "fixedCode": "var count = 3\nvar message = \"start\"\nmessage = \"running\"\ncount = count + 1\nprint(message, count)"
+      },
+      "hints": [
+        "エラーは「値を入れ替えている行」で起きています。宣言のしかたと見比べてください。",
+        "letで作った名前には、あとから別の値を入れられません。letで宣言された名前がどれかを先に確認します。",
+        "1行目は `let count`、2行目は `var message` です。書き換えている行は3行目と4行目の2つあります。そのうちletの名前を書き換えているのはどちらでしょうか。"
+      ],
+      "explanation": "4行目の `count = count + 1` が原因です。countは1行目でletとして宣言されているため再代入できず、コンパイラは 'Cannot assign to value: count is a let constant' を出します。3行目のmessageはvar宣言なので書き換えても問題ありません。",
+      "detail": {
+        "concept": "letは「この名前には最初に入れた値しか入らない」という約束です。約束を破る行があると、実行前のコンパイル段階でエラーになります。実行時エラー（クラッシュ）ではない点が重要です。",
+        "steps": [
+          "1行目: `let count = 3` で、countは変更不可として作られる。",
+          "2行目: `var message = \"start\"` で、messageは変更可として作られる。",
+          "3行目: messageへの再代入。varなので許される。",
+          "4行目: countへの再代入。letなので許されず、ここでビルドが止まる。"
+        ],
+        "whyCorrect": "エラーは「宣言のしかた」と「使い方」が食い違っている場所で起きます。4行目だけがletの名前を書き換えているので、そこが原因です。",
+        "commonMistakes": [
+          "3行目も代入なので同じエラーだと考えてしまう間違いがあります。messageはvarなので合法です。代入の有無ではなく、宣言がletかvarかで決まります。",
+          "countをvarに変えずに `let count = count + 1` と書き足すと、同じスコープで同じ名前を2回宣言する別のエラー（Invalid redeclaration）になります。"
+        ],
+        "takeaway": "コンパイルエラーは実行前に出る。letへの再代入はその典型で、直す場所は代入行かもしれないし宣言行かもしれない。",
+        "example": {
+          "code": "var count = 3\ncount = count + 1\nprint(count)",
+          "output": "4",
+          "explanation": "宣言をvarに変えれば4行目は通ります。カウンタのように増えていく値はvarで宣言します。"
+        }
+      },
+      "seriesId": "starter-letvar",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-starter-004",
+      "track": "starter",
+      "lessonId": "starter-assignment",
+      "type": "repair",
+      "difficulty": 2,
+      "title": "letへの再代入を直す",
+      "prompt": "1行目を書き換えて、このコードがビルドできるようにします。適切な修正を選んでください。",
+      "skills": [
+        "syntax",
+        "debugging"
+      ],
+      "content": {
+        "code": "let total = 0\nfor price in [120, 80] {\n    total = total + price\n}\nprint(total)",
+        "options": [
+          {
+            "id": "o1",
+            "code": "var total = 0"
+          },
+          {
+            "id": "o2",
+            "code": "let total = 0.0"
+          },
+          {
+            "id": "o3",
+            "code": "let total: Int = 0"
+          },
+          {
+            "id": "o4",
+            "code": "var total: String = \"0\""
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1",
+        "fixedCode": "var total = 0\nfor price in [120, 80] {\n    total = total + price\n}\nprint(total)"
+      },
+      "hints": [
+        "ループの中でtotalの中身が増えていきます。その動きを許す宣言に変える必要があります。",
+        "型を変えても再代入の可否は変わりません。変えるべきはletかvarかの部分です。",
+        "合計は Int のまま、宣言だけを「変更可能」にします。`var total = 0` と書けば 0 から始まる整数のカウンタになります。"
+      ],
+      "explanation": "letは再代入を禁止するので、ループで合計を足し込む書き方と両立しません。`var total = 0` に変えると再代入が許可され、120と80が順に足されて200が出力されます。型を Double や String に変えても再代入の禁止は解けず、むしろ Int との計算でエラーが増えます。",
+      "detail": {
+        "concept": "「値をためていく変数」はアキュムレータと呼ばれ、初期値を入れてから繰り返しの中で更新します。更新が前提なのでvarで宣言します。",
+        "steps": [
+          "totalを0で初期化する。ここが合計の出発点。",
+          "forで配列の要素を1つずつpriceに取り出す。",
+          "`total = total + price` で、今のtotalにpriceを足した結果を改めてtotalに入れる。letだとこの再代入ができない。",
+          "ループが終わるとtotalは120+80=200になり、printで200が出る。"
+        ],
+        "whyCorrect": "var total = 0 は「Intの0から始まり、あとで書き換えられる名前」を作ります。ループ内の再代入が合法になり、他の行を一切変えずに動くようになります。",
+        "commonMistakes": [
+          "`let total: Int = 0` のように型注釈を足す修正は、エラー原因が型だと誤解した結果です。エラーは型ではなく再代入の可否なので直りません。",
+          "`var total: String = \"0\"` にすると再代入はできますが、`\"0\" + price` はStringとIntの加算になり別のコンパイルエラーになります。"
+        ],
+        "takeaway": "エラーメッセージが 'Cannot assign to value' なら、直すのは代入行ではなく宣言のlet/varであることが多い。",
+        "example": {
+          "code": "var total = 0\nfor price in [120, 80] {\n    total += price\n}\nprint(total)",
+          "output": "200",
+          "explanation": "`total = total + price` は `total += price` と短く書けます。意味は同じで、varでなければ使えない点も同じです。"
+        }
+      },
+      "seriesId": "starter-letvar",
+      "seriesStep": 4
+    },
+    {
+      "id": "practice-starter-005",
+      "track": "starter",
+      "lessonId": "starter-values",
+      "type": "trace",
+      "difficulty": 1,
+      "title": "代入のあと、値はどうなっているか",
+      "prompt": "上から順に実行したとき、最後のprintで表示される内容を選んでください。",
+      "skills": [
+        "syntax",
+        "controlFlow"
+      ],
+      "content": {
+        "code": "var a = 5\nvar b = 8\na = b\nb = 3\nprint(a, b)",
+        "options": [
+          {
+            "id": "o1",
+            "label": "8 3"
+          },
+          {
+            "id": "o2",
+            "label": "5 3"
+          },
+          {
+            "id": "o3",
+            "label": "3 3"
+          },
+          {
+            "id": "o4",
+            "label": "8 8"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "`a = b` を実行した時点でのbの値が、そのままaに入ります。",
+        "代入はコピーです。`a = b` のあとにbを変えても、aは巻き込まれません。",
+        "3行目でaは8になります。4行目でbだけが3に変わります。aは8のままです。"
+      ],
+      "explanation": "`a = b` は「その瞬間のbの値をaにコピーする」動作です。3行目でaは8になり、4行目のbへの代入はaに影響しません。したがって最後の状態は a=8、b=3 で、「8 3」が表示されます。",
+      "detail": {
+        "concept": "Int のような値型の代入は、名前どうしを結びつけるのではなく、値そのものを複製します。片方を変えてももう片方は変わりません。",
+        "steps": [
+          "1行目: aに5が入る（a=5）。",
+          "2行目: bに8が入る（a=5、b=8）。",
+          "3行目: `a = b` によって、bの現在値8がaにコピーされる。a=8、b=8。",
+          "4行目: `b = 3` でbだけが3になる。a=8、b=3。",
+          "5行目: print(a, b) は値をスペース区切りで出力するので「8 3」。"
+        ],
+        "whyCorrect": "3行目でコピーされるのは「bという名前」ではなく「その時点の値8」です。そのため4行目のbの変更はaに伝わらず、a=8、b=3のまま出力されます。",
+        "commonMistakes": [
+          "`a = b` を「aとbが同じものを指す」と読むと、4行目のあとaも3になると誤解します。Intではリンクは作られません。",
+          "print(a, b) をカンマ区切りの文字列だと思うと「8,3」と答えてしまいます。実際の区切りは半角スペースです。"
+        ],
+        "takeaway": "値型の代入はコピー。代入後に元の名前を変えても、コピー先は変わらない。",
+        "example": {
+          "code": "var a = 5\nvar b = 8\na = b\nb = 3\nprint(a)\nprint(b)",
+          "output": "8\n3",
+          "explanation": "1行ずつprintすると、aが8、bが3であることがはっきり確認できます。"
+        }
+      },
+      "seriesId": "starter-values",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-starter-006",
+      "track": "starter",
+      "lessonId": "starter-read-line-by-line",
+      "type": "chooseBlocks",
+      "difficulty": 1,
+      "title": "挨拶を表示するのに必要な行だけ選ぶ",
+      "prompt": "「Hello, Yuki」と1行だけ表示したいです。必要な行だけを選び、実行順に並べてください。",
+      "skills": [
+        "syntax",
+        "controlFlow"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "let name = \"Yuki\""
+          },
+          {
+            "id": "b2",
+            "code": "print(\"Hello, \" + name)"
+          },
+          {
+            "id": "b3",
+            "code": "let age = 20"
+          },
+          {
+            "id": "b4",
+            "code": "print(age)"
+          },
+          {
+            "id": "b5",
+            "code": "name = \"Taro\""
+          }
+        ],
+        "requireOrder": true
+      },
+      "solution": {
+        "selected": [
+          "b1",
+          "b2"
+        ],
+        "order": [
+          "b1",
+          "b2"
+        ]
+      },
+      "hints": [
+        "表示したいのは1行だけです。printが2回実行されると2行出てしまいます。",
+        "使う値を先に用意してから、それを使う行を書きます。使わない値の行は不要です。",
+        "必要なのは名前を用意する行と、その名前を使って挨拶を組み立てるprintの2行です。ageの行とnameの再代入は結果に関係しません。"
+      ],
+      "explanation": "必要なのは `let name = \"Yuki\"` と `print(\"Hello, \" + name)` の2行だけです。ageは表示に使われず、`print(age)` を入れると余計な行が出力されます。また `name = \"Taro\"` はletへの再代入なのでコンパイルエラーになり、そもそも含められません。プログラムは上から順に読まれるので、nameを使う行より前でnameを用意する必要があります。",
+      "detail": {
+        "concept": "「何を書く必要があるか」を判断するには、まず求められている出力から逆算します。出力に関係しない行はノイズであり、コードを読みにくくするだけです。",
+        "steps": [
+          "目標は「Hello, Yuki」という1行の出力。",
+          "そのprintには name の値が必要なので、printより前に name を用意する行が要る。",
+          "ageは出力に一切登場しないので不要。print(age)を足すと余計な1行が出る。",
+          "`name = \"Taro\"` はletで作った名前への再代入なのでビルドが通らない。"
+        ],
+        "whyCorrect": "上から順に実行されるため、値を作る行 → 値を使う行の順に並べる必要があります。この2行だけで「Hello, Yuki」が過不足なく出力されます。",
+        "commonMistakes": [
+          "順番を逆にすると、nameがまだ存在しない位置で使うことになり 'Cannot find name in scope' になります。",
+          "「あっても害がなさそう」とage関連の行を残すと、出力が2行になり要件を満たしません。"
+        ],
+        "takeaway": "必要な行は出力から逆算する。使われない値の行は、動いても要件違反になることがある。",
+        "example": {
+          "code": "let name = \"Yuki\"\nprint(\"Hello, \" + name)",
+          "output": "Hello, Yuki",
+          "explanation": "文字列同士は + でつなげます。\"Hello, \" の末尾のスペースがそのまま出力に残る点にも注目してください。"
+        }
+      },
+      "seriesId": "starter-values",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-starter-007",
+      "track": "starter",
+      "lessonId": "starter-read-line-by-line",
+      "type": "reorder",
+      "difficulty": 1,
+      "title": "上から順に実行される順番に直す",
+      "prompt": "「合計は 300 です」と表示したいです。ブロックを正しい実行順に並べ替えてください。",
+      "skills": [
+        "syntax",
+        "controlFlow"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "print(\"合計は \\(total) です\")"
+          },
+          {
+            "id": "b2",
+            "code": "let apple = 120"
+          },
+          {
+            "id": "b3",
+            "code": "let orange = 180"
+          },
+          {
+            "id": "b4",
+            "code": "let total = apple + orange"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b2",
+          "b3",
+          "b4",
+          "b1"
+        ]
+      },
+      "hints": [
+        "Swiftはファイルの上の行から順に実行します。使う値は、使う行より前に用意します。",
+        "totalを計算するには、appleとorangeの両方がすでに存在している必要があります。",
+        "apple → orange → total（2つを足す）→ print の順です。printは最後に来ます。"
+      ],
+      "explanation": "Swiftのコードは上から順に実行されるため、値は使う前に用意しておく必要があります。appleとorangeを先に作り、その2つからtotalを計算し、最後にtotalを使ってprintします。printを先頭に置くと、まだtotalが存在しないため 'Cannot find total in scope' というコンパイルエラーになります。",
+      "detail": {
+        "concept": "文字列補間 `\\(total)` は、文字列の途中に値を差し込む書き方です。差し込む値はその行に到達した時点で存在していなければなりません。",
+        "steps": [
+          "`let apple = 120` でappleが使えるようになる。",
+          "`let orange = 180` でorangeが使えるようになる。",
+          "`let total = apple + orange` は右辺を先に計算する。120+180=300がtotalに入る。",
+          "`print(\"合計は \\(total) です\")` で、totalの300が文字列に埋め込まれて出力される。"
+        ],
+        "whyCorrect": "各行が必要とする値が、その行より前で必ず用意されているためです。依存関係の順（apple・orange → total → print）に並べたときだけコンパイルが通ります。",
+        "commonMistakes": [
+          "printを先頭に置く並びは、実行順ではなく「結論から書く」文章の感覚に引きずられた間違いです。コードでは材料が先です。",
+          "totalの行をappleより前に置くと、appleが未定義のためやはりスコープエラーになります。"
+        ],
+        "takeaway": "コードは上から下へ。値は「作る → 使う」の順にしか書けない。",
+        "example": {
+          "code": "let apple = 120\nlet orange = 180\nlet total = apple + orange\nprint(\"合計は \\(total) です\")",
+          "output": "合計は 300 です",
+          "explanation": "\\(total) の部分がtotalの値に置き換わります。文字列の中に計算結果を混ぜたいときの標準的な書き方です。"
+        }
+      },
+      "seriesId": "starter-values",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-starter-008",
+      "track": "starter",
+      "lessonId": "starter-assignment",
+      "type": "shortCode",
+      "difficulty": 1,
+      "title": "変数を宣言する1行を書く",
+      "prompt": "あとで書き換える予定の整数 count を、初期値 0 で用意する1行を書いてください。",
+      "skills": [
+        "syntax"
+      ],
+      "content": {
+        "context": "// ここに1行書く\n// このあと count = count + 1 のように書き換えます\nprint(count)",
+        "placeholder": "例: var 名前 = 値"
+      },
+      "solution": {
+        "accepted": [
+          "var count = 0",
+          "var count: Int = 0"
+        ]
+      },
+      "hints": [
+        "あとで書き換えるので、変更を許可する宣言が必要です。",
+        "「宣言のキーワード」「名前」「=」「初期値」の4つを並べます。名前は count、初期値は 0 です。",
+        "変更可能な宣言キーワードのあとに `count = 0` と続けます。型注釈は省略でき、0からIntと推論されます。"
+      ],
+      "explanation": "`var count = 0` と書きます。varはあとから書き換えられる名前を作る宣言で、= の右の 0 が初期値です。0はIntリテラルなのでcountの型はIntと推論され、`var count: Int = 0` と書いても同じ意味になります。letで宣言すると、次に予定している `count = count + 1` が再代入エラーになります。",
+      "detail": {
+        "concept": "宣言は「変更可否のキーワード + 名前 + = + 初期値」でできています。Swiftは初期値から型を推論するので、多くの場面で型注釈は省略できます。",
+        "steps": [
+          "あとで書き換える予定なので、変更可能な宣言 var を選ぶ。",
+          "名前は問題文で指定された count。",
+          "= の右に初期値 0 を書く。0 は整数リテラルなので Int と推論される。",
+          "結果として `var count = 0` の1行になる。"
+        ],
+        "whyCorrect": "varは再代入を許可するため、このあとの `count = count + 1` が合法になります。初期値0によって型がIntに決まり、整数の加算がそのまま書けます。",
+        "commonMistakes": [
+          "`let count = 0` と書くと、宣言自体は通りますが次の再代入でビルドが失敗します。",
+          "`var count` とだけ書くと初期値も型もないため 'Type annotation missing' エラーになります。少なくとも型か初期値のどちらかが必要です。"
+        ],
+        "takeaway": "あとで書き換える値はvar。初期値を書けば型注釈は省略できる。",
+        "example": {
+          "code": "var count = 0\ncount = count + 1\nprint(count)",
+          "output": "1",
+          "explanation": "宣言・再代入・出力という、もっとも基本的な3行の形です。"
+        }
+      },
+      "seriesId": "starter-values",
+      "seriesStep": 4
+    },
+    {
+      "id": "practice-starter-009",
+      "track": "starter",
+      "lessonId": "starter-what-is-type",
+      "type": "matching",
+      "difficulty": 1,
+      "title": "値と型を対応づける",
+      "prompt": "それぞれの値が、Swiftではどの型になるかを選んでください。",
+      "skills": [
+        "types",
+        "syntax"
+      ],
+      "content": {
+        "left": [
+          {
+            "id": "l1",
+            "label": "42"
+          },
+          {
+            "id": "l2",
+            "label": "\"42\""
+          },
+          {
+            "id": "l3",
+            "label": "3.5"
+          },
+          {
+            "id": "l4",
+            "label": "true"
+          }
+        ],
+        "right": [
+          {
+            "id": "r1",
+            "label": "String（文字の並び）"
+          },
+          {
+            "id": "r2",
+            "label": "Int（整数）"
+          },
+          {
+            "id": "r3",
+            "label": "Bool（true か false）"
+          },
+          {
+            "id": "r4",
+            "label": "Double（小数を含む数）"
+          },
+          {
+            "id": "r5",
+            "label": "Array（値の並び）"
+          }
+        ]
+      },
+      "solution": {
+        "pairs": {
+          "l1": "r2",
+          "l2": "r1",
+          "l3": "r4",
+          "l4": "r3"
+        }
+      },
+      "hints": [
+        "書き方（リテラルの見た目）が型を決めます。引用符・小数点・true/false に注目してください。",
+        "引用符で囲まれていれば、中身が数字に見えても文字の並びです。",
+        "`42` は整数、`\"42\"` は引用符付きなので文字列、`3.5` は小数点があるので浮動小数点数、`true` は真偽値です。"
+      ],
+      "explanation": "Swiftはリテラルの書き方から型を推論します。42はInt、引用符で囲んだ\"42\"はString、小数点のある3.5はDouble、trueはBoolです。見た目が数字でも引用符が付いていればStringなので、42 + \"42\" のような計算はできません。",
+      "detail": {
+        "concept": "型とは「その値に対してできること」の分類です。Intは足し算ができ、Stringは連結ができ、Boolはif条件に使えます。同じ「42」でも型が違えばできることが変わります。",
+        "steps": [
+          "`42` は引用符も小数点もない整数リテラルなのでInt。",
+          "`\"42\"` はダブルクォートで囲まれているのでString。中身が数字でも計算はできない。",
+          "`3.5` は小数点を含むのでDouble（Swiftの浮動小数点の既定型）。",
+          "`true` は真偽値リテラルなのでBool。"
+        ],
+        "whyCorrect": "Swiftは型推論を持つので、明示しなくてもリテラルの形から型が決まります。この対応を覚えておくと、型エラーが出たときに「どちらの型が想定外なのか」をすぐ判断できます。",
+        "commonMistakes": [
+          "\"42\" を数値だと思って計算すると 'Cannot convert value of type String to expected argument type Int' になります。数にしたい場合は Int(\"42\") で変換します。",
+          "3.5 を Int だと思ってIntの変数に入れると型エラーになります。Doubleに入れるか、Int(3.5) で切り捨てて変換します。"
+        ],
+        "takeaway": "型はリテラルの見た目で決まる。引用符=String、小数点=Double、true/false=Bool。",
+        "example": {
+          "code": "let a = 42\nlet b = \"42\"\nprint(type(of: a), type(of: b))",
+          "output": "Int String",
+          "explanation": "type(of:) を使うと、推論された型を実際に確認できます。"
+        }
+      },
+      "seriesId": "starter-type",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-starter-010",
+      "track": "starter",
+      "lessonId": "starter-basic-types",
+      "type": "fillBlank",
+      "difficulty": 1,
+      "title": "型注釈を書く",
+      "prompt": "それぞれの名前に、値と合う型注釈を入れてください。",
+      "skills": [
+        "types",
+        "syntax"
+      ],
+      "content": {
+        "template": "let name: {{1}} = \"Yuki\"\nlet height: {{2}} = 170.5\nlet isMember: {{3}} = true",
+        "blanks": [
+          {
+            "id": "1",
+            "options": [
+              "String",
+              "Int",
+              "Bool",
+              "Double"
+            ]
+          },
+          {
+            "id": "2",
+            "options": [
+              "Double",
+              "Int",
+              "String",
+              "Bool"
+            ]
+          },
+          {
+            "id": "3",
+            "options": [
+              "Bool",
+              "String",
+              "Int",
+              "Double"
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "1": "String",
+          "2": "Double",
+          "3": "Bool"
+        }
+      },
+      "hints": [
+        "= の右にある値の見た目から、入るべき型を判断します。",
+        "引用符付きの値、小数点を含む値、true/false の3種類がそれぞれ別の型です。",
+        "\"Yuki\" は文字の並び、170.5 は小数を含む数、true は真偽値です。この3つに対応する型名を思い出してください。"
+      ],
+      "explanation": "型注釈は「この名前にはこの型の値しか入らない」という宣言です。\"Yuki\"はString、170.5はDouble、trueはBoolなので、それぞれの型名を書きます。値と型注釈が食い違うと 'Cannot convert value of type ... to specified type ...' というコンパイルエラーになります。",
+      "detail": {
+        "concept": "`let 名前: 型 = 値` の `: 型` の部分が型注釈です。Swiftは値から型を推論できるので省略できますが、意図を明示したいときや初期値を後で入れるときに書きます。",
+        "steps": [
+          "1つ目は \"Yuki\" という引用符付きの値なので String。",
+          "2つ目は 170.5 と小数点を含むので Double。Int にすると小数を入れられずエラーになる。",
+          "3つ目は true なので Bool。",
+          "型注釈と値が一致していれば、コンパイラは何も文句を言わない。"
+        ],
+        "whyCorrect": "型注釈は値の型と一致していなければなりません。3つとも値の形（引用符・小数点・真偽値）から型が一意に決まるので、対応する型名を書けばコンパイルが通ります。",
+        "commonMistakes": [
+          "`let height: Int = 170.5` と書くと、Intは小数を表現できないため 'Cannot convert value of type Double to specified type Int' になります。",
+          "型注釈を全部Stringにして値だけ変えると動くように見えますが、数値計算ができなくなり、あとで必ず困ります。"
+        ],
+        "takeaway": "型注釈は値と一致していなければならない。迷ったら値の見た目（引用符・小数点・true/false）から決める。",
+        "example": {
+          "code": "let height: Double = 170.5\nprint(height / 2)",
+          "output": "85.25",
+          "explanation": "Doubleなので小数の割り算がそのままできます。Intだと 170 / 2 = 85 と小数が切り捨てられます。"
+        }
+      },
+      "seriesId": "starter-type",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-starter-011",
+      "track": "starter",
+      "lessonId": "starter-basic-types",
+      "type": "bugHunt",
+      "difficulty": 2,
+      "title": "型が合っていない行を見つける",
+      "prompt": "このコードはビルドできません。型の食い違いが起きている行を選んでください。",
+      "skills": [
+        "types",
+        "debugging"
+      ],
+      "content": {
+        "lines": [
+          {
+            "id": "l1",
+            "code": "let count = 3"
+          },
+          {
+            "id": "l2",
+            "code": "let unit = \"個\""
+          },
+          {
+            "id": "l3",
+            "code": "let label = count + unit"
+          },
+          {
+            "id": "l4",
+            "code": "print(label)"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "l3",
+        "fixedCode": "let count = 3\nlet unit = \"個\"\nlet label = \"\\(count)\\(unit)\"\nprint(label)"
+      },
+      "hints": [
+        "+ の左右がそれぞれ何型かを確認してください。",
+        "Swiftでは、型の違う値を + でつなぐことはできません。数と文字は自動では変換されません。",
+        "countはIntで、unitはStringです。この2つを + で結んでいる行が問題です。"
+      ],
+      "explanation": "3行目の `count + unit` が原因です。countはInt、unitはStringで、SwiftにはIntとStringを足す + が用意されていないため 'Binary operator + cannot be applied to operands of type Int and String' になります。数値を文字列に混ぜたいときは文字列補間 \"\\(count)\\(unit)\" を使います。",
+      "detail": {
+        "concept": "Swiftは暗黙の型変換をしません。JavaScriptのように数と文字を自動でつなぐことはなく、混ぜたい場合は明示的に変換するか、文字列補間を使います。",
+        "steps": [
+          "1行目: countは3なのでInt。",
+          "2行目: unitは\"個\"なのでString。",
+          "3行目: `count + unit` はInt + Stringになる。この組み合わせの+はSwiftに存在しない。",
+          "結果として3行目でコンパイルが止まり、4行目は実行されない。"
+        ],
+        "whyCorrect": "エラーは型が食い違う演算そのものの位置で報告されます。1行目も2行目も単体では正しく、+ で結んだ3行目だけが不正です。",
+        "commonMistakes": [
+          "「countを文字列にすればいい」と考えて `String(count) + unit` にするのは正解の一つです。文字列補間 \"\\(count)\\(unit)\" のほうが読みやすいので実務ではよく使われます。",
+          "`\"個\" + 3` のように順序を入れ替えても、型の組み合わせは同じなので直りません。"
+        ],
+        "takeaway": "Swiftは自動で型を変換しない。数と文字を混ぜるなら String(...) か \"\\(...)\" を使う。",
+        "example": {
+          "code": "let count = 3\nlet unit = \"個\"\nprint(\"\\(count)\\(unit)\")",
+          "output": "3個",
+          "explanation": "文字列補間なら変換を書かずに数値を文字列へ埋め込めます。"
+        }
+      },
+      "seriesId": "starter-type",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-starter-012",
+      "track": "starter",
+      "lessonId": "starter-basic-types",
+      "type": "repair",
+      "difficulty": 2,
+      "title": "IntとDoubleの計算を直す",
+      "prompt": "平均点を小数で求めたいのに、この式はビルドできません。3行目を置き換える正しい式を選んでください。",
+      "skills": [
+        "types",
+        "debugging"
+      ],
+      "content": {
+        "code": "let total = 250\nlet count = 4\nlet average = total / Double(count)\nprint(average)",
+        "options": [
+          {
+            "id": "o1",
+            "code": "Double(total) / Double(count)"
+          },
+          {
+            "id": "o2",
+            "code": "total / count"
+          },
+          {
+            "id": "o3",
+            "code": "Double(total / count)"
+          },
+          {
+            "id": "o4",
+            "code": "total.average(count)"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1",
+        "fixedCode": "let total = 250\nlet count = 4\nlet average = Double(total) / Double(count)\nprint(average)"
+      },
+      "hints": [
+        "割り算の左右は、同じ型でなければ計算できません。今どちらが何型かを確認します。",
+        "片方だけを変換しても、もう片方がIntのままなら型は揃いません。",
+        "小数の結果がほしいので、両方を小数の型に変換してから割ります。切り捨てを避けるには、割る前に変換する必要があります。"
+      ],
+      "explanation": "totalはInt、Double(count)はDoubleなので、Int / Double という演算は存在せずコンパイルエラーになります。両方をDoubleに変換した `Double(total) / Double(count)` が正解で、結果は62.5です。`total / count` はInt同士の割り算になり、小数が切り捨てられて62になります。`Double(total / count)` は切り捨てた62をあとから62.0にするだけで、やはり小数部分は戻りません。",
+      "detail": {
+        "concept": "Swiftの演算子は型ごとに定義されています。Int / Int はIntを返し（小数切り捨て）、Double / Double はDoubleを返します。混在した演算はそもそも定義されていません。",
+        "steps": [
+          "totalはIntリテラル250から推論されてInt。countも同じくInt。",
+          "`Double(count)` はDoubleへの変換なので、左右がInt / Doubleとなり演算子が見つからずエラー。",
+          "両方を `Double(...)` で揃えると Double / Double になり、250.0 / 4.0 = 62.5。",
+          "変換のタイミングが重要で、割ってから変換すると切り捨て後の値しか残らない。"
+        ],
+        "whyCorrect": "Double(total) / Double(count) は左右ともDoubleなので演算が成立し、しかも割り算の前に小数の世界へ移っているため 62.5 という正確な平均が得られます。",
+        "commonMistakes": [
+          "`total / count` はビルドは通りますが、Intの割り算なので62になります。エラーが消えても要件を満たしません。",
+          "`Double(total / count)` も通りますが、切り捨てた62を62.0にするだけです。「変換してから割る」と「割ってから変換する」の違いは実務でも頻出のバグです。"
+        ],
+        "takeaway": "混在した数値計算は、演算の前に型を揃える。Int割り算は小数を切り捨てる。",
+        "example": {
+          "code": "let total = 250\nlet count = 4\nprint(total / count)\nprint(Double(total) / Double(count))",
+          "output": "62\n62.5",
+          "explanation": "同じ値でも、割る前に変換したかどうかで結果が変わります。"
+        }
+      },
+      "seriesId": "starter-type",
+      "seriesStep": 4
+    },
+    {
+      "id": "practice-starter-013",
+      "track": "starter",
+      "lessonId": "starter-expressions",
+      "type": "trace",
+      "difficulty": 1,
+      "title": "式はどの順番で計算されるか",
+      "prompt": "この式の計算結果を選んでください。",
+      "skills": [
+        "syntax",
+        "controlFlow"
+      ],
+      "content": {
+        "code": "let price = 100\nlet count = 3\nlet shipping = 500\nlet total = price * count + shipping\nprint(total)",
+        "options": [
+          {
+            "id": "o1",
+            "label": "800"
+          },
+          {
+            "id": "o2",
+            "label": "80000"
+          },
+          {
+            "id": "o3",
+            "label": "1800"
+          },
+          {
+            "id": "o4",
+            "label": "600"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "+ と * では計算される順番が違います。算数と同じ規則です。",
+        "掛け算が先に計算され、その結果に足し算が行われます。",
+        "まず price * count を計算し、その結果に shipping を足します。100×3=300、300+500 です。"
+      ],
+      "explanation": "掛け算は足し算より優先されるため、`price * count` が先に計算されて300になり、そこにshippingの500が足されて800になります。左から順に計算するわけではないので、(100 * 3) + 500 = 800 が正しい結果です。",
+      "detail": {
+        "concept": "演算子には優先順位があり、Swiftでも算数と同じく * や / が + や - より先に計算されます。優先順位を変えたいときは丸かっこを使います。",
+        "steps": [
+          "`price * count` が先に評価され、100 * 3 = 300 になる。",
+          "次に `300 + shipping` が評価され、300 + 500 = 800。",
+          "その800がtotalに代入される。",
+          "print(total) が800を出力する。"
+        ],
+        "whyCorrect": "掛け算の優先順位が高いため、式は (price * count) + shipping と解釈されます。結果は800です。",
+        "commonMistakes": [
+          "左から順に計算すると考えると 100 * 3 は同じでも、`price * (count + shipping)` のような式で 100 * 503 = 50300 と誤読します。",
+          "意図が (price * count) なのか price * (count + shipping) なのか紛らわしいときは、読み手のために明示的にかっこを書くのが安全です。"
+        ],
+        "takeaway": "* と / は + と - より先。迷う式にはかっこを書く。",
+        "example": {
+          "code": "let price = 100\nlet count = 3\nlet shipping = 500\nprint(price * (count + shipping))",
+          "output": "50300",
+          "explanation": "かっこを付けると評価順が変わり、まったく違う結果になります。"
+        }
+      },
+      "seriesId": "starter-bool",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-starter-014",
+      "track": "starter",
+      "lessonId": "starter-comparison",
+      "type": "fillBlank",
+      "difficulty": 1,
+      "title": "比較の記号を選ぶ",
+      "prompt": "「18歳以上ならtrue」「名前が空でなければtrue」となるように空欄を埋めてください。",
+      "skills": [
+        "controlFlow",
+        "syntax"
+      ],
+      "content": {
+        "template": "let age = 20\nlet name = \"Yuki\"\nlet isAdult = age {{1}} 18\nlet hasName = name {{2}} \"\"\nprint(isAdult, hasName)",
+        "blanks": [
+          {
+            "id": "1",
+            "options": [
+              ">=",
+              ">",
+              "=",
+              "<="
+            ]
+          },
+          {
+            "id": "2",
+            "options": [
+              "!=",
+              "==",
+              "=",
+              ">"
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "1": ">=",
+          "2": "!="
+        }
+      },
+      "hints": [
+        "「以上」は、ちょうど同じ値のときもtrueになる比較です。",
+        "「空でない」は「空と等しくない」と言い換えられます。等しいかどうかの記号に否定を付けます。",
+        "1つ目は「大きい または 等しい」を1つの記号で表したものです。2つ目は == の反対で、先頭に ! が付きます。"
+      ],
+      "explanation": "「18歳以上」は18そのものを含むので `>=` を使います。`>` だとちょうど18歳のときfalseになってしまいます。「空でない」は「空文字列と等しくない」なので `!=` です。`=` は比較ではなく代入なので、条件式には使えません。",
+      "detail": {
+        "concept": "比較演算子は左右を比べてBool（trueかfalse）を返します。== が等しい、!= が等しくない、>= が以上、<= が以下です。1つの = は代入で、比較ではありません。",
+        "steps": [
+          "ageは20。`age >= 18` は 20 >= 18 なのでtrue。",
+          "nameは\"Yuki\"。`name != \"\"` は「空文字列ではない」ためtrue。",
+          "どちらの結果もBoolなので、そのままletに入れたりifの条件に使える。",
+          "print(isAdult, hasName) は true true を出力する。"
+        ],
+        "whyCorrect": ">= は「大きいか等しい」を表すので、境界値である18歳ちょうどを含められます。!= は == の否定で、空文字列でないことを判定できます。",
+        "commonMistakes": [
+          "「以上」を `>` で書くと境界値が漏れます。仕様が「18歳以上」なのか「18歳より上」なのかは実務でも要確認ポイントです。",
+          "`age = 18` と書くと、条件式ではなく代入になり 'Use of = in a boolean context' というエラーになります。"
+        ],
+        "takeaway": "== は等しい、!= は等しくない、>= は以上。= は代入で条件には使えない。",
+        "example": {
+          "code": "let age = 18\nprint(age >= 18, age > 18)",
+          "output": "true false",
+          "explanation": "境界値18では >= と > の結果が分かれます。仕様の「以上」を正しく写せているか確認しましょう。"
+        }
+      },
+      "seriesId": "starter-bool",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-starter-015",
+      "track": "starter",
+      "lessonId": "starter-comparison",
+      "type": "chooseBlocks",
+      "difficulty": 2,
+      "title": "合否を表示するのに必要な行を選ぶ",
+      "prompt": "「60点以上なら合格と表示する」だけを行いたいです。必要な行だけを選び、実行順に並べてください。",
+      "skills": [
+        "controlFlow"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "let score = 72"
+          },
+          {
+            "id": "b2",
+            "code": "if score >= 60 {"
+          },
+          {
+            "id": "b3",
+            "code": "    print(\"合格\")"
+          },
+          {
+            "id": "b4",
+            "code": "}"
+          },
+          {
+            "id": "b5",
+            "code": "score = 100"
+          },
+          {
+            "id": "b6",
+            "code": "print(\"点数は\\(score)です\")"
+          }
+        ],
+        "requireOrder": true
+      },
+      "solution": {
+        "selected": [
+          "b1",
+          "b2",
+          "b3",
+          "b4"
+        ],
+        "order": [
+          "b1",
+          "b2",
+          "b3",
+          "b4"
+        ]
+      },
+      "hints": [
+        "要件は「合格の表示」だけです。それ以外の出力は要件に入っていません。",
+        "if文は「条件を書く行」「中身」「閉じる }」の3つがそろって初めて成立します。",
+        "点数を用意する行、条件を書く行、合格を表示する行、そしてif文を閉じる `}` の4行が必要です。点数そのものの表示や再代入は要件外です。"
+      ],
+      "explanation": "必要なのは値の用意・条件・処理・閉じかっこの4行です。`print(\"点数は…\")` は要件にない余計な出力で、`score = 100` はletで宣言したscoreへの再代入なのでビルドも通りません。if文では `{` と `}` が必ず対になる点も重要です。",
+      "detail": {
+        "concept": "if文は `if 条件 { 処理 }` という形をしています。条件がtrueのときだけ { } の中が実行され、閉じかっこを忘れると 'expected }' というエラーになります。",
+        "steps": [
+          "まず判定対象の値 score を用意する。これがないと条件が書けない。",
+          "`if score >= 60 {` が条件。72 >= 60 なのでtrueになる。",
+          "trueのときだけ `print(\"合格\")` が実行される。",
+          "`}` でif文の範囲を閉じる。この行がないとコードブロックが終わらない。"
+        ],
+        "whyCorrect": "この4行だけで「60点以上なら合格と表示する」という要件を過不足なく満たします。余計な出力もなく、再代入も行っていません。",
+        "commonMistakes": [
+          "`}` を選び忘れると、ブロックが閉じないためコンパイルエラーになります。かっこは常にセットで考えます。",
+          "`print(\"点数は\\(score)です\")` を含めると出力が2行になり、要件と違う挙動になります。動くことと要件を満たすことは別です。"
+        ],
+        "takeaway": "if文は条件・中身・閉じかっこの3点セット。要件にない出力は足さない。",
+        "example": {
+          "code": "let score = 72\nif score >= 60 {\n    print(\"合格\")\n}",
+          "output": "合格",
+          "explanation": "条件がfalseなら何も出力されません。ifは「実行するかしないか」を切り替える構文です。"
+        }
+      },
+      "seriesId": "starter-bool",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-starter-016",
+      "track": "starter",
+      "lessonId": "starter-comparison",
+      "type": "bugHunt",
+      "difficulty": 2,
+      "title": "== と = を取り違えている行を見つける",
+      "prompt": "「in progress のときだけメッセージを出す」つもりのコードですが、ビルドできません。原因の行を選んでください。",
+      "skills": [
+        "controlFlow",
+        "debugging"
+      ],
+      "content": {
+        "lines": [
+          {
+            "id": "l1",
+            "code": "var status = \"idle\""
+          },
+          {
+            "id": "l2",
+            "code": "status = \"in progress\""
+          },
+          {
+            "id": "l3",
+            "code": "if status = \"in progress\" {"
+          },
+          {
+            "id": "l4",
+            "code": "    print(\"作業中です\")"
+          },
+          {
+            "id": "l5",
+            "code": "}"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "l3",
+        "fixedCode": "var status = \"idle\"\nstatus = \"in progress\"\nif status == \"in progress\" {\n    print(\"作業中です\")\n}"
+      },
+      "hints": [
+        "「値を入れる」記号と「等しいか調べる」記号は別物です。",
+        "if の条件には、trueかfalseになる式を書かなければなりません。代入式は値を返しません。",
+        "2行目の代入は正しい使い方です。問題は、条件を書くべき場所に代入を書いている行です。"
+      ],
+      "explanation": "3行目が原因です。`=` は代入なので、ifの条件として書くと 'Use of = in a boolean context, did you mean ==?' というコンパイルエラーになります。等しいかどうかを調べたいので `==` を使います。2行目の `status = \"in progress\"` は条件ではなく代入文なので正しい書き方です。",
+      "detail": {
+        "concept": "if の条件には Bool を返す式が必要です。代入 `=` は値を作る式ではないため、条件の位置には置けません。Swiftはこの取り違えを明示的なエラーにしてくれます。",
+        "steps": [
+          "1行目: statusを\"idle\"で初期化（var なので変更可）。",
+          "2行目: statusに\"in progress\"を代入。文としては正しい。",
+          "3行目: if の条件に `status = \"in progress\"` と書いている。これは代入でありBoolではない。",
+          "コンパイラが 'did you mean ==?' と提案してくれる典型的なエラー。"
+        ],
+        "whyCorrect": "条件式は「trueかfalseになる式」でなければなりません。== は比較してBoolを返すため条件に使えますが、= は代入なので使えません。",
+        "commonMistakes": [
+          "C言語などでは `if (x = 1)` が警告だけで通ってしまい、深刻なバグになります。Swiftはこれをエラーにして防いでいます。",
+          "文字列の比較は == で行います。Swiftでは参照の同一性ではなく、内容が同じかどうかを比較します。"
+        ],
+        "takeaway": "= は代入、== は比較。if の条件に = は書けない。",
+        "example": {
+          "code": "let status = \"in progress\"\nif status == \"in progress\" {\n    print(\"作業中です\")\n}",
+          "output": "作業中です",
+          "explanation": "== で比較すればBoolが得られ、条件として正しく動きます。"
+        }
+      },
+      "seriesId": "starter-bool",
+      "seriesStep": 4
+    },
+    {
+      "id": "practice-starter-017",
+      "track": "starter",
+      "lessonId": "starter-if-else",
+      "type": "reorder",
+      "difficulty": 1,
+      "title": "if / else の形を組み立てる",
+      "prompt": "「20歳以上なら大人、そうでなければ子ども」と表示するコードになるよう並べ替えてください。",
+      "skills": [
+        "controlFlow"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "    print(\"子ども\")"
+          },
+          {
+            "id": "b2",
+            "code": "if age >= 20 {"
+          },
+          {
+            "id": "b3",
+            "code": "    print(\"大人\")"
+          },
+          {
+            "id": "b4",
+            "code": "} else {"
+          },
+          {
+            "id": "b5",
+            "code": "}"
+          },
+          {
+            "id": "b6",
+            "code": "let age = 25"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b6",
+          "b2",
+          "b3",
+          "b4",
+          "b1",
+          "b5"
+        ]
+      },
+      "hints": [
+        "まず判定に使う値を用意します。条件はそのあとです。",
+        "if / else は「条件 {」「trueのときの処理」「} else {」「falseのときの処理」「}」の5つの部品が順に並びます。",
+        "値の準備 → `if age >= 20 {` → 大人の表示 → `} else {` → 子どもの表示 → 閉じる `}` の順です。"
+      ],
+      "explanation": "if / else は上から「条件」「trueのときの処理」「} else {」「falseのときの処理」「閉じかっこ」の順に並びます。判定に使うageは条件より前で用意しておく必要があります。この順に並べるとageが25なので「大人」だけが表示されます。",
+      "detail": {
+        "concept": "`if 条件 { A } else { B }` は、条件がtrueならAだけ、falseならBだけを実行します。両方が実行されることはありません。",
+        "steps": [
+          "`let age = 25` でageを用意する。これがないと条件が書けない。",
+          "`if age >= 20 {` で条件を評価。25 >= 20 なのでtrue。",
+          "trueなので `print(\"大人\")` が実行される。",
+          "`} else {` 以降はfalseのときの分岐なので、今回は実行されない。",
+          "最後の `}` がif文全体を閉じる。"
+        ],
+        "whyCorrect": "この並びだけが構文として成立します。elseはifブロックを閉じる `}` と同じ行に書き、最後にもう一度 `}` で全体を閉じる形です。",
+        "commonMistakes": [
+          "elseブロックを先に置くと 'expected expression' などの構文エラーになります。else単体では存在できません。",
+          "`}` と `} else {` の区別を誤ると、ifが早く閉じてしまい、elseがどのifにも対応しなくなります。"
+        ],
+        "takeaway": "if / else は5つの部品の決まった並び。判定に使う値は必ず条件より前で用意する。",
+        "example": {
+          "code": "let age = 15\nif age >= 20 {\n    print(\"大人\")\n} else {\n    print(\"子ども\")\n}",
+          "output": "子ども",
+          "explanation": "ageを15にすると条件がfalseになり、elseの側だけが実行されます。"
+        }
+      },
+      "seriesId": "starter-if",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-starter-018",
+      "track": "starter",
+      "lessonId": "starter-if-else",
+      "type": "fillBlank",
+      "difficulty": 2,
+      "title": "3つに分かれる条件を書く",
+      "prompt": "80点以上はA、60点以上はB、それ以外はCと表示したいです。空欄を埋めてください。",
+      "skills": [
+        "controlFlow"
+      ],
+      "content": {
+        "template": "let score = 72\nif score >= 80 {\n    print(\"A\")\n} {{1}} score >= 60 {\n    print(\"B\")\n} {{2}} {\n    print(\"C\")\n}",
+        "blanks": [
+          {
+            "id": "1",
+            "options": [
+              "else if",
+              "else",
+              "if",
+              "and"
+            ]
+          },
+          {
+            "id": "2",
+            "options": [
+              "else",
+              "else if",
+              "if",
+              "then"
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "1": "else if",
+          "2": "else"
+        }
+      },
+      "hints": [
+        "2つ目の分岐にはまだ条件が必要で、3つ目にはもう条件が要りません。",
+        "「前の条件がfalseで、かつ別の条件を調べたい」ときの書き方と、「残り全部」を受ける書き方は別です。",
+        "1つ目の空欄のあとには `score >= 60` という条件が続いています。条件を伴う分岐と、条件を伴わない最後の受け皿を書き分けます。"
+      ],
+      "explanation": "2つ目の分岐は「80点未満で、かつ60点以上」を調べるので条件付きの `else if` を使います。3つ目は残りすべてを受けるので条件のない `else` です。上から順に評価され、最初にtrueになった分岐だけが実行されるため、72点はAの条件を外れてBになります。",
+      "detail": {
+        "concept": "if / else if / else は上から順に条件を試し、最初にtrueになったブロックだけを実行して残りを飛ばします。順序そのものが仕様の一部です。",
+        "steps": [
+          "`score >= 80` は 72 >= 80 なのでfalse。Aは実行されない。",
+          "次の `else if score >= 60` は 72 >= 60 なのでtrue。Bが実行される。",
+          "1つの分岐が実行されたら、以降の else は評価されない。",
+          "最後の else は、どの条件にも当てはまらなかった場合の受け皿。"
+        ],
+        "whyCorrect": "else if は「前の条件がfalseだったときに、さらに別の条件を調べる」ための書き方です。最後の else には条件を書けないので、残り全部がここに来ます。",
+        "commonMistakes": [
+          "`if` を並べて書くと、80点のときAとBの両方が表示されてしまいます。排他にしたいなら else if を使います。",
+          "条件の順番を逆にして `score >= 60` を先に書くと、90点でもBになってしまいます。範囲判定は厳しい条件から書きます。"
+        ],
+        "takeaway": "else if は条件付きの追加分岐、else は残り全部。上から順に最初のtrueだけが実行される。",
+        "example": {
+          "code": "let score = 95\nif score >= 60 {\n    print(\"B\")\n} else if score >= 80 {\n    print(\"A\")\n}",
+          "output": "B",
+          "explanation": "条件の順序を誤ると、95点でもBになります。分岐は書いた順に評価されます。"
+        }
+      },
+      "seriesId": "starter-if",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-starter-019",
+      "track": "starter",
+      "lessonId": "starter-if-else",
+      "type": "trace",
+      "difficulty": 2,
+      "title": "どの分岐が実行されるか追う",
+      "prompt": "このコードを実行したとき、出力される内容を選んでください。",
+      "skills": [
+        "controlFlow"
+      ],
+      "content": {
+        "code": "let stock = 0\nif stock > 10 {\n    print(\"在庫あり\")\n} else if stock > 0 {\n    print(\"残りわずか\")\n} else {\n    print(\"在庫なし\")\n}\nprint(\"完了\")",
+        "options": [
+          {
+            "id": "o1",
+            "label": "在庫なし\n完了"
+          },
+          {
+            "id": "o2",
+            "label": "残りわずか\n完了"
+          },
+          {
+            "id": "o3",
+            "label": "在庫あり\n完了"
+          },
+          {
+            "id": "o4",
+            "label": "在庫なし\n残りわずか\n完了"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "stockは0です。各条件に0を当てはめて、上から順に確かめます。",
+        "最初にtrueになった分岐だけが実行され、残りは飛ばされます。",
+        "0 > 10 はfalse、0 > 0 もfalseです。どの条件も満たさないとき、実行されるのはどこでしょうか。最後のprintはif文の外にあります。"
+      ],
+      "explanation": "stockは0なので `0 > 10` はfalse、`0 > 0` もfalse（0は0より大きくない）です。どの条件にも当てはまらないためelseが実行され「在庫なし」が出力されます。最後の `print(\"完了\")` はif文の外なので、どの分岐を通っても必ず実行され「完了」が続きます。",
+      "detail": {
+        "concept": "if / else if / else では、実行されるブロックは必ず1つだけです。ブロックの外に書かれた行は分岐の結果に関わらず実行されます。",
+        "steps": [
+          "`stock > 10` → 0 > 10 は false。1つ目のブロックは飛ばされる。",
+          "`stock > 0` → 0 > 0 は false。0は0より大きくないため。2つ目も飛ばされる。",
+          "すべての条件がfalseなので else が実行され「在庫なし」が出力される。",
+          "if文を抜けたあとの `print(\"完了\")` が実行され「完了」が出力される。"
+        ],
+        "whyCorrect": "0は「0より大きい」を満たさないため、境界値でelseに落ちます。if文の外の行は分岐に関係なく必ず実行されるので、出力は2行になります。",
+        "commonMistakes": [
+          "`stock > 0` を `stock >= 0` と読み違えると「残りわずか」を選んでしまいます。境界値0の扱いが分かれ目です。",
+          "複数のブロックが実行されると考えると3行の出力を選んでしまいます。else if の連鎖では1つしか実行されません。"
+        ],
+        "takeaway": "else if 連鎖で実行されるのは1ブロックだけ。境界値（0やちょうどの値）で結果が変わることを常に確認する。",
+        "example": {
+          "code": "let stock = 1\nif stock > 10 {\n    print(\"在庫あり\")\n} else if stock > 0 {\n    print(\"残りわずか\")\n} else {\n    print(\"在庫なし\")\n}",
+          "output": "残りわずか",
+          "explanation": "stockを1にすると2つ目の条件がtrueになり、別の分岐に入ります。"
+        }
+      },
+      "seriesId": "starter-if",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-starter-020",
+      "track": "starter",
+      "lessonId": "starter-if-else",
+      "type": "chooseBlocks",
+      "difficulty": 2,
+      "title": "気温に応じたメッセージに必要な行を選ぶ",
+      "prompt": "「30度以上なら暑い、それ以外は普通」と1行だけ表示します。必要な行を選び、実行順に並べてください。",
+      "skills": [
+        "controlFlow"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "let temperature = 28"
+          },
+          {
+            "id": "b2",
+            "code": "if temperature >= 30 {"
+          },
+          {
+            "id": "b3",
+            "code": "    print(\"暑い\")"
+          },
+          {
+            "id": "b4",
+            "code": "} else {"
+          },
+          {
+            "id": "b5",
+            "code": "    print(\"普通\")"
+          },
+          {
+            "id": "b6",
+            "code": "}"
+          },
+          {
+            "id": "b7",
+            "code": "if temperature < 30 {"
+          },
+          {
+            "id": "b8",
+            "code": "    print(\"普通\")"
+          },
+          {
+            "id": "b9",
+            "code": "}"
+          }
+        ],
+        "requireOrder": true
+      },
+      "solution": {
+        "selected": [
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6"
+        ],
+        "order": [
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6"
+        ]
+      },
+      "hints": [
+        "「それ以外」を表す書き方を使えば、条件をもう一度書く必要はありません。",
+        "同じ判定を2回書くと、条件を変更するときに片方だけ直し忘れるバグが生まれます。",
+        "1つのif / else で両方の場合を書き切れます。後半の `if temperature < 30 {` 以降のブロックは不要です。"
+      ],
+      "explanation": "if / else を使えば1つの条件で両方の場合を扱えます。後半の `if temperature < 30` は同じ判定を裏返して書き直しただけで、条件が2か所に散らばるため保守しづらく、しかも今回はelse側と重複して「普通」が2回表示されてしまいます。",
+      "detail": {
+        "concept": "同じ判断を2か所に書くと、仕様変更のときに片方だけ直して不整合が起きます。else は「条件のもう一方」を自動的に受け持つため、判定は1か所で済みます。",
+        "steps": [
+          "temperatureを用意する。",
+          "`if temperature >= 30 {` が唯一の判定。28なのでfalse。",
+          "falseなので `} else {` 側の `print(\"普通\")` が実行される。",
+          "`}` でif文を閉じる。ここまでで要件を満たしている。",
+          "後半のifブロックを足すと、同じ条件を別の形で書いた重複になり、出力も2行になる。"
+        ],
+        "whyCorrect": "if / else の6行だけで「30以上」と「それ以外」を漏れなく分けられます。条件が1か所にまとまるため、しきい値を変えるときも1行の修正で済みます。",
+        "commonMistakes": [
+          "条件を裏返した2つ目のifを足すと、境界の扱いを間違えたときに「どちらも実行されない」または「両方実行される」バグが生まれます。",
+          "else側だけを選ぶと、30度以上のときに何も表示されなくなります。"
+        ],
+        "takeaway": "「それ以外」は else で受ける。同じ判定を2回書かない。",
+        "example": {
+          "code": "let temperature = 31\nif temperature >= 30 {\n    print(\"暑い\")\n} else {\n    print(\"普通\")\n}",
+          "output": "暑い",
+          "explanation": "条件が1か所なので、31度でも28度でも必ずどちらか一方だけが表示されます。"
+        }
+      },
+      "seriesId": "starter-if",
+      "seriesStep": 4
+    },
+    {
+      "id": "practice-starter-021",
+      "track": "starter",
+      "lessonId": "starter-if-else",
+      "type": "buildFunction",
+      "difficulty": 3,
+      "title": "合否を返す関数を組み立てる",
+      "prompt": "点数を受け取り、60点以上なら\"合格\"、それ以外なら\"不合格\"を返す関数を作ります。必要なブロックだけを選んで正しい順に並べてください。",
+      "skills": [
+        "functions",
+        "controlFlow"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "    } else {"
+          },
+          {
+            "id": "b2",
+            "code": "func judge(_ score: Int) -> String {"
+          },
+          {
+            "id": "b3",
+            "code": "        return \"合格\""
+          },
+          {
+            "id": "b4",
+            "code": "    if score >= 60 {"
+          },
+          {
+            "id": "b5",
+            "code": "}"
+          },
+          {
+            "id": "b6",
+            "code": "        return \"不合格\""
+          },
+          {
+            "id": "b7",
+            "code": "    }"
+          },
+          {
+            "id": "b8",
+            "code": "        print(\"合格\")"
+          },
+          {
+            "id": "b9",
+            "code": "    if score > 60 {"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b2",
+          "b4",
+          "b3",
+          "b1",
+          "b6",
+          "b7",
+          "b5"
+        ]
+      },
+      "hints": [
+        "まず関数の入口（func …）と出口（閉じかっこ）を決め、その中に判定を入れます。",
+        "問題文は「返す」なので、画面に表示するのではなく値を返す必要があります。printのブロックは使いません。",
+        "`func judge(_ score: Int) -> String {` で始め、`if score >= 60 {` で判定し、それぞれのreturnを書き、`}` を2つ（ifの分と関数の分）で閉じます。「60点以上」は境界値60を含む比較です。"
+      ],
+      "explanation": "関数は「入口 → 判定 → それぞれのreturn → 閉じる」の順に組み立てます。`-> String` と宣言した以上、すべての経路で必ずStringを返さなければならないため、if側とelse側の両方にreturnが必要です。`print(\"合格\")` は表示するだけで値を返さないので使えず、`score > 60` は60点ちょうどを不合格にしてしまうため要件と合いません。",
+      "detail": {
+        "concept": "関数は入力（引数）を受け取り、処理して、出力（戻り値）を返す箱です。`-> String` は「必ずStringを返す」という約束で、returnの書き漏れはコンパイルエラーになります。",
+        "steps": [
+          "`func judge(_ score: Int) -> String {` … Int を1つ受け取り String を返すと宣言する。`_` は呼び出し時にラベルを省略する指定。",
+          "`if score >= 60 {` … 60点ちょうどを合格に含めるため >= を使う。",
+          "`return \"合格\"` … true側で値を返し、その時点で関数を抜ける。",
+          "`} else {` と `return \"不合格\"` … false側でも必ず値を返す。",
+          "`}` でifを閉じ、もう1つの `}` で関数を閉じる。"
+        ],
+        "whyCorrect": "if側とelse側の両方にreturnがあるため、どの経路を通っても必ずStringが返ります。これで 'Missing return in a function expected to return String' というエラーが起きません。",
+        "commonMistakes": [
+          "`print(\"合格\")` に置き換えると、値を返さないため 'Missing return' エラーになります。表示と戻り値はまったく別のものです。",
+          "`score > 60` を使うと、ちょうど60点が不合格になります。要件の「以上」を正しく写せているか、境界値で必ず確認します。",
+          "else側のreturnを忘れると、条件がfalseのときに返す値がなくなり、やはりコンパイルエラーになります。"
+        ],
+        "takeaway": "関数はすべての経路で戻り値を返す。表示（print）と返却（return）は別物。",
+        "example": {
+          "code": "func judge(_ score: Int) -> String {\n    if score >= 60 {\n        return \"合格\"\n    } else {\n        return \"不合格\"\n    }\n}\nprint(judge(60), judge(59))",
+          "output": "合格 不合格",
+          "explanation": "境界値60と59で試すと、>= と > の違いがはっきり確認できます。"
+        }
+      },
+      "seriesId": "starter-if",
+      "seriesStep": 5
+    },
+    {
+      "id": "practice-starter-022",
+      "track": "starter",
+      "lessonId": "starter-braces-scope",
+      "type": "reorder",
+      "difficulty": 2,
+      "title": "波かっこの対応を正しくする",
+      "prompt": "1から3までの数を表示し、そのあとに「終了」と表示するコードに並べ替えてください。",
+      "skills": [
+        "controlFlow",
+        "syntax"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "print(\"終了\")"
+          },
+          {
+            "id": "b2",
+            "code": "    print(number)"
+          },
+          {
+            "id": "b3",
+            "code": "for number in 1...3 {"
+          },
+          {
+            "id": "b4",
+            "code": "}"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b3",
+          "b2",
+          "b4",
+          "b1"
+        ]
+      },
+      "hints": [
+        "`{` で始まったブロックは、必ず対応する `}` で閉じます。",
+        "ループの中で繰り返したい処理と、ループが終わってから1回だけ実行したい処理を区別してください。",
+        "`for number in 1...3 {` → 繰り返す処理 → `}` でループを閉じる → その外側で「終了」を表示、の順です。"
+      ],
+      "explanation": "forループは `for … in … {` で始まり `}` で終わります。その内側にある行だけが繰り返され、`}` の後ろに書いた行はループ終了後に1回だけ実行されます。この並びでは1、2、3が順に表示されたあと「終了」が1回表示されます。",
+      "detail": {
+        "concept": "`{ }` はスコープ（有効範囲）を作ります。ループ本体の範囲も、その中だけで使える名前の範囲も、この波かっこで決まります。",
+        "steps": [
+          "`for number in 1...3 {` が1、2、3を順にnumberへ入れながらブロックを繰り返す。",
+          "`print(number)` はブロックの内側なので3回実行され、1・2・3が出力される。",
+          "`}` でループの範囲が終わる。",
+          "`print(\"終了\")` はループの外なので、繰り返しが全部終わったあと1回だけ実行される。"
+        ],
+        "whyCorrect": "波かっこの内側が繰り返しの対象、外側が1回だけの処理という区別が正しく表現できているためです。出力は1、2、3、終了の4行になります。",
+        "commonMistakes": [
+          "`print(\"終了\")` を `}` の前に入れると、ループのたびに実行されて3回表示されます。",
+          "`}` を書き忘れると 'expected }' というエラーになり、どこまでがループなのかコンパイラが判断できません。"
+        ],
+        "takeaway": "`{ }` の内側だけが繰り返される。閉じかっこの位置が処理回数を決める。",
+        "example": {
+          "code": "for number in 1...3 {\n    print(number)\n}\nprint(\"終了\")",
+          "output": "1\n2\n3\n終了",
+          "explanation": "ループが3回、そのあとの1行が1回実行されます。"
+        }
+      },
+      "seriesId": "starter-scope",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-starter-023",
+      "track": "starter",
+      "lessonId": "starter-braces-scope",
+      "type": "bugHunt",
+      "difficulty": 2,
+      "title": "if の外では使えない値がある",
+      "prompt": "このコードはビルドできません。原因になっている行を選んでください。",
+      "skills": [
+        "controlFlow",
+        "debugging"
+      ],
+      "content": {
+        "lines": [
+          {
+            "id": "l1",
+            "code": "let isMember = true"
+          },
+          {
+            "id": "l2",
+            "code": "if isMember {"
+          },
+          {
+            "id": "l3",
+            "code": "    let discount = 200"
+          },
+          {
+            "id": "l4",
+            "code": "}"
+          },
+          {
+            "id": "l5",
+            "code": "print(discount)"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "l5",
+        "fixedCode": "let isMember = true\nvar discount = 0\nif isMember {\n    discount = 200\n}\nprint(discount)"
+      },
+      "hints": [
+        "`{ }` の中で作った名前が、どこまで使えるかを考えてください。",
+        "ブロックの中で宣言した名前は、そのブロックを抜けると消えます。",
+        "discountはif文の内側で宣言されています。それを使っている行はif文の外側にあります。"
+      ],
+      "explanation": "5行目の `print(discount)` が原因です。discountは3行目のifブロックの内側で宣言されているため、`}` を抜けた時点で有効範囲の外になり 'Cannot find discount in scope' というエラーになります。ブロックの外でも使いたい値は、ブロックの外で宣言してから中で代入します。",
+      "detail": {
+        "concept": "スコープとは名前が有効な範囲のことです。`{ }` の中で宣言した定数・変数は、その `}` に到達すると使えなくなります。これは事故を防ぐための仕組みです。",
+        "steps": [
+          "1行目: isMemberはトップレベルで宣言され、以降どこでも使える。",
+          "3行目: discountはifブロックの中で宣言される。有効範囲は3行目から4行目の `}` まで。",
+          "4行目: `}` でブロックが閉じ、discountは存在しなくなる。",
+          "5行目: 存在しない名前を参照しているためコンパイルエラー。"
+        ],
+        "whyCorrect": "エラーは「名前が見つからない側」で報告されます。宣言そのものは正しいので、直すのは宣言の位置か、参照の位置のどちらかです。",
+        "commonMistakes": [
+          "ifの中でletのまま宣言位置だけ外に出すと、ifの中で代入できずエラーになります。外で宣言するときは var にして初期値を入れます。",
+          "参照行をifの中に移す修正も可能ですが、「割引額をあとで使いたい」という元の意図からは離れます。"
+        ],
+        "takeaway": "`{ }` の中で宣言した名前は外では使えない。外で使うなら外で宣言する。",
+        "example": {
+          "code": "let isMember = true\nvar discount = 0\nif isMember {\n    discount = 200\n}\nprint(discount)",
+          "output": "200",
+          "explanation": "外で var として宣言し、中で代入すれば、ブロックの外でも結果を使えます。"
+        }
+      },
+      "seriesId": "starter-scope",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-starter-024",
+      "track": "starter",
+      "lessonId": "starter-braces-scope",
+      "type": "fillBlank",
+      "difficulty": 2,
+      "title": "ブロックを閉じる記号を入れる",
+      "prompt": "ループとif文が正しく閉じるように、空欄を埋めてください。",
+      "skills": [
+        "syntax",
+        "controlFlow"
+      ],
+      "content": {
+        "template": "for number in 1...5 {\n    if number % 2 == 0 {\n        print(number)\n    {{1}}\n{{2}}\nprint(\"done\")",
+        "blanks": [
+          {
+            "id": "1",
+            "options": [
+              "}",
+              ")",
+              "]",
+              "end"
+            ]
+          },
+          {
+            "id": "2",
+            "options": [
+              "}",
+              ")",
+              "];",
+              "endfor"
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "1": "}",
+          "2": "}"
+        }
+      },
+      "hints": [
+        "開いたかっこの数と閉じたかっこの数は必ず一致します。",
+        "内側から順に閉じます。あとから開いたブロックが先に閉じられます。",
+        "`{` が2つ開いています。インデントの浅い深いを見ると、どちらを先に閉じるべきかが分かります。Swiftのブロックは丸かっこや角かっこでは閉じられません。"
+      ],
+      "explanation": "波かっこ `{` で開いたブロックは `}` で閉じます。内側のif文を先に閉じ、次に外側のforループを閉じるため、空欄はどちらも `}` です。丸かっこ `)` は関数呼び出しや式のグループ化、角かっこ `]` は配列に使うもので、ブロックを閉じることはできません。",
+      "detail": {
+        "concept": "Swiftではブロック（実行される範囲）を波かっこで表します。かっこの種類にはそれぞれ役割があり、入れ替えは効きません。ブロックは「後に開いたものから先に閉じる」入れ子構造です。",
+        "steps": [
+          "`for number in 1...5 {` で外側のブロックが開く。",
+          "`if number % 2 == 0 {` で内側のブロックが開く。開いているブロックは2つ。",
+          "最初の空欄は内側のifを閉じる `}`。インデントもifに合わせる。",
+          "次の空欄は外側のforを閉じる `}`。これで開いた2つがすべて閉じる。",
+          "`print(\"done\")` はループの外なので最後に1回だけ実行される。"
+        ],
+        "whyCorrect": "開いた順と逆の順に閉じることで入れ子が正しく対応します。この状態で実行すると偶数の2と4が出力され、最後にdoneが出ます。",
+        "commonMistakes": [
+          "閉じかっこが足りないと 'expected }' のエラーになり、多すぎると 'extraneous }' になります。どちらも実行以前のエラーです。",
+          "`)` や `]` で閉じようとしても、種類が違うためブロックは閉じられません。かっこの種類は役割ごとに固定です。"
+        ],
+        "takeaway": "`{` は必ず `}` で、内側から順に閉じる。かっこの種類には役割がある。",
+        "example": {
+          "code": "for number in 1...5 {\n    if number % 2 == 0 {\n        print(number)\n    }\n}\nprint(\"done\")",
+          "output": "2\n4\ndone",
+          "explanation": "% は割った余りを求める演算子で、`number % 2 == 0` は「2で割り切れる＝偶数」を意味します。"
+        }
+      },
+      "seriesId": "starter-scope",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-starter-025",
+      "track": "starter",
+      "lessonId": "starter-nil",
+      "type": "trace",
+      "difficulty": 1,
+      "title": "nil と値の違いを見分ける",
+      "prompt": "このコードの出力を選んでください。",
+      "skills": [
+        "optional"
+      ],
+      "content": {
+        "code": "var nickname: String? = nil\nprint(nickname == nil)\nnickname = \"ゆき\"\nprint(nickname == nil)",
+        "options": [
+          {
+            "id": "o1",
+            "label": "true\nfalse"
+          },
+          {
+            "id": "o2",
+            "label": "false\ntrue"
+          },
+          {
+            "id": "o3",
+            "label": "true\ntrue"
+          },
+          {
+            "id": "o4",
+            "label": "nil\nゆき"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "`String?` は「文字列が入っているかもしれないし、空っぽ（nil）かもしれない」型です。",
+        "`== nil` は「今なにも入っていないか」を調べてtrue / falseを返します。",
+        "1回目のprintの時点ではまだ何も入っていません。3行目で値を入れたあと、状態がどう変わるか考えてください。"
+      ],
+      "explanation": "`String?`（Optional）は「値があるか、nil（なし）か」の2つの状態を持ちます。1行目でnilを入れたので最初の `nickname == nil` はtrue、3行目で\"ゆき\"を代入したあとはfalseになります。printされるのは比較の結果であるBoolなので、出力は true と false です。",
+      "detail": {
+        "concept": "Optionalは「値が無いかもしれない」ことを型で表す仕組みです。`String` は必ず文字列が入っていますが、`String?` は文字列かnilのどちらかです。この区別があるおかげで、値が無い場合の考慮漏れをコンパイラが指摘できます。",
+        "steps": [
+          "1行目: `var nickname: String? = nil` でnickname は「まだ何も無い」状態。",
+          "2行目: `nickname == nil` は true。printはBoolのtrueを出力する。",
+          "3行目: \"ゆき\" を代入すると、nickname は「値がある」状態に変わる。",
+          "4行目: `nickname == nil` は false になる。"
+        ],
+        "whyCorrect": "Optionalの状態は代入によって切り替わります。== nil はその瞬間の状態を調べるだけなので、出力は true → false の順になります。",
+        "commonMistakes": [
+          "nilを「空文字列 \"\"」と同じだと考えるのは誤りです。\"\" は長さ0の文字列という『値』であり、nilは値が無い状態です。",
+          "print(nickname) と書くと Optional(\"ゆき\") と表示され、素の文字列とは違う見た目になります。中身を取り出すにはif letなどが必要です。"
+        ],
+        "takeaway": "Optional（型名の末尾の ?）は「値あり」か「nil」の2状態。nilは空文字列でも0でもない。",
+        "example": {
+          "code": "var nickname: String? = nil\nprint(nickname ?? \"未設定\")\nnickname = \"ゆき\"\nprint(nickname ?? \"未設定\")",
+          "output": "未設定\nゆき",
+          "explanation": "?? を使うと、nilのときの代わりの値を指定して取り出せます。"
+        }
+      },
+      "seriesId": "starter-optional",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-starter-026",
+      "track": "starter",
+      "lessonId": "starter-if-let",
+      "type": "reorder",
+      "difficulty": 2,
+      "title": "if let を組み立てる",
+      "prompt": "Optionalに値があるときだけ挨拶を表示するコードに並べ替えてください。",
+      "skills": [
+        "optional",
+        "controlFlow"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "    print(\"こんにちは、\\(name)さん\")"
+          },
+          {
+            "id": "b2",
+            "code": "let input: String? = \"ゆき\""
+          },
+          {
+            "id": "b3",
+            "code": "}"
+          },
+          {
+            "id": "b4",
+            "code": "if let name = input {"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b2",
+          "b4",
+          "b1",
+          "b3"
+        ]
+      },
+      "hints": [
+        "まず取り出す対象のOptionalを用意します。",
+        "`if let 新しい名前 = Optional {` は「値があれば取り出してブロックに入る」という書き方です。",
+        "input を用意 → `if let name = input {` → 中で name を使う → `}` で閉じる、の順です。"
+      ],
+      "explanation": "if let は「Optionalに値が入っていれば取り出して、新しい定数に入れ、ブロックの中だけで使う」構文です。取り出した name はブロックの内側でだけ有効なので、printはif letの `{` と `}` の間に置きます。値がnilならブロックは実行されません。",
+      "detail": {
+        "concept": "Optionalの中身をそのままでは使えないため、安全に取り出す手順が必要です。if let（Optional束縛）はその標準的な方法で、値があるときだけ処理を行えます。",
+        "steps": [
+          "`let input: String? = \"ゆき\"` で、値の入ったOptionalを用意する。",
+          "`if let name = input {` で中身を取り出す。値があるので name は素の String になる。",
+          "ブロック内では name をOptionalではない普通の文字列として使えるので、文字列補間にそのまま書ける。",
+          "`}` でブロックを閉じる。nameはここまでで有効期限が切れる。"
+        ],
+        "whyCorrect": "if let の中では、取り出した値が確実に存在することが保証されます。だからこそ `\\(name)` と書いてもOptional(\"ゆき\") のような表示にならず、「こんにちは、ゆきさん」と出力されます。",
+        "commonMistakes": [
+          "printをif letの外に置くと、nameがスコープ外になり 'Cannot find name in scope' になります。",
+          "if let を使わずに `print(\"こんにちは、\\(input)さん\")` と書くと Optional(\"ゆき\") が埋め込まれ、意図しない表示になります。"
+        ],
+        "takeaway": "if let は「値があれば取り出して、その中だけで使う」。取り出した名前はブロック内限定。",
+        "example": {
+          "code": "let input: String? = nil\nif let name = input {\n    print(\"こんにちは、\\(name)さん\")\n} else {\n    print(\"名前が未入力です\")\n}",
+          "output": "名前が未入力です",
+          "explanation": "nilのときはブロックに入らず、else側が実行されます。"
+        }
+      },
+      "seriesId": "starter-optional",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-starter-027",
+      "track": "starter",
+      "lessonId": "starter-optional",
+      "type": "fillBlank",
+      "difficulty": 2,
+      "title": "nilのときの代わりの値を指定する",
+      "prompt": "nicknameがnilなら「ゲスト」を使うように空欄を埋めてください。",
+      "skills": [
+        "optional"
+      ],
+      "content": {
+        "template": "let nickname: String? = nil\nlet display = nickname {{1}} \"ゲスト\"\nprint(display)",
+        "blanks": [
+          {
+            "id": "1",
+            "options": [
+              "??",
+              "?",
+              "!",
+              "||"
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "1": "??"
+        }
+      },
+      "hints": [
+        "「値があればそれを、無ければ別の値を」を1つの演算子で書けます。",
+        "Optional専用の演算子で、記号が2つ並んだ形をしています。BoolのORとは別物です。",
+        "`nickname` と `\"ゲスト\"` の間に置く、疑問符を2つ重ねた演算子です。nil合体演算子と呼ばれます。"
+      ],
+      "explanation": "`??` はnil合体演算子で、左がnilでなければその中身を、nilなら右の値を返します。ここではnicknameがnilなので display は \"ゲスト\" になります。結果はOptionalではない普通のStringなので、printしてもOptional(...)は付きません。`!` は強制アンラップでnilのときクラッシュし、`||` はBool同士のORなのでここでは使えません。",
+      "detail": {
+        "concept": "?? は「デフォルト値付きで取り出す」ための演算子です。if let より短く書けるので、値が無いときの代替値が決まっている場面で多用されます。",
+        "steps": [
+          "`nickname` は String? 型で、中身は nil。",
+          "`??` は左辺を評価し、nilかどうかを調べる。",
+          "nilなので右辺の \"ゲスト\" が採用される。",
+          "結果の型は String（Optionalが外れる）ので、そのままprintできる。"
+        ],
+        "whyCorrect": "?? は「nilなら右の値」という動作をひとつの式で表します。取り出した結果は非Optionalになるため、以降の処理でOptionalを気にせず扱えます。",
+        "commonMistakes": [
+          "`nickname!` と書くと、nilのときに 'Unexpectedly found nil while unwrapping an Optional value' で実行時クラッシュします。代替値がある場面では ?? を選びます。",
+          "`||` はBool専用の論理和です。String?に対して使うと型エラーになります。"
+        ],
+        "takeaway": "?? は「nilならこちらを使う」。安全で、結果は非Optionalになる。",
+        "example": {
+          "code": "let nickname: String? = \"ゆき\"\nprint(nickname ?? \"ゲスト\")",
+          "output": "ゆき",
+          "explanation": "値が入っていれば右辺は評価されず、中身がそのまま使われます。"
+        }
+      },
+      "seriesId": "starter-optional",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-starter-028",
+      "track": "starter",
+      "lessonId": "starter-optional",
+      "type": "trace",
+      "difficulty": 2,
+      "title": "Optionalの流れを追う",
+      "prompt": "このコードの出力を選んでください。",
+      "skills": [
+        "optional",
+        "controlFlow"
+      ],
+      "content": {
+        "code": "let inputs: [String?] = [\"A\", nil, \"C\"]\nfor value in inputs {\n    if let text = value {\n        print(\"あり: \\(text)\")\n    } else {\n        print(\"なし\")\n    }\n}",
+        "options": [
+          {
+            "id": "o1",
+            "label": "あり: A\nなし\nあり: C"
+          },
+          {
+            "id": "o2",
+            "label": "あり: A\nあり: C"
+          },
+          {
+            "id": "o3",
+            "label": "あり: A\nあり: nil\nあり: C"
+          },
+          {
+            "id": "o4",
+            "label": "なし\nなし\nなし"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "配列の要素は3つあり、ループは3回まわります。",
+        "各要素はString?なので、値のときとnilのときで通る道が変わります。",
+        "1番目は値あり、2番目はnil、3番目は値ありです。if letは値があるときだけ中に入り、nilのときはelseに行きます。"
+      ],
+      "explanation": "配列には3つの要素があるのでループは3回実行されます。\"A\"とC\"は値があるのでif let側、nilはelse側に入ります。したがって「あり: A」「なし」「あり: C」の3行が順に出力されます。nilの要素でもループが止まったりクラッシュしたりはしません。",
+      "detail": {
+        "concept": "`[String?]` は「String? の配列」で、要素ごとに値かnilかが違います。if let はその都度判定するので、混在していても安全に処理できます。",
+        "steps": [
+          "1回目: value は \"A\"。if let が成功し、text に \"A\" が入って「あり: A」を出力。",
+          "2回目: value は nil。if let が失敗し、elseに入って「なし」を出力。",
+          "3回目: value は \"C\"。if let が成功し「あり: C」を出力。",
+          "ループは3回とも最後まで実行され、出力は3行になる。"
+        ],
+        "whyCorrect": "if let は失敗しても例外を投げず、単にelse側へ流れます。そのためnilが混ざっていても処理を続けられ、3行すべてが出力されます。",
+        "commonMistakes": [
+          "nilの要素でクラッシュすると考えるのは、強制アンラップ `value!` を使った場合の挙動です。if letは安全です。",
+          "`print(\"あり: \\(value)\")` のようにif letを使わず書くと Optional(\"A\") と表示されてしまいます。"
+        ],
+        "takeaway": "if let は値があるときだけ中に入り、nilならelseへ。nilが混ざっていても止まらない。",
+        "example": {
+          "code": "let inputs: [String?] = [\"A\", nil, \"C\"]\nlet names = inputs.compactMap { $0 }\nprint(names)",
+          "output": "[\"A\", \"C\"]",
+          "explanation": "compactMapを使うと、nilを取り除いた非Optionalの配列を一度に作れます。"
+        }
+      },
+      "seriesId": "starter-optional",
+      "seriesStep": 4
+    },
+    {
+      "id": "practice-starter-029",
+      "track": "starter",
+      "lessonId": "starter-if-let",
+      "type": "repair",
+      "difficulty": 3,
+      "title": "強制アンラップのクラッシュを直す",
+      "prompt": "このコードは実行時にクラッシュします。3行目を置き換える安全な書き方を選んでください。",
+      "skills": [
+        "optional",
+        "debugging"
+      ],
+      "content": {
+        "code": "let raw = \"abc\"\nlet number = Int(raw)\nprint(number! * 2)",
+        "options": [
+          {
+            "id": "o1",
+            "code": "if let number = Int(raw) { print(number * 2) } else { print(\"数値ではありません\") }"
+          },
+          {
+            "id": "o2",
+            "code": "print(Int(raw) * 2)"
+          },
+          {
+            "id": "o3",
+            "code": "print(number!! * 2)"
+          },
+          {
+            "id": "o4",
+            "code": "print(Int(raw)! * 2)"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1",
+        "fixedCode": "let raw = \"abc\"\nif let number = Int(raw) {\n    print(number * 2)\n} else {\n    print(\"数値ではありません\")\n}"
+      },
+      "hints": [
+        "`Int(\"abc\")` は変換に失敗します。そのときの戻り値がどうなるかを考えてください。",
+        "変換が失敗する可能性がある以上、「失敗したらどうするか」を書かないと安全になりません。",
+        "値があるときだけ計算し、無いときは別のメッセージを出す構文を使います。強制アンラップ `!` は失敗時にクラッシュするので使いません。"
+      ],
+      "explanation": "`Int(\"abc\")` は数値に変換できないためnilを返します。そこに `!`（強制アンラップ）を使うと 'Unexpectedly found nil while unwrapping an Optional value' で実行時クラッシュします。if let で値がある場合と無い場合の両方を書けば、クラッシュせずに処理できます。`Int(raw) * 2` はOptionalのまま掛け算しようとして型エラー、`Int(raw)!` は結局同じ強制アンラップです。",
+      "detail": {
+        "concept": "`Int(String)` は失敗するかもしれない変換なので、戻り値は `Int?` です。Optionalが返るということは「失敗した場合の分岐を書け」という設計上のメッセージです。",
+        "steps": [
+          "`Int(\"abc\")` は数字として解釈できないためnilを返す。",
+          "`number!` はOptionalの中身を強制的に取り出す操作。中身がnilなら実行時にクラッシュする。",
+          "if let なら「中身があれば取り出して計算、無ければelse」と両方の道を用意できる。",
+          "結果としてクラッシュせず、変換できない入力にもメッセージで対応できる。"
+        ],
+        "whyCorrect": "if let は取り出しと分岐を同時に行うため、nilのときにクラッシュする経路がそもそも存在しません。ユーザー入力のように失敗しうる値を扱うときの基本形です。",
+        "commonMistakes": [
+          "`!` は「絶対にnilではない」と断言する記号です。断言が外れると即クラッシュするので、外部入力には使いません。",
+          "`print(Int(raw) * 2)` はOptionalのまま演算しようとして 'Value of optional type Int? must be unwrapped' というコンパイルエラーになります。"
+        ],
+        "takeaway": "失敗しうる変換の結果はOptional。`!` ではなく if let / guard let / ?? で受ける。",
+        "example": {
+          "code": "let raw = \"12\"\nif let number = Int(raw) {\n    print(number * 2)\n} else {\n    print(\"数値ではありません\")\n}",
+          "output": "24",
+          "explanation": "変換できる入力なら中身が取り出され、計算結果が出力されます。"
+        }
+      },
+      "seriesId": "starter-optional",
+      "seriesStep": 5
+    },
+    {
+      "id": "practice-starter-030",
+      "track": "starter",
+      "lessonId": "starter-optional",
+      "type": "buildFunction",
+      "difficulty": 3,
+      "title": "Optionalを返す関数を組み立てる",
+      "prompt": "文字列を受け取り、数値に変換できればその2倍を、できなければnilを返す関数を作ります。必要なブロックだけを選んで並べてください。",
+      "skills": [
+        "optional",
+        "functions"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "    return number * 2"
+          },
+          {
+            "id": "b2",
+            "code": "func doubled(_ text: String) -> Int? {"
+          },
+          {
+            "id": "b3",
+            "code": "    guard let number = Int(text) else {"
+          },
+          {
+            "id": "b4",
+            "code": "        return nil"
+          },
+          {
+            "id": "b5",
+            "code": "    }"
+          },
+          {
+            "id": "b6",
+            "code": "}"
+          },
+          {
+            "id": "b7",
+            "code": "    return Int(text)! * 2"
+          },
+          {
+            "id": "b8",
+            "code": "func doubled(_ text: String) -> Int {"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b1",
+          "b6"
+        ]
+      },
+      "hints": [
+        "変換に失敗することがあるので、戻り値の型も「無いかもしれない」ことを表せる必要があります。",
+        "失敗したら早めに抜ける書き方を使うと、そのあとのコードは成功した場合だけを考えれば済みます。",
+        "`func doubled(_ text: String) -> Int? {` で始め、`guard let number = Int(text) else { return nil }` で失敗時に抜け、残りで `number * 2` を返します。"
+      ],
+      "explanation": "変換が失敗しうるので、戻り値は `Int?` にします。guard let は「取り出せなければelseで抜ける」書き方で、else節ではnilを返して関数を終了します。guardを抜けたあとの number は非Optionalとして使えるため、`number * 2` をそのまま返せます。戻り値を `Int` にしたり `Int(text)!` を使う版は、変換失敗時にクラッシュするので要件を満たしません。",
+      "detail": {
+        "concept": "guard let は「条件を満たさなければ即座に抜ける」ための構文です。if let と違い、取り出した値はguardの後ろでも使えます。失敗ケースを先に片付けるので、本来の処理が入れ子にならず読みやすくなります。",
+        "steps": [
+          "`-> Int?` … 変換できないことがあるので、戻り値の型自体をOptionalにする。",
+          "`guard let number = Int(text) else {` … 変換に成功すれば number に中身が入る。",
+          "`return nil` … 失敗した場合はここで関数を終える。guardのelseは必ず抜ける処理を書く決まり。",
+          "`return number * 2` … ここに到達した時点で number は確実に存在するので、そのまま計算できる。",
+          "`}` で関数を閉じる。"
+        ],
+        "whyCorrect": "戻り値をInt?にしたことで「失敗した」という状態を呼び出し側に伝えられます。guard letにより失敗経路が先に処理され、残りのコードは成功時だけを扱えばよくなります。",
+        "commonMistakes": [
+          "戻り値を `Int` にすると、失敗を表す方法が無くなり、0を返すなど意味の紛れる設計になります。",
+          "`Int(text)!` を使うと、\"abc\" のような入力でクラッシュします。関数の利用者は不正な入力を渡してくるものだと考えます。",
+          "guardのelseでreturnを書かないと 'guard body must not fall through' というコンパイルエラーになります。"
+        ],
+        "takeaway": "失敗しうる処理はOptionalを返す。guard letで失敗を先に抜けると、本処理がすっきりする。",
+        "example": {
+          "code": "func doubled(_ text: String) -> Int? {\n    guard let number = Int(text) else {\n        return nil\n    }\n    return number * 2\n}\nprint(doubled(\"21\") ?? -1, doubled(\"abc\") ?? -1)",
+          "output": "42 -1",
+          "explanation": "呼び出し側は ?? でデフォルト値を決められます。失敗を値として扱えるのがOptionalの利点です。"
+        }
+      },
+      "seriesId": "starter-optional",
+      "seriesStep": 6
+    },
+    {
+      "id": "practice-starter-031",
+      "track": "starter",
+      "lessonId": "starter-functions",
+      "type": "chooseBlocks",
+      "difficulty": 1,
+      "title": "関数を使うのに必要な行を選ぶ",
+      "prompt": "「Hello, Swift」と1回だけ表示したいです。必要な行だけを選び、実行順に並べてください。",
+      "skills": [
+        "functions"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "func greet() {"
+          },
+          {
+            "id": "b2",
+            "code": "    print(\"Hello, Swift\")"
+          },
+          {
+            "id": "b3",
+            "code": "}"
+          },
+          {
+            "id": "b4",
+            "code": "greet()"
+          },
+          {
+            "id": "b5",
+            "code": "print(\"Hello, Swift\")"
+          },
+          {
+            "id": "b6",
+            "code": "func greet()"
+          }
+        ],
+        "requireOrder": true
+      },
+      "solution": {
+        "selected": [
+          "b1",
+          "b2",
+          "b3",
+          "b4"
+        ],
+        "order": [
+          "b1",
+          "b2",
+          "b3",
+          "b4"
+        ]
+      },
+      "hints": [
+        "関数は「作る（定義）」と「使う（呼び出し）」の2段階です。定義しただけでは実行されません。",
+        "定義は `func 名前() { 処理 }` の3行で1セットです。呼び出しは名前にかっこを付けます。",
+        "定義の3行と、それを呼び出す `greet()` の1行が必要です。直接print する行を足すと出力が2回になります。"
+      ],
+      "explanation": "関数は定義しただけでは実行されません。`func greet() { … }` で処理に名前を付け、`greet()` と書いて初めて中身が実行されます。裸の `print(\"Hello, Swift\")` を足すと出力が2行になり要件から外れ、`func greet()` だけの行は本体が無いためコンパイルエラーになります。",
+      "detail": {
+        "concept": "関数は「処理に名前を付けて、あとから何度でも呼べるようにする」仕組みです。定義（設計図を書く）と呼び出し（実際に動かす）は別の行為です。",
+        "steps": [
+          "`func greet() {` … greet という名前の関数を定義し始める。",
+          "`print(\"Hello, Swift\")` … 関数の中身。ここは定義しただけでは実行されない。",
+          "`}` … 関数定義の終わり。",
+          "`greet()` … ここで初めて中身が実行され、1行出力される。"
+        ],
+        "whyCorrect": "定義3行＋呼び出し1行で、出力はちょうど1回になります。関数の中身は呼ばれた回数だけ実行されます。",
+        "commonMistakes": [
+          "定義だけ書いて呼び出しを忘れると、コードは正しいのに何も起きません。初学者がもっとも遭遇する「動かない」の原因です。",
+          "`func greet()` のように本体の `{ }` が無いとコンパイルエラーになります（プロトコル宣言の中を除く）。"
+        ],
+        "takeaway": "関数は定義と呼び出しの2段階。呼ばなければ中身は動かない。",
+        "example": {
+          "code": "func greet() {\n    print(\"Hello, Swift\")\n}\ngreet()\ngreet()",
+          "output": "Hello, Swift\nHello, Swift",
+          "explanation": "呼び出した回数だけ実行されます。これが「名前を付けて再利用する」ことの意味です。"
+        }
+      },
+      "seriesId": "starter-function",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-starter-032",
+      "track": "starter",
+      "lessonId": "starter-functions",
+      "type": "reorder",
+      "difficulty": 2,
+      "title": "引数と戻り値のある関数を組み立てる",
+      "prompt": "税込み価格を返す関数と、その呼び出しになるよう並べ替えてください。",
+      "skills": [
+        "functions"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "print(withTax(1000))"
+          },
+          {
+            "id": "b2",
+            "code": "    return Int(Double(price) * 1.1)"
+          },
+          {
+            "id": "b3",
+            "code": "}"
+          },
+          {
+            "id": "b4",
+            "code": "func withTax(_ price: Int) -> Int {"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b4",
+          "b2",
+          "b3",
+          "b1"
+        ]
+      },
+      "hints": [
+        "関数の定義が先、呼び出しが後です。",
+        "定義は「func の行」「中身」「閉じかっこ」の3つで1セットです。",
+        "`func withTax(_ price: Int) -> Int {` → `return …` → `}` → `print(withTax(1000))` の順です。"
+      ],
+      "explanation": "関数は定義してから呼び出します。`func withTax(_ price: Int) -> Int {` が入口の宣言、`return Int(Double(price) * 1.1)` が中身、`}` が定義の終わりです。最後の `print(withTax(1000))` で1000を渡して呼び出し、戻ってきた1100が表示されます。",
+      "detail": {
+        "concept": "`func 名前(_ 引数名: 型) -> 戻り値の型 { … }` が関数定義の基本形です。引数は外から受け取る値、戻り値はその関数の計算結果です。",
+        "steps": [
+          "`func withTax(_ price: Int) -> Int {` … Intを1つ受け取ってIntを返すと宣言する。`_` は呼び出し時のラベルを省略する指定。",
+          "`return Int(Double(price) * 1.1)` … IntのままではDoubleと掛けられないので、Doubleに変換して1.1倍し、Intに戻す。",
+          "`}` … 関数定義の終わり。",
+          "`print(withTax(1000))` … 1000を渡して呼び出し、返ってきた値を表示する。1000×1.1=1100.0を Int にして 1100。"
+        ],
+        "whyCorrect": "定義が先にあるため、呼び出しの行で withTax という名前が解決できます。戻り値がIntなので、そのままprintに渡せます。",
+        "commonMistakes": [
+          "呼び出しを先に書いても、Swiftのトップレベルコードでは「使う前に定義」が必要なため 'Cannot find withTax in scope' になる場合があります。定義を先に置くのが安全です。",
+          "`Double(price) * 1.1` の結果はDoubleなので、`-> Int` の関数からそのまま返すと型エラーになります。Int(...) で包む必要があります。"
+        ],
+        "takeaway": "関数は定義してから呼び出す。引数の型・戻り値の型・returnの型は一致させる。",
+        "example": {
+          "code": "func withTax(_ price: Int) -> Int {\n    return Int(Double(price) * 1.1)\n}\nprint(withTax(1000), withTax(250))",
+          "output": "1100 275",
+          "explanation": "同じ関数を違う引数で何度でも呼べます。これが関数を作る目的です。"
+        }
+      },
+      "seriesId": "starter-function",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-starter-033",
+      "track": "starter",
+      "lessonId": "starter-arguments-return",
+      "type": "fillBlank",
+      "difficulty": 2,
+      "title": "戻り値の型と return を書く",
+      "prompt": "2つの整数を受け取って合計を返す関数になるよう、空欄を埋めてください。",
+      "skills": [
+        "functions"
+      ],
+      "content": {
+        "template": "func add(_ a: Int, _ b: Int) {{1}} Int {\n    {{2}} a + b\n}\nprint(add(2, 3))",
+        "blanks": [
+          {
+            "id": "1",
+            "options": [
+              "->",
+              ":",
+              "=>",
+              "in"
+            ]
+          },
+          {
+            "id": "2",
+            "options": [
+              "return",
+              "print",
+              "let",
+              "yield"
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "1": "->",
+          "2": "return"
+        }
+      },
+      "hints": [
+        "「この関数は何を返すか」を宣言する記号と、「実際に返す」キーワードの2つが必要です。",
+        "戻り値の型は引数リストのかっこの後ろに矢印で示します。",
+        "1つ目は矢印の形をした記号です。2つ目は、計算した値を呼び出し元へ戻すキーワードで、表示するものではありません。"
+      ],
+      "explanation": "`->` は「この関数が返す値の型」を宣言する記号で、引数リストの後ろに書きます。`return` は実際に値を呼び出し元へ返すキーワードです。printは画面に表示するだけで値を返さないため、`-> Int` と宣言した関数の中でprintだけを書くと 'Missing return' エラーになります。",
+      "detail": {
+        "concept": "関数の「入口」は引数、「出口」は戻り値です。-> で出口の型を宣言し、return で実際に値を出します。この2つは必ずセットで考えます。",
+        "steps": [
+          "`func add(_ a: Int, _ b: Int)` … Intを2つ受け取る。",
+          "`-> Int` … 戻り値がIntであることを宣言する。",
+          "`return a + b` … 2+3=5 を計算して呼び出し元へ返す。",
+          "`print(add(2, 3))` … 返ってきた5が表示される。"
+        ],
+        "whyCorrect": "-> Int と宣言し、return で Int を返しているため、宣言と実装が一致します。呼び出し側は結果の5を値として受け取り、自由に使えます。",
+        "commonMistakes": [
+          "`print(a + b)` にすると関数の中で表示はされますが、値を返さないので呼び出し側で結果を使えません。「表示」と「返却」は別です。",
+          "`-> Int` を書き忘れると戻り値なし（Void）の関数になり、returnで値を返そうとしてエラーになります。"
+        ],
+        "takeaway": "-> は戻り値の型宣言、return は実際に返す動作。printは戻り値ではない。",
+        "example": {
+          "code": "func add(_ a: Int, _ b: Int) -> Int {\n    return a + b\n}\nlet result = add(2, 3)\nprint(result * 10)",
+          "output": "50",
+          "explanation": "戻り値なので、変数に入れてさらに計算できます。printだけの関数ではこれができません。"
+        }
+      },
+      "seriesId": "starter-function",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-starter-034",
+      "track": "starter",
+      "lessonId": "starter-arguments-return",
+      "type": "chooseBlocks",
+      "difficulty": 2,
+      "title": "関数の結果を使うのに必要な行を選ぶ",
+      "prompt": "add関数はすでに定義済みです。2と3の合計を計算し、その結果を使って「合計は5」と表示するために必要な行を選んで並べてください。",
+      "skills": [
+        "functions"
+      ],
+      "content": {
+        "code": "func add(_ a: Int, _ b: Int) -> Int {\n    return a + b\n}",
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "let sum = add(2, 3)"
+          },
+          {
+            "id": "b2",
+            "code": "print(\"合計は\\(sum)\")"
+          },
+          {
+            "id": "b3",
+            "code": "add(2, 3)"
+          },
+          {
+            "id": "b4",
+            "code": "print(\"合計は\\(add)\")"
+          },
+          {
+            "id": "b5",
+            "code": "let sum = add"
+          }
+        ],
+        "requireOrder": true
+      },
+      "solution": {
+        "selected": [
+          "b1",
+          "b2"
+        ],
+        "order": [
+          "b1",
+          "b2"
+        ]
+      },
+      "hints": [
+        "関数を呼ぶだけでは、結果はどこにも残りません。",
+        "戻ってきた値を受け取る名前を用意してから、その名前を表示に使います。",
+        "`let sum = add(2, 3)` で結果を受け取り、`print(\"合計は\\(sum)\")` で表示します。かっこを付けずに `add` と書くと呼び出しになりません。"
+      ],
+      "explanation": "関数の呼び出しは `add(2, 3)` のようにかっこと引数を伴います。その戻り値をletで受け取ってはじめて、あとの行で使えます。`add(2, 3)` だけの行は結果を捨てているだけで、`\\(add)` はかっこが無いため呼び出しではなく関数そのものを指し、意図した表示になりません。",
+      "detail": {
+        "concept": "関数呼び出しは値を生み出す式です。生み出された値は、変数に入れるか、その場で使うかしないと消えてしまいます。",
+        "steps": [
+          "`add(2, 3)` が実行されると 5 という値が返ってくる。",
+          "`let sum = add(2, 3)` はその5を sum という名前で保存する。",
+          "`print(\"合計は\\(sum)\")` は保存した5を文字列に埋め込んで表示する。",
+          "結果として「合計は5」が1行出力される。"
+        ],
+        "whyCorrect": "戻り値を受け取る行と、それを使う行の2行で要件を満たします。呼び出しと利用が分かれているので、結果を何度でも使い回せます。",
+        "commonMistakes": [
+          "`add(2, 3)` だけを書くと結果が捨てられます（Swiftは 'Result of call is unused' と警告します）。",
+          "`\\(add)` はかっこが無いので関数値そのものを指し、'Function is unused' や型の警告になります。呼び出しには必ずかっこが要ります。"
+        ],
+        "takeaway": "関数呼び出しにはかっこが要る。戻り値は受け取らないと消える。",
+        "example": {
+          "code": "func add(_ a: Int, _ b: Int) -> Int { a + b }\nlet sum = add(2, 3)\nprint(\"合計は\\(sum)\")",
+          "output": "合計は5",
+          "explanation": "1行だけの関数では return を省略できます（暗黙のreturn）。"
+        }
+      },
+      "seriesId": "starter-function",
+      "seriesStep": 4
+    },
+    {
+      "id": "practice-starter-035",
+      "track": "starter",
+      "lessonId": "starter-arguments-return",
+      "type": "shortCode",
+      "difficulty": 2,
+      "title": "合計を返す1行を書く",
+      "prompt": "関数の中で、引数aとbを足した結果を呼び出し元へ返す1行を書いてください。",
+      "skills": [
+        "functions"
+      ],
+      "content": {
+        "context": "func add(_ a: Int, _ b: Int) -> Int {\n    // ここに1行書く\n}",
+        "placeholder": "例: ○○○ a ○ b"
+      },
+      "solution": {
+        "accepted": [
+          "return a + b",
+          "return b + a"
+        ]
+      },
+      "hints": [
+        "画面に表示するのではなく、値を呼び出し元へ戻します。",
+        "戻すためのキーワードのあとに、足し算の式を書きます。",
+        "キーワードは5文字で、`-> Int` と宣言した関数から値を出すときに使うものです。そのあとに `a + b` を続けます。"
+      ],
+      "explanation": "`return a + b` と書きます。returnは式を評価して、その値を呼び出し元へ返し、同時に関数を終了させます。`-> Int` と宣言している以上、すべての経路でIntを返す必要があるため、returnを書かないと 'Missing return in a function expected to return Int' になります。足し算は順序を入れ替えても同じ結果なので `return b + a` も正解です。",
+      "detail": {
+        "concept": "return は「この値を答えとして返す」命令です。printは画面に文字を出すだけで、呼び出し元に値は渡りません。",
+        "steps": [
+          "`a + b` が先に評価され、2つの引数の合計が求まる。",
+          "return がその値を呼び出し元へ返す。",
+          "return に到達した時点で関数は終了し、それ以降の行は実行されない。",
+          "呼び出し側は `let sum = add(2, 3)` のように結果を受け取れる。"
+        ],
+        "whyCorrect": "宣言した戻り値の型Intと、返している `a + b` の型Intが一致しているため、コンパイルが通り呼び出し側でも値として使えます。",
+        "commonMistakes": [
+          "`print(a + b)` に置き換えると表示はされますが値は返らず、Missing returnエラーになります。",
+          "`return` だけ書くと、Intを返すべき関数から何も返さないことになりエラーです。"
+        ],
+        "takeaway": "return は「値を返して関数を終える」。printとは役割が違う。",
+        "example": {
+          "code": "func add(_ a: Int, _ b: Int) -> Int {\n    return a + b\n}\nprint(add(10, 5))",
+          "output": "15",
+          "explanation": "返ってきた値がそのままprintに渡されます。"
+        }
+      },
+      "seriesId": "starter-function",
+      "seriesStep": 5
+    },
+    {
+      "id": "practice-starter-036",
+      "track": "starter",
+      "lessonId": "starter-arguments-return",
+      "type": "buildFunction",
+      "difficulty": 3,
+      "title": "割引価格を計算する関数を組み立てる",
+      "prompt": "価格と割引率（%）を受け取り、割引後の価格をIntで返す関数を作ります。必要なブロックだけを選んで並べてください。",
+      "skills": [
+        "functions",
+        "types"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "    return Int(Double(price) * rate)"
+          },
+          {
+            "id": "b2",
+            "code": "func discounted(price: Int, percent: Int) -> Int {"
+          },
+          {
+            "id": "b3",
+            "code": "    let rate = Double(100 - percent) / 100.0"
+          },
+          {
+            "id": "b4",
+            "code": "}"
+          },
+          {
+            "id": "b5",
+            "code": "    let rate = (100 - percent) / 100"
+          },
+          {
+            "id": "b6",
+            "code": "    print(Int(Double(price) * rate))"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b2",
+          "b3",
+          "b1",
+          "b4"
+        ]
+      },
+      "hints": [
+        "割引後の割合は「100 − 割引率」を100で割ったものです。この計算に何型を使うかが鍵になります。",
+        "Int同士の割り算は小数を切り捨てます。割合の計算では致命的です。",
+        "`func discounted(price: Int, percent: Int) -> Int {` で始め、割合をDoubleで計算し、`return Int(Double(price) * rate)` で返します。"
+      ],
+      "explanation": "20%引きなら残りは80%、つまり0.8倍です。この0.8を求めるには小数を扱えるDoubleが必要で、`(100 - percent) / 100` のようにInt同士で割ると80/100が0になり、価格が常に0になってしまいます。Doubleで割合を求め、価格に掛けてからIntへ戻すのが正しい順序です。printの版は値を返さないため 'Missing return' になります。",
+      "detail": {
+        "concept": "「割合の計算はDoubleで、金額の表示はIntで」という使い分けは実務でも頻出です。Intの割り算が切り捨てになることを忘れると、静かに0や誤差が混入します。",
+        "steps": [
+          "`func discounted(price: Int, percent: Int) -> Int {` … 引数ラベル付きで2つ受け取り、Intを返す。",
+          "`let rate = Double(100 - percent) / 100.0` … 割引後の割合。先にDoubleへ変換してから割るのがポイント。percent=20なら 80.0/100.0 = 0.8。",
+          "`return Int(Double(price) * rate)` … 価格をDoubleにして掛け、結果をIntに戻して返す。1000×0.8=800.0 → 800。",
+          "`}` で関数を閉じる。"
+        ],
+        "whyCorrect": "割合をDoubleで求めているため小数が保たれ、掛け算のあとで初めてIntに戻すので誤差が最小限になります。戻り値の型Intとreturnの型Intも一致しています。",
+        "commonMistakes": [
+          "`(100 - percent) / 100` はInt同士なので、80/100 が 0 になります。エラーにならず結果だけが壊れる、発見しにくいバグです。",
+          "printの行を選ぶと表示はされますが値が返らず、関数として使えません。",
+          "Int(...) への変換は切り捨てです。四捨五入したい場合は `Int((Double(price) * rate).rounded())` を使います。"
+        ],
+        "takeaway": "割合はDoubleで計算し、最後にIntへ戻す。Int同士の割り算は切り捨て。",
+        "example": {
+          "code": "func discounted(price: Int, percent: Int) -> Int {\n    let rate = Double(100 - percent) / 100.0\n    return Int(Double(price) * rate)\n}\nprint(discounted(price: 1000, percent: 20), discounted(price: 999, percent: 10))",
+          "output": "800 899",
+          "explanation": "999円の10%引きは899.1なので、Intへの変換で切り捨てられて899になります。"
+        }
+      },
+      "seriesId": "starter-function",
+      "seriesStep": 6
+    },
+    {
+      "id": "practice-starter-037",
+      "track": "starter",
+      "lessonId": "starter-array-index",
+      "type": "fillBlank",
+      "difficulty": 1,
+      "title": "配列の要素を番号で取り出す",
+      "prompt": "配列の2番目の要素「バナナ」を表示するように、空欄を埋めてください。",
+      "skills": [
+        "collections"
+      ],
+      "content": {
+        "template": "let fruits = [\"りんご\", \"バナナ\", \"みかん\"]\nprint(fruits[{{1}}])",
+        "blanks": [
+          {
+            "id": "1",
+            "options": [
+              "1",
+              "2",
+              "0",
+              "3"
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "1": "1"
+        }
+      },
+      "hints": [
+        "配列の番号は0から始まります。",
+        "1番目の要素の番号が0なので、2番目の要素の番号はその次です。",
+        "「りんご」が0番、「バナナ」がその次の番号です。要素は3つなので、使える番号は0から2までです。"
+      ],
+      "explanation": "Swiftの配列は0始まりのインデックスで要素を指します。りんごが0、バナナが1、みかんが2なので、バナナを取り出すには `fruits[1]` と書きます。要素数は3ですが有効な番号は0〜2までで、`fruits[3]` と書くと実行時に 'Index out of range' でクラッシュします。",
+      "detail": {
+        "concept": "インデックス（添字）は「先頭から何個ずらすか」を表す数です。だから先頭は0ずらし、つまり0番になります。この考え方はほとんどのプログラミング言語で共通です。",
+        "steps": [
+          "`fruits` は3つの要素を持つ配列。",
+          "先頭の「りんご」は0番。0個ずらした位置という意味。",
+          "「バナナ」は1個ずらした位置なので1番。",
+          "`fruits[1]` は「バナナ」を返し、printがそれを表示する。"
+        ],
+        "whyCorrect": "0始まりの規則に従うと、2番目の要素のインデックスは1です。範囲内なのでクラッシュもしません。",
+        "commonMistakes": [
+          "「2番目だから2」と書くと「みかん」が表示されます。エラーにならず結果だけ違うので気付きにくい間違いです。",
+          "`fruits[3]` は要素数と同じ番号なので範囲外です。要素数nに対して有効なのは0からn-1までです。"
+        ],
+        "takeaway": "配列は0始まり。要素数nなら有効な番号は0〜n-1。",
+        "example": {
+          "code": "let fruits = [\"りんご\", \"バナナ\", \"みかん\"]\nprint(fruits.count, fruits[fruits.count - 1])",
+          "output": "3 みかん",
+          "explanation": "count は要素数、最後の要素は count - 1 番です。"
+        }
+      },
+      "seriesId": "starter-array",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-starter-038",
+      "track": "starter",
+      "lessonId": "starter-for-in",
+      "type": "reorder",
+      "difficulty": 2,
+      "title": "配列を1つずつ処理するループを組み立てる",
+      "prompt": "配列の要素をすべて表示したあとに「以上です」と表示するコードに並べ替えてください。",
+      "skills": [
+        "collections",
+        "controlFlow"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "}"
+          },
+          {
+            "id": "b2",
+            "code": "print(\"以上です\")"
+          },
+          {
+            "id": "b3",
+            "code": "let names = [\"佐藤\", \"鈴木\"]"
+          },
+          {
+            "id": "b4",
+            "code": "    print(name)"
+          },
+          {
+            "id": "b5",
+            "code": "for name in names {"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b3",
+          "b5",
+          "b4",
+          "b1",
+          "b2"
+        ]
+      },
+      "hints": [
+        "ループの対象になる配列を先に用意します。",
+        "for-in は「配列の要素を1つずつ取り出して、名前を付けて、ブロックの中で使う」構文です。",
+        "配列の用意 → `for name in names {` → `print(name)` → `}` → ループの外で「以上です」の順です。"
+      ],
+      "explanation": "for-in ループは対象の配列が用意されたあとに書きます。`for name in names {` は要素を1つずつ name に入れながらブロックを繰り返す構文で、ブロックの中の `print(name)` が要素数だけ実行されます。`}` の外にある「以上です」は、繰り返しがすべて終わってから1回だけ実行されます。",
+      "detail": {
+        "concept": "for-in は「集まりの中身を順番に取り出す」構文です。取り出した1件分を受け取る名前（ここではname）は、ループのたびに新しい値になります。",
+        "steps": [
+          "`let names = [\"佐藤\", \"鈴木\"]` で2要素の配列を用意する。",
+          "`for name in names {` … 1回目は name に \"佐藤\" が入る。",
+          "`print(name)` … 佐藤を出力。ブロックの終わりまで来たら次の要素へ。",
+          "2回目は name が \"鈴木\" になり、鈴木を出力。要素が尽きたらループ終了。",
+          "`print(\"以上です\")` はループの外なので最後に1回だけ実行される。"
+        ],
+        "whyCorrect": "配列の準備・ループの開始・本体・閉じかっこ・ループ後の処理という依存順に並んでいるためです。出力は佐藤、鈴木、以上ですの3行になります。",
+        "commonMistakes": [
+          "「以上です」を `}` の内側に入れると要素ごとに表示され、2回出てしまいます。",
+          "配列の宣言をforより後ろに置くと、ループの時点でnamesが存在せずスコープエラーになります。"
+        ],
+        "takeaway": "for-in は「1件ずつ取り出す」。ループの外の行は繰り返されない。",
+        "example": {
+          "code": "let names = [\"佐藤\", \"鈴木\"]\nfor (index, name) in names.enumerated() {\n    print(index, name)\n}",
+          "output": "0 佐藤\n1 鈴木",
+          "explanation": "番号も一緒に欲しいときは enumerated() を使います。"
+        }
+      },
+      "seriesId": "starter-array",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-starter-039",
+      "track": "starter",
+      "lessonId": "starter-for-in",
+      "type": "fillBlank",
+      "difficulty": 2,
+      "title": "合計を求めるループを完成させる",
+      "prompt": "配列の合計を求めるコードになるよう、空欄を埋めてください。",
+      "skills": [
+        "collections",
+        "controlFlow"
+      ],
+      "content": {
+        "template": "let scores = [10, 20, 30]\n{{1}} total = 0\nfor score {{2}} scores {\n    total {{3}} score\n}\nprint(total)",
+        "blanks": [
+          {
+            "id": "1",
+            "options": [
+              "var",
+              "let",
+              "func",
+              "if"
+            ]
+          },
+          {
+            "id": "2",
+            "options": [
+              "in",
+              "of",
+              "from",
+              "as"
+            ]
+          },
+          {
+            "id": "3",
+            "options": [
+              "+=",
+              "==",
+              "=",
+              "-="
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "1": "var",
+          "2": "in",
+          "3": "+="
+        }
+      },
+      "hints": [
+        "合計を入れる箱は、ループのたびに中身が増えていきます。",
+        "for文で配列から1件ずつ取り出す部分には、決まったキーワードが入ります。",
+        "3つ目の空欄は「今の値に足して入れ直す」複合代入演算子です。`total = total + score` と同じ意味の短い書き方があります。"
+      ],
+      "explanation": "合計を貯める total はループのたびに書き換わるので var で宣言します。for文の要素取り出しは `for 要素 in 配列` という形です。`+=` は `total = total + score` の短い書き方で、10・20・30が順に足されて60が出力されます。`=` にすると毎回上書きされ、最後の要素30だけが残ってしまいます。",
+      "detail": {
+        "concept": "合計や個数を数えるコードは「初期値0の変数を用意 → ループで更新 → ループ後に使う」という決まった形をしています。この形を覚えると多くの集計処理が書けます。",
+        "steps": [
+          "`var total = 0` … 合計の出発点。letだと更新できない。",
+          "`for score in scores {` … 要素を1つずつ score に取り出す。",
+          "`total += score` … 1回目 0+10=10、2回目 10+20=30、3回目 30+60… ではなく 30+30=60。",
+          "ループ終了後、total は 60。printが60を出力する。"
+        ],
+        "whyCorrect": "varで宣言したtotalを += で更新しているため、各要素が積み上がります。ループの外でprintしているので、最終結果の60が1回だけ表示されます。",
+        "commonMistakes": [
+          "`total = score` と書くと毎回上書きされ、最後の要素30が結果になります。エラーが出ないぶん厄介です。",
+          "`let total = 0` にすると `total += score` の時点で 'Left side of mutating operator isn't mutable' になります。"
+        ],
+        "takeaway": "集計は「var で0を用意 → ループで += → ループ後に使う」。= と += の違いに注意。",
+        "example": {
+          "code": "let scores = [10, 20, 30]\nprint(scores.reduce(0, +))",
+          "output": "60",
+          "explanation": "同じ集計は reduce でも書けます。まずforで仕組みを理解してから、短い書き方に移るのがおすすめです。"
+        }
+      },
+      "seriesId": "starter-array",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-starter-040",
+      "track": "starter",
+      "lessonId": "starter-array-index",
+      "type": "bugHunt",
+      "difficulty": 3,
+      "title": "範囲外アクセスの原因になる行を見つける",
+      "prompt": "このコードは実行するとクラッシュします。原因になっている行を選んでください。",
+      "skills": [
+        "collections",
+        "debugging"
+      ],
+      "content": {
+        "lines": [
+          {
+            "id": "l1",
+            "code": "let items = [\"A\", \"B\", \"C\"]"
+          },
+          {
+            "id": "l2",
+            "code": "var index = 0"
+          },
+          {
+            "id": "l3",
+            "code": "while index <= items.count {"
+          },
+          {
+            "id": "l4",
+            "code": "    print(items[index])"
+          },
+          {
+            "id": "l5",
+            "code": "    index += 1"
+          },
+          {
+            "id": "l6",
+            "code": "}"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "l3",
+        "fixedCode": "let items = [\"A\", \"B\", \"C\"]\nvar index = 0\nwhile index < items.count {\n    print(items[index])\n    index += 1\n}"
+      },
+      "hints": [
+        "要素数と、使える最大の番号は同じではありません。",
+        "countは3ですが、有効なインデックスは0・1・2です。ループの続行条件を確かめてください。",
+        "クラッシュするのは `items[index]` の行ですが、indexが3まで進んでしまう原因は別の行にあります。ループを止める条件を見てください。"
+      ],
+      "explanation": "3行目の `while index <= items.count` が原因です。countは3なのでindexが3のときも条件がtrueになり、4周目で `items[3]` を評価して 'Fatal error: Index out of range' でクラッシュします。クラッシュが起きるのは4行目ですが、直すべきは条件を `<` にする3行目です。要素数nの配列で有効な番号は0からn-1までです。",
+      "detail": {
+        "concept": "「クラッシュした行」と「バグのある行」は別であることがよくあります。境界条件（off-by-oneエラー）は、条件式そのものを疑うのが定石です。",
+        "steps": [
+          "index=0,1,2 のときは items[0], items[1], items[2] が正常に取れる。",
+          "index=3 のとき、`3 <= 3` はtrueなのでループに入ってしまう。",
+          "`items[3]` は存在しないため実行時エラー 'Index out of range' でプログラムが停止する。",
+          "条件を `index < items.count` にすれば index=3 でループが終わり、クラッシュしない。"
+        ],
+        "whyCorrect": "配列の有効なインデックスは 0 から count-1 までです。ループ条件を `<` にすることで、ちょうどその範囲だけを回せます。",
+        "commonMistakes": [
+          "4行目の `print(items[index])` を犯人だと考えると、`if index < items.count` を足すような遠回りな修正になります。条件式そのものを直すのが正解です。",
+          "`for item in items` で書けば、そもそもインデックスを扱わずに済み、この種のバグが起こりません。"
+        ],
+        "takeaway": "配列の範囲外アクセスはコンパイルではなく実行時に落ちる。ループ条件は `< count` が基本。",
+        "example": {
+          "code": "let items = [\"A\", \"B\", \"C\"]\nfor item in items {\n    print(item)\n}",
+          "output": "A\nB\nC",
+          "explanation": "for-inならインデックス計算そのものが不要になり、範囲外アクセスの余地がありません。"
+        }
+      },
+      "seriesId": "starter-array",
+      "seriesStep": 4
+    },
+    {
+      "id": "practice-starter-041",
+      "track": "starter",
+      "lessonId": "starter-array-index",
+      "type": "repair",
+      "difficulty": 3,
+      "title": "空配列でも落ちないように直す",
+      "prompt": "配列が空のときにクラッシュしないよう、2行目を置き換える書き方を選んでください。",
+      "skills": [
+        "collections",
+        "debugging",
+        "optional"
+      ],
+      "content": {
+        "code": "let items: [String] = []\nlet first = items[0]\nprint(first)",
+        "options": [
+          {
+            "id": "o1",
+            "code": "let first = items.first ?? \"なし\""
+          },
+          {
+            "id": "o2",
+            "code": "let first = items[0] ?? \"なし\""
+          },
+          {
+            "id": "o3",
+            "code": "let first = items.first!"
+          },
+          {
+            "id": "o4",
+            "code": "let first = items.count > 0"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1",
+        "fixedCode": "let items: [String] = []\nlet first = items.first ?? \"なし\"\nprint(first)"
+      },
+      "hints": [
+        "空の配列には0番の要素すらありません。存在しないかもしれない先頭要素を、安全に取る方法があります。",
+        "配列には「先頭要素をOptionalで返す」プロパティがあります。無ければnilが返ります。",
+        "`items.first` は String? を返します。nilのときの代わりの値を ?? で指定すれば、空でも落ちません。"
+      ],
+      "explanation": "`items[0]` は要素が無ければ 'Index out of range' で必ずクラッシュします。`items.first` は先頭要素をOptional（String?）で返し、空配列ならnilになるため、?? で代わりの値を指定すれば安全です。`items.first!` は強制アンラップなので空配列ではやはりクラッシュし、`items.count > 0` はBoolなので文字列として使えません。",
+      "detail": {
+        "concept": "添字アクセスは「そこに必ずある」という前提の操作です。前提が崩れうる場面では、Optionalを返す安全なAPI（first / last / indices）を使います。",
+        "steps": [
+          "`items` は空配列なので count は 0、有効なインデックスは存在しない。",
+          "`items[0]` は範囲外アクセスとなり実行時にクラッシュする。コンパイルは通ってしまう点に注意。",
+          "`items.first` は Optional を返す設計なので、空なら nil。",
+          "`?? \"なし\"` によって nil のときの値が決まり、first は必ず String になる。"
+        ],
+        "whyCorrect": "first がOptionalを返すことで「空かもしれない」状態が型に現れ、?? でその場で解決しています。結果としてクラッシュ経路が存在しなくなります。",
+        "commonMistakes": [
+          "`items[0] ?? \"なし\"` は書けません。添字は非Optionalを返すため ?? の対象になれず、そもそもクラッシュが先に起きます。",
+          "`items.first!` は「絶対にある」と断言する書き方で、空配列という今回の前提と矛盾します。",
+          "`items.count > 0` はBoolなので、Stringを期待する first に代入すると型エラーです。"
+        ],
+        "takeaway": "添字は前提が崩れると落ちる。空かもしれないなら first / last とOptionalで受ける。",
+        "example": {
+          "code": "let items: [String] = []\nprint(items.first ?? \"なし\")\nprint([\"A\"].first ?? \"なし\")",
+          "output": "なし\nA",
+          "explanation": "同じ書き方で、空のときも要素があるときも安全に動きます。"
+        }
+      },
+      "seriesId": "starter-array",
+      "seriesStep": 5
+    },
+    {
+      "id": "practice-starter-042",
+      "track": "starter",
+      "lessonId": "starter-for-in",
+      "type": "shortCode",
+      "difficulty": 3,
+      "title": "合計に足し込む1行を書く",
+      "prompt": "ループの中で、今の合計 total に score を足し込む1行を書いてください。",
+      "skills": [
+        "collections",
+        "controlFlow"
+      ],
+      "content": {
+        "context": "let scores = [10, 20, 30]\nvar total = 0\nfor score in scores {\n    // ここに1行書く\n}\nprint(total)",
+        "placeholder": "例: total ○○ score"
+      },
+      "solution": {
+        "accepted": [
+          "total += score",
+          "total = total + score",
+          "total = score + total"
+        ]
+      },
+      "hints": [
+        "今の合計を捨てずに、新しい値を積み上げます。",
+        "`total = total + score` と同じ意味を、短く書く複合代入演算子があります。",
+        "記号は2文字で、足し算の記号と代入の記号を並べたものです。`total` と `score` の間に置きます。"
+      ],
+      "explanation": "`total += score` と書きます。これは `total = total + score` の短縮形で、現在のtotalにscoreを足した結果をtotalに入れ直します。10・20・30が順に加算され、ループ後のtotalは60になります。`total = score` と書くと毎回上書きされ、最後の30だけが残ります。",
+      "detail": {
+        "concept": "+= のような複合代入演算子は「読み出して、計算して、書き戻す」を1つの記号で表します。集計処理では毎回この形が登場します。",
+        "steps": [
+          "1回目: score=10。total は 0+10 で 10 になる。",
+          "2回目: score=20。total は 10+20 で 30 になる。",
+          "3回目: score=30。total は 30+30 で 60 になる。",
+          "ループ終了後、print(total) が 60 を出力する。"
+        ],
+        "whyCorrect": "現在のtotalを右辺で使ってから代入し直しているため、値が累積します。totalがvarで宣言されているので再代入も合法です。",
+        "commonMistakes": [
+          "`total = score` は累積せず上書きになり、結果は最後の要素の値になります。",
+          "`total + score` とだけ書くと計算結果が捨てられ、'Result of operator + is unused' という警告になります。代入が必要です。"
+        ],
+        "takeaway": "累積は `+=`。単なる `=` は上書き、計算だけでは何も残らない。",
+        "example": {
+          "code": "let scores = [10, 20, 30]\nvar total = 0\nfor score in scores {\n    total += score\n}\nprint(total)",
+          "output": "60",
+          "explanation": "合計処理の定型です。個数を数えるなら count += 1 と同じ形になります。"
+        }
+      },
+      "seriesId": "starter-array",
+      "seriesStep": 6
+    }
+  ]
 }
