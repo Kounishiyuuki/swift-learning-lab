@@ -4495,7 +4495,7 @@
         "takeaway": "個数で考えるなら `..<`、終端の値で考えるなら `...`。",
         "example": {
           "code": "for i in 0..<5 { print(i, terminator: \" \") }\nprint()\nfor i in 0...4 { print(i, terminator: \" \") }",
-          "output": "0 1 2 3 4 \n0 1 2 3 4",
+          "output": "0 1 2 3 4 \n0 1 2 3 4 ",
           "explanation": "2つの書き方が同じ列を生むことを、横並びの出力で確認できます。"
         }
       },
