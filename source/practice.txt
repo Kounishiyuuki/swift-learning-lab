@@ -1,6 +1,6 @@
 # 実装練習 (practice)
 
-実装練習 246問。編集元は source/practice.json です。このTXTは生成物です.
+実装練習 273問。編集元は source/practice.json です。このTXTは生成物です.
 
 ## Swift Starter（42問）
 
@@ -8684,5 +8684,1067 @@ print(apiKey ?? "（未設定）")
 - 関連例の出力: （未設定）
 - 関連例の説明: 設定されていない環境変数を読むと nil が返るため、?? による既定値の指定がそのまま使えます。
 - 覚えておくこと: 鍵はコードに書かず環境から読む。履歴に入った鍵は無効化して作り直す。
+
+---
+
+## SwiftUI（27問）
+
+### practice-swiftui-001 いちばん小さいViewを並べ替える [並べ替え / Lv1 ガイド]
+対象レッスン: swiftui-view-declarative
+シリーズ: swiftui-view (1段階目)
+スキル: swiftui, syntax
+問題: 文字を1つ表示するだけの View です。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+struct GreetingView: View {
+    var body: some View {
+        Text("こんにちは")
+    }
+}
+```
+ヒント1: いちばん外側は「この型は View である」と宣言している行です。
+ヒント2: body は View の中に置かれるプロパティです。表示内容はさらにその中に書きます。
+ヒント3: 閉じかっこは、内側で開いたものから順に閉じていきます。
+解説: 正しい順は「struct 宣言 → body プロパティ → Text → body を閉じる → struct を閉じる」です。SwiftUI の View は、`View` プロトコルに準拠した struct として書きます。準拠するために必ず必要なのが `body` プロパティで、ここに「何を表示するか」を書きます。`some View` は「View プロトコルに準拠した何らかの具体的な型」という意味で、Text なのか VStack なのかを毎回書かなくて済むようにするための記法です。かっこは内側から順に閉じるため、body を閉じる `}` が先、struct を閉じる `}` が後になります。この入れ子構造が SwiftUI のすべての View の土台です。
+- 使っている考え方: SwiftUI の View は「画面の状態を表す値」です。命令を並べて画面を作るのではなく、`body` に「今どう見えるべきか」を書くと、SwiftUI がその通りに描画します。
+- 手順: `struct GreetingView: View {` … View プロトコルに準拠した型を宣言する。
+- 手順: `var body: some View {` … 準拠に必要なプロパティ。表示内容を返す。
+- 手順: `Text("こんにちは")` … body が返す View 本体。
+- 手順: `}` … body を閉じる。
+- 手順: `}` … struct を閉じる。
+- 動く理由: 型の宣言の中に body があり、body の中に表示内容があるという入れ子が守られています。かっこも内側から順に閉じているため、構文として成立します。
+- よくある間違い: body を書き忘れる間違いです。View プロトコルの要求を満たさないため、コンパイルエラーになります。
+- よくある間違い: class で View を作ろうとする間違いです。SwiftUI の View は値として扱われるため struct にします。
+- よくある間違い: 閉じかっこの順序を入れ替える間違いです。body より先に struct を閉じると構造が壊れます。
+- 関連例:
+```swift
+protocol Renderable { var body: String { get } }
+struct GreetingView: Renderable {
+    var body: String { "こんにちは" }
+}
+print(GreetingView().body)
+```
+- 関連例の出力: こんにちは
+- 関連例の説明: SwiftUI の View も構造はこれと同じで、body が「表示すべき内容」を返します。
+- 覚えておくこと: View は struct + body。表示内容は body の中に書く。
+
+### practice-swiftui-002 Viewの宣言を完成させる [穴埋め / Lv1 ガイド]
+対象レッスン: swiftui-view-declarative
+シリーズ: swiftui-view (2段階目)
+スキル: swiftui, syntax, protocols
+問題: 名前を表示する View の定義です。空欄を埋めてください。
+埋めたあと:
+```swift
+struct NameLabel: View {
+    let name: String
+
+    var body: some View {
+        Text(name)
+    }
+}
+```
+ヒント1: 1つ目は、SwiftUI が「これは画面部品だ」と判断するためのプロトコル名です。
+ヒント2: 2つ目は戻り値の型で、具体的な型名を書かずに済ませる書き方を使います。
+ヒント3: UIKit の型名は SwiftUI の View 宣言には登場しません。
+解説: 1つ目は `View` です。SwiftUI の画面部品は View プロトコルに準拠することで初めて画面に置けるようになります。2つ目は `some View` です。これは opaque return type（不透明な戻り値型）という機能で、「View に準拠した何か1つの具体的な型を返す」という意味になります。実際の body の型は Text や `ModifiedContent<Text, ...>` のように modifier を足すたびに変化する複雑な型ですが、`some View` と書けばその型名を人が書く必要がありません。`any View` でもコンパイルは通りますが、こちらは実行時に型を包む仕組み（existential）になるため、SwiftUI が型情報を使って行う差分更新の最適化が効きにくくなります。`Text` と具体的に書いてしまうと、あとから `.padding()` を足しただけで型が変わり、宣言を書き直す必要が出ます。
+- 使っている考え方: `some View` は「型は1つに決まっているが、その名前をここには書かない」という宣言です。呼び出し側からは具体的な型が隠れ、実装側は自由に型を変えられます。
+- 手順: `: View` … このstructがSwiftUIの画面部品であることを宣言する。
+- 手順: `var body: some View` … View に準拠した具体的な型を1つ返すと宣言する。
+- 手順: body の実装が Text を返すので、実際の型は Text に決まる。
+- 手順: `.padding()` を足すと実際の型は変わるが、宣言は some View のままでよい。
+- 動く理由: View プロトコルへの準拠と、body の戻り値を some View にする組み合わせが、SwiftUI の View 定義の標準形です。型名を書かずに済むため、modifier の追加で宣言を壊しません。
+- よくある間違い: `var body: Text` と具体的に書く間違いです。modifier を1つ足しただけで型が変わり、コンパイルエラーになります。
+- よくある間違い: `any View` を常用する間違いです。動きはしますが、型情報が失われて更新の最適化が働きにくくなります。
+- よくある間違い: View プロトコルへの準拠を書き忘れる間違いです。body があっても画面には置けません。
+- 関連例:
+```swift
+protocol Shape { func area() -> Double }
+struct Circle: Shape { let r: Double; func area() -> Double { 3.14 * r * r } }
+func makeShape() -> some Shape { Circle(r: 2) }
+print(makeShape().area())
+```
+- 関連例の出力: 12.56
+- 関連例の説明: some Shape は「Shape に準拠した具体的な型を1つ返す」意味です。呼び出し側は Circle という名前を知らずに使えます。
+- 覚えておくこと: View に準拠し、body は some View で返す。
+
+### practice-swiftui-003 SwiftUIの用語を対応づける [対応づけ / Lv2 基本]
+対象レッスン: swiftui-view-declarative
+スキル: swiftui, syntax
+問題: SwiftUI でよく出てくる用語と、その役割を対応づけてください。
+対応:
+- body → この View が今どう見えるべきかを返すプロパティ
+- modifier（.padding など） → 既存の View を包んで、見た目や配置を変えた新しい View を返す
+- ViewBuilder → かっこの中に並べた複数の View を1つにまとめる仕組み
+- @State → View 自身が持つ、変化すると再描画のきっかけになる値
+ヒント1: 「返すもの」に注目すると、body と modifier の違いがはっきりします。
+ヒント2: VStack の中に Text を2つ並べただけで動くのは、ある仕組みのおかげです。
+ヒント3: 再描画のきっかけになるのは、値を持つものだけです。
+解説: `body` は「今どう見えるべきか」を返すプロパティで、View プロトコルが要求する唯一のメンバーです。modifier は `.padding()` のように既存の View に対して呼ぶメソッドで、元の View を変更するのではなく、それを包んだ新しい View を返します。だから呼ぶ順番によって結果が変わります。ViewBuilder は、VStack のかっこの中に Text を複数並べただけで動く仕組みで、並べた View を1つにまとめて返す result builder です。`@State` は View 自身が持つ値で、変化すると SwiftUI が body を呼び直して画面を更新します。「画面遷移のたびに View を破棄して作り直す命令」というものは SwiftUI には存在しません。View は必要に応じて何度も作り直される軽い値なので、破棄を明示する仕組み自体が不要です。
+- 使っている考え方: SwiftUI の中心にあるのは「View は状態から計算される値である」という考え方です。body が計算、@State が入力、modifier が変換、ViewBuilder が組み立てを担当します。
+- 手順: @State が変化する → SwiftUI が変化を検知する。
+- 手順: body が呼び直され、新しい View の構造が計算される。
+- 手順: ViewBuilder が並べた View をまとめ、modifier が包んだ結果を含めて確定する。
+- 手順: SwiftUI が前回との差分だけを実際の描画に反映する。
+- 動く理由: 4つの用語は「値を持つ／計算する／変換する／まとめる」という役割で互いに重ならないため、それぞれ1つの説明に対応します。破棄の命令だけはSwiftUIの考え方に存在しません。
+- よくある間違い: modifier が元の View を書き換えると考える間違いです。新しい View を返すため、呼ぶ順番が結果に影響します。
+- よくある間違い: body を「一度だけ実行される初期化処理」と考える間違いです。状態が変わるたびに何度でも呼ばれます。
+- よくある間違い: body の中に重い計算を書く間違いです。何度も呼ばれる前提なので、計算はモデル側に置きます。
+- 関連例:
+```swift
+struct Box { let text: String; let padded: Bool }
+func padding(_ b: Box) -> Box { Box(text: b.text, padded: true) }
+let original = Box(text: "Hi", padded: false)
+let modified = padding(original)
+print(original.padded, modified.padded)
+```
+- 関連例の出力: false true
+- 関連例の説明: modifier は元の値を変えず、新しい値を返します。original が false のままである点が重要です。
+- 覚えておくこと: body は計算、modifier は変換、@State は入力。View は何度でも作り直される。
+
+### practice-swiftui-004 余白の内側に色を敷く順番に並べ替える [並べ替え / Lv2 基本]
+対象レッスン: swiftui-layout-modifiers
+シリーズ: swiftui-layout (1段階目)
+スキル: swiftui
+問題: 文字の周囲に余白をとり、その余白の内側までを黄色く塗り、さらに全体の外側に余白をとります。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+Text("合計")
+    .padding(16)
+    .background(Color.yellow)
+    .padding(8)
+```
+ヒント1: modifier は上から順に、直前までの結果を包んでいきます。
+ヒント2: 背景色は、その時点で確定しているサイズに対して敷かれます。
+ヒント3: 同じ padding が2つあります。塗りたい範囲に含まれるのはどちらでしょうか。
+解説: 正しい順は「Text → .padding(16) → .background(Color.yellow) → .padding(8)」です。modifier は書いた順に、それまでの結果を包んだ新しい View を作ります。まず Text の周囲に16ポイントの余白を足すと、その余白を含んだ大きさの View になります。次に `.background` を呼ぶと、その時点で確定しているサイズ、つまり文字＋16ポイントの余白の範囲が黄色く塗られます。最後の `.padding(8)` は塗られた矩形のさらに外側に余白を作るため、この8ポイント分は塗られません。順番を入れ替えて `.background` を先に書くと、文字の大きさぴったりにだけ色が付き、余白部分は塗られない別の見た目になります。「どこまで塗るか」を決めているのは色の指定ではなく、その直前までに適用された modifier だという点が要点です。
+- 使っている考え方: SwiftUI の modifier は、元の View を書き換えるのではなく「包む」操作です。そのため適用順が、そのまま入れ子の内側から外側への順序になります。
+- 手順: `Text("合計")` … 文字の大きさぴったりの View。
+- 手順: `.padding(16)` … 周囲に16の余白を加えた、ひとまわり大きい View になる。
+- 手順: `.background(Color.yellow)` … その時点の大きさ（文字＋16）を黄色で塗る。
+- 手順: `.padding(8)` … 黄色い矩形の外側に8の余白を置く。ここは塗られない。
+- 動く理由: 要件が「余白の内側まで塗る」なので、padding を background より前に置く必要があります。外側の余白は塗られてはいけないので、background のあとに置きます。
+- よくある間違い: `.background` を先に書く間違いです。文字の大きさにだけ色が付き、余白は背景色になりません。
+- よくある間違い: modifier の順序を「どれも見た目の指定だから同じ」と考える間違いです。包む順序が結果を決めます。
+- よくある間違い: 余白を空の Spacer や改行で作ろうとする間違いです。サイズが文字数に依存して崩れます。
+- 関連例:
+```swift
+var width = 40.0
+print("Text:", width)
+width += 16 * 2
+print("padding(16)後:", width, "→ この幅が塗られる")
+width += 8 * 2
+print("padding(8)後:", width, "→ 外側8は塗られない")
+```
+- 関連例の出力: Text: 40.0
+padding(16)後: 72.0 → この幅が塗られる
+padding(8)後: 88.0 → 外側8は塗られない
+- 関連例の説明: background が塗る範囲は、それが呼ばれた時点の幅で決まります。あとから足した padding は含まれません。
+- 覚えておくこと: modifier は書いた順に包む。background は直前までのサイズを塗る。
+
+### practice-swiftui-005 modifierの順序による見た目の違いを追う [実行追跡 / Lv2 基本]
+対象レッスン: swiftui-layout-modifiers
+シリーズ: swiftui-layout (2段階目)
+スキル: swiftui
+問題: 2つの View を並べました。見た目はどう違いますか。
+正解: A は 120×44 全体が青くなり、B は文字の大きさぶんだけ青くなって、その青い部分が 120×44 の領域の中央に置かれる
+ヒント1: background が塗るのは「その時点で確定しているサイズ」です。
+ヒント2: frame は View に希望のサイズを与えて、その領域の中に元の内容を配置します。
+ヒント3: 順番が違えば、background が見ているサイズも違います。
+解説: A では `.frame(width:height:)` が先に適用されるため、その時点で View のサイズが 120×44 に確定します。続く `.background` はそのサイズを塗るので、120×44 の矩形全体が青くなります。B では `.background` が先に呼ばれ、このとき確定しているのは文字の大きさだけなので、"OK" の文字にぴったりの範囲だけが青くなります。そのあとの `.frame` は、青くなった小さな View を 120×44 の領域の中に配置します。frame は既定で中央に配置するため、120×44 の透明な領域の真ん中に、小さな青い矩形が置かれた見た目になります。frame が無視されるわけではなく、B でも View 全体の大きさは 120×44 になります。違うのは「青い範囲」だけです。
+- 使っている考え方: SwiftUI のレイアウトは、内側の View が自分の必要なサイズを提案し、外側の modifier がそれを加工していく流れで決まります。modifier の位置は、この流れのどの段階に割り込むかを意味します。
+- 手順: A: Text が「文字ぶんの大きさ」を提案する。
+- 手順: A: frame がサイズを 120×44 に上書きする。
+- 手順: A: background が 120×44 を塗る。
+- 手順: B: Text が「文字ぶんの大きさ」を提案する。
+- 手順: B: background が文字ぶんのサイズを塗る。
+- 手順: B: frame が、塗られた小さい View を 120×44 の領域に中央配置する。
+- 動く理由: background が塗る対象は常に「直前までに確定したサイズ」です。A では frame 適用後、B では Text のままなので、塗られる範囲だけが異なります。どちらも最終的な View の大きさは 120×44 です。
+- よくある間違い: frame と background の順序は結果に影響しないと考える間違いです。ボタンの当たり判定や見た目が意図と変わります。
+- よくある間違い: B の見た目を直すのに文字を長くして調整する間違いです。文言が変わるたびに崩れます。
+- よくある間違い: 背景を敷きたい範囲を frame ではなく Spacer で作ろうとする間違いです。親のレイアウトによって結果が変わります。
+- 関連例:
+```swift
+let textSize = (w: 28.0, h: 20.0)
+let frameSize = (w: 120.0, h: 44.0)
+print("A の青い範囲:", frameSize)
+print("B の青い範囲:", textSize)
+print("A も B も View 全体の大きさ:", frameSize)
+```
+- 関連例の出力: A の青い範囲: (w: 120.0, h: 44.0)
+B の青い範囲: (w: 28.0, h: 20.0)
+A も B も View 全体の大きさ: (w: 120.0, h: 44.0)
+- 関連例の説明: 全体の大きさは同じで、塗られる範囲だけが違う、という関係が整理できます。
+- 覚えておくこと: サイズを決めてから塗る。frame → background の順が「全体を塗る」形。
+
+### practice-swiftui-006 左右に寄せる行レイアウトを組む [ブロック選択 / Lv2 基本]
+対象レッスン: swiftui-layout-modifiers
+スキル: swiftui
+問題: 1行の中で、ラベルを左端に、金額を右端に配置します。必要なブロックだけを正しい順に選んでください。不要なブロックが混ざっています。
+使うブロック:
+- HStack {
+-     Text("合計")
+-     Spacer()
+-     Text("¥1,200")
+- }
+ヒント1: 「1行の中で左右に」と言っているので、要素を横に並べるコンテナを選びます。
+ヒント2: 余った幅を吸収して2つを押し広げる部品が1つあります。
+ヒント3: 空白文字で位置を調整する方法は、文字数や画面幅が変わると崩れます。
+解説: 必要なのは HStack、ラベルの Text、Spacer、金額の Text、閉じかっこの5つです。`HStack` は子を横一列に並べるコンテナで、「1行の中で」という要件に合致します。`Spacer()` は「使える限りの幅を占有する」という性質を持つ View で、2つの Text の間に置くと余った幅をすべて吸収し、結果として左右の要素が両端まで押し広げられます。画面幅が変わっても、金額の桁数が変わっても、Spacer が吸収する量が自動的に変わるだけなので配置が崩れません。`VStack` は子を縦に並べるため、この要件では使いません。空白だけの `Text("          ")` で位置を調整する方法は、フォントや文字幅、画面サイズが変わるたびにずれるうえ、読み上げにも空の要素として現れるためアクセシビリティ上も好ましくありません。
+- 使っている考え方: SwiftUI のレイアウトは「余った空間を誰が取るか」で決まります。Spacer は余白を数値で指定する代わりに、余りをすべて引き受ける役割を担う View です。
+- 手順: `HStack { }` … 子を横一列に並べる。
+- 手順: `Text("合計")` … 必要な幅だけを主張する。
+- 手順: `Spacer()` … 残りの幅をすべて取る。
+- 手順: `Text("¥1,200")` … 必要な幅だけを主張する。
+- 手順: 結果として、2つの Text が両端に押し出される。
+- 動く理由: 固定値ではなく「余りを取る」という相対的な指定なので、画面幅や文字数が変わっても両端揃えという意図が保たれます。
+- よくある間違い: 空白文字や固定 padding で位置を合わせる間違いです。端末サイズや文字数が変わると崩れます。
+- よくある間違い: Spacer を両端にも置いてしまう間違いです。左右にも余白が入り、両端揃えになりません。
+- よくある間違い: VStack を使ってしまう間違いです。縦に並ぶため、1行に収まりません。
+- 関連例:
+```swift
+let total = 200.0
+let left = 40.0
+let right = 60.0
+let spacer = total - left - right
+print("左:", left, "Spacer:", spacer, "右:", right)
+```
+- 関連例の出力: 左: 40.0 Spacer: 100.0 右: 60.0
+- 関連例の説明: Spacer の幅は指定するものではなく、全体から他の要素を引いた残りとして決まります。
+- 覚えておくこと: 両端揃えは HStack + Spacer。空白文字で位置を作らない。
+
+### practice-swiftui-007 タップできる範囲が狭いボタンの原因を見つける [バグ発見 / Lv3 実装]
+対象レッスン: swiftui-layout-modifiers
+スキル: swiftui, debugging
+問題: 行全体をタップできるようにしたつもりですが、実際には文字の上しか反応しません。原因となっている行を1つ選んでください。
+問題のある行: .onTapGesture { openSettings() }
+ヒント1: 幅は広がっているのに反応しないので、原因は幅の指定ではありません。
+ヒント2: SwiftUI が当たり判定に使う形は、描画されている中身から決まります。
+ヒント3: Spacer や透明な領域は、既定では当たり判定を持ちません。
+解説: 問題は6行目の `.onTapGesture` で、当たり判定の形を指定しないままジェスチャーを付けていることです。`.frame(maxWidth: .infinity)` によって View の幅は行いっぱいに広がりますが、SwiftUI がタップ判定に使う形（contentShape）は既定では「実際に描画されている中身」から作られます。HStack の中で描画されているのは Text だけで、Spacer が占める領域は透明なため判定に含まれません。その結果、幅は広いのに反応するのは文字の上だけ、という状態になります。修正は `.contentShape(Rectangle())` を onTapGesture の直前に挟むことです。これは「この View の当たり判定は、この矩形全体とみなす」という指定で、frame で広げた領域全体がタップに反応するようになります。1〜5行目は配置としては正しく、幅も意図どおり広がっているため、原因ではありません。
+- 使っている考え方: SwiftUI では「描画される形」と「タップ判定に使う形」が別々に扱われます。既定では描画内容から判定形状が導かれるため、透明な領域は反応しません。
+- 手順: `.frame(maxWidth: .infinity)` … View の占める領域は行いっぱいに広がる。
+- 手順: しかし描画されているのは Text の部分だけ。
+- 手順: 既定の contentShape は描画内容から作られるため、透明部分は判定外。
+- 手順: `.contentShape(Rectangle())` … 判定形状を矩形全体に置き換える。
+- 手順: 以後、`.onTapGesture` は広がった領域全体で反応する。
+- 動く理由: 幅は既に広がっているので、不足しているのは判定形状の指定だけです。contentShape を挟むと、レイアウトを変えずに反応範囲だけを意図どおりにできます。
+- よくある間違い: 背景に `.background(Color.clear)` を敷いて解決しようとする間違いです。clear は描画されないため判定は広がりません。
+- よくある間違い: Spacer を Color.white に置き換える対応です。判定は広がりますが、ダークモードで背景が白く残ります。
+- よくある間違い: Text 側に padding を足して当たり判定を広げる間違いです。行幅に追従せず、端末サイズによって隙間が残ります。
+- 関連例:
+```swift
+let frameWidth = 375.0
+let drawnWidth = 90.0
+print("レイアウト上の幅:", frameWidth)
+print("既定の当たり判定:", drawnWidth)
+print("contentShape(Rectangle())後:", frameWidth)
+```
+- 関連例の出力: レイアウト上の幅: 375.0
+既定の当たり判定: 90.0
+contentShape(Rectangle())後: 375.0
+- 関連例の説明: レイアウト幅と判定幅が別々の数値である、という点がこのバグの本質です。
+- 覚えておくこと: 透明な領域はタップに反応しない。contentShape(Rectangle()) で判定形状を指定する。
+
+### practice-swiftui-008 カウンターの状態宣言を完成させる [穴埋め / Lv1 ガイド]
+対象レッスン: swiftui-state-binding
+シリーズ: swiftui-state (1段階目)
+スキル: swiftui, syntax
+問題: ボタンを押すと数が増えるカウンターです。空欄を埋めてください。
+埋めたあと:
+```swift
+struct CounterView: View {
+    @State private var count = 0
+
+    var body: some View {
+        VStack {
+            Text("\(count)")
+            Button("+1") {
+                count += 1
+            }
+        }
+    }
+}
+```
+ヒント1: この View 自身が持ち、変化したら再描画したい値です。親から渡される値ではありません。
+ヒント2: 値そのものを読み書きするときは、記号を付けない書き方を使います。
+ヒント3: $ を付けた形が必要になるのは、別の場所へ「書き換える権利」を渡すときです。
+解説: 1つ目は `@State` です。View は struct なので、通常のプロパティは変更できません。`@State` を付けると値の保管場所が View の外側（SwiftUI が管理する領域）に移り、struct が作り直されても値が保持され、変化すると body が呼び直されて再描画が起きます。2つ目は `count` です。`@State private var count` と宣言した場合、`count` は値そのもの（Int）を指し、`$count` はその値への Binding を指します。ここでやりたいのは値を1増やすことなので、値そのものを扱う `count` を使います。`$count` は `Binding<Int>` なので `+= 1` はできません。`$` が必要になるのは、TextField や Toggle、あるいは子 View に「この値を書き換えてよい」という権利を渡すときです。
+- 使っている考え方: @State は「この View が所有する、変化したら再描画する値」です。View 自体は何度も作り直される使い捨ての値なので、状態はその外側に置かれます。
+- 手順: `@State private var count = 0` … 値を SwiftUI 管理下に置き、初期値0で開始する。
+- 手順: `Text("\(count)")` … 値そのものを読み取って表示する。
+- 手順: `count += 1` … 値を書き換える。
+- 手順: SwiftUI が変化を検知し、body を呼び直して表示を更新する。
+- 動く理由: この View だけが持つ値なので @State が適切で、更新は値そのものへの代入なので $ は不要です。private を付けているのは、外部から直接触らせないためです。
+- よくある間違い: `@State` を付けずに `var count = 0` とする間違いです。struct のプロパティは body の中から変更できず、コンパイルエラーになります。
+- よくある間違い: `$count += 1` と書く間違いです。$count は Binding なので、そのまま数値演算はできません。
+- よくある間違い: @State を親子で共有しようとする間違いです。共有したい場合は @Binding で渡します。
+- 関連例:
+```swift
+final class Storage { var value = 0 }
+let storage = Storage()
+struct View1 { let box: Storage; func tap() { box.value += 1 } }
+let v = View1(box: storage)
+v.tap(); v.tap()
+print(storage.value)
+```
+- 関連例の出力: 2
+- 関連例の説明: @State の仕組みはこれに近く、値の実体は struct の外にあるため、struct が作り直されても保持されます。
+- 覚えておくこと: 自分が持つ値は @State。値そのものは count、書き換え権を渡すときだけ $count。
+
+### practice-swiftui-009 子Viewへ書き換え権を渡す形に並べ替える [並べ替え / Lv2 基本]
+対象レッスン: swiftui-state-binding
+シリーズ: swiftui-state (2段階目)
+スキル: swiftui
+問題: 親が持つ isOn を、子の Toggle から書き換えられるようにします。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+struct SwitchRow: View {
+    @Binding var isOn: Bool
+    var body: some View {
+        Toggle("通知", isOn: $isOn)
+    }
+}
+```
+ヒント1: 型の宣言、プロパティ、body、中身、という並びが基本形です。
+ヒント2: @Binding のプロパティは body より前に宣言します。
+ヒント3: 並べ替えの結果、かっこが内側から順に閉じられている必要があります。
+解説: 正しい順は「struct 宣言 → @Binding プロパティ → body → Toggle → body を閉じる → struct を閉じる」です。プロパティ宣言を body より前に置くのは Swift の慣習で、その型が何を必要としているかが最初に読めるようにするためです。`@Binding var isOn: Bool` は「値そのものは持たず、他の場所にある値への読み書きの通り道を持つ」という宣言です。親側は `SwitchRow(isOn: $notificationEnabled)` のように `$` を付けて渡し、子はそれを `isOn` として通常の Bool のように読み書きできます。Toggle に渡すときに `$isOn` と書いているのは、Toggle 自身も値を書き換えるため Binding を必要とするからです。この連鎖によって、子の Toggle を操作すると親の状態が更新され、親の body が呼び直されます。
+- 使っている考え方: @Binding は「値の所有権は持たず、参照だけを持つ」プロパティラッパーです。所有者は @State を持つ親で、子は借りて読み書きします。
+- 手順: 親: `@State private var notificationEnabled = false` … 値を所有する。
+- 手順: 親: `SwitchRow(isOn: $notificationEnabled)` … $ で Binding を渡す。
+- 手順: 子: `@Binding var isOn: Bool` … 通り道を受け取る。
+- 手順: 子: `Toggle("通知", isOn: $isOn)` … Toggle にさらに Binding を渡す。
+- 手順: 操作すると親の @State が更新され、親子とも再描画される。
+- 動く理由: プロパティが body より前にあり、かっこが内側から順に閉じられているため構文として成立します。@Binding によって、子は値を所有せずに親の状態を書き換えられます。
+- よくある間違い: 子でも @State を使う間違いです。子が独自の値を持つため、操作しても親に反映されません。
+- よくある間違い: `Toggle("通知", isOn: isOn)` と $ を付け忘れる間違いです。Toggle は Binding を要求するためコンパイルエラーになります。
+- よくある間違い: 親から値のコピー（let isOn: Bool）だけを渡す間違いです。表示はできますが書き換えられません。
+- 関連例:
+```swift
+final class Box { var value = false }
+struct Child { let box: Box; func toggle() { box.value.toggle() } }
+let box = Box()
+Child(box: box).toggle()
+print(box.value)
+```
+- 関連例の出力: true
+- 関連例の説明: 子が親の値を書き換えられるのは、値のコピーではなく到達手段を渡しているからです。@Binding も同じ考え方です。
+- 覚えておくこと: 所有は @State、借用は @Binding。渡すときに $ を付ける。
+
+### practice-swiftui-010 子で操作しても親に反映されない原因を見つける [バグ発見 / Lv2 基本]
+対象レッスン: swiftui-state-binding
+シリーズ: swiftui-state (3段階目)
+スキル: swiftui, debugging
+問題: 子の Toggle を操作しても、親の表示が変わりません。原因となっている行を1つ選んでください。
+問題のある行: SwitchRow(isOn: isOn)              // 親のbody
+ヒント1: 子側の宣言は @Binding になっていて、受け取る準備はできています。
+ヒント2: 問題は「何を渡しているか」です。値そのものと通り道は別のものです。
+ヒント3: $ を付けるべき場所が1つ抜けています。
+解説: 問題は2行目で、親が `SwitchRow(isOn: isOn)` と値そのものを渡していることです。子は `@Binding var isOn: Bool` として通り道を要求しているので、親は `$isOn` を渡す必要があります。`$` を付けると `Binding<Bool>` が得られ、これは「読むこともできるし、書き込めば親の @State が更新される」通り道です。値そのもの（Bool）を渡すと、子は現在の値のコピーだけを受け取ることになり、書き換えても親には届きません。実際にはこの書き方は型が合わないためコンパイルエラーになるはずですが、`.constant(isOn)` を渡すなどして無理に通すと、まさに「操作しても何も起きない」症状になります。1行目の @State、3行目の @Binding、4行目の Toggle への `$isOn` はいずれも正しく、修正が必要なのは受け渡しの1箇所だけです。
+- 使っている考え方: SwiftUI では「値」と「値への通り道（Binding）」が別の型です。親子で状態を共有するには、値ではなく通り道を渡す必要があります。
+- 手順: 親が @State で値を所有している。
+- 手順: 子は @Binding を宣言し、Binding<Bool> を要求している。
+- 手順: しかし親は Bool を渡している。型も意味も一致していない。
+- 手順: `$isOn` に直すと Binding<Bool> が渡り、子の書き込みが親に届く。
+- 動く理由: 子側の宣言と Toggle への受け渡しは既に正しいため、残る不一致は親からの受け渡しだけです。ここを $ 付きに直せば、状態は1箇所（親の @State）に保たれたまま共有されます。
+- よくある間違い: `.constant(isOn)` を渡して型エラーを消す対応です。ビルドは通りますが、書き込みが捨てられるため永久に反映されません。
+- よくある間違い: 子を @State に変えて型を合わせる間違いです。子が独自の値を持つので、親とは別々に動きます。
+- よくある間違い: 親子それぞれで値を持ち、手動で同期させる間違いです。同期漏れが起き、片方だけ古い値になります。
+- 関連例:
+```swift
+var parent = false
+func passByValue(_ v: Bool) { var copy = v; copy.toggle() }
+func passByReference(_ v: inout Bool) { v.toggle() }
+passByValue(parent)
+print("値渡し後:", parent)
+passByReference(&parent)
+print("参照渡し後:", parent)
+```
+- 関連例の出力: 値渡し後: false
+参照渡し後: true
+- 関連例の説明: $ を付けるかどうかの違いは、この inout の有無に近い関係です。値のコピーには書き戻す先がありません。
+- 覚えておくこと: @Binding には $ を付けて渡す。値を渡すと書き込みが届かない。
+
+### practice-swiftui-011 お気に入りを切り替えるメソッドを組み立てる [関数組み立て / Lv3 実装]
+対象レッスン: swiftui-state-binding
+スキル: swiftui, controlFlow, collections
+問題: お気に入りの状態を反転し、上限（10件）を超える場合は追加せずに警告フラグを立てるメソッドを作ります。必要なブロックだけを正しい順に選んでください。
+正解の並び:
+```swift
+private func toggleFavorite(_ id: Int) {
+    if favorites.contains(id) {
+        favorites.remove(id)
+    } else if favorites.count >= 10 {
+        showsLimitAlert = true
+    } else {
+        favorites.insert(id)
+    }
+}
+```
+ヒント1: 3つの場合分けがあります。すでに入っている／上限に達している／それ以外です。
+ヒント2: 上限の判定は、追加しようとしている場合にだけ必要です。解除には上限は関係ありません。
+ヒント3: 条件分岐の外で無条件に追加や代入を行うブロックは、分岐の意味を壊します。
+解説: 必要なのは、メソッド宣言、`if favorites.contains(id)` による解除の分岐、`remove`、`else if favorites.count >= 10` による上限判定、警告フラグ、`else`、`insert`、閉じかっこ2つの9ブロックです。順序の要点は、解除の判定を最初に置くことです。すでにお気に入りに入っている項目を解除する操作は、件数が上限に達していても実行できなければなりません。上限チェックを先に書くと、10件登録した状態で解除すらできなくなります。次に、追加しようとしている場合にだけ上限を確認し、超えていれば警告フラグを立てて追加しません。どちらでもない場合だけ insert します。分岐の外にある `favorites.insert(id)` は、どの経路を通っても必ず追加されてしまうため、解除も上限判定も無意味になります。`showsLimitAlert = false` を無条件に置くと、直前に立てた警告フラグをその場で消してしまいます。
+- 使っている考え方: 状態を切り替える処理は「今どの状態か」を先に判定し、状態ごとに1つの結果だけを起こす形にすると、後から条件が増えても壊れにくくなります。
+- 手順: `favorites.contains(id)` … すでに入っているか。入っていれば解除して終わり。
+- 手順: `favorites.count >= 10` … 追加しようとしている場合だけ上限を確認する。
+- 手順: 上限超過なら `showsLimitAlert = true` にして、追加はしない。
+- 手順: どちらでもなければ `favorites.insert(id)` で追加する。
+- 手順: 3つの経路が排他なので、1回の呼び出しで起きることは必ず1つ。
+- 動く理由: 解除の判定が最初にあるため、上限に達していても解除できます。上限判定が else if の位置にあるため、追加の場合にだけ効きます。3つの経路が重ならないので、状態が二重に変化することもありません。
+- よくある間違い: 上限チェックを関数の先頭に置く間違いです。10件登録済みの状態で解除操作までブロックされます。
+- よくある間違い: `showsLimitAlert = false` を無条件に先頭へ置く間違いです。前回の警告は消えますが、同じ呼び出しで立てたフラグまで消す位置に置くと警告が一切出なくなります。
+- よくある間違い: 配列で favorites を持ち、重複チェックを忘れる間違いです。同じidが複数入り、件数が実態と合わなくなります。
+- 関連例:
+```swift
+var favorites: Set<Int> = [1,2,3,4,5,6,7,8,9,10]
+var showsLimitAlert = false
+func toggle(_ id: Int) {
+    if favorites.contains(id) { favorites.remove(id) }
+    else if favorites.count >= 10 { showsLimitAlert = true }
+    else { favorites.insert(id) }
+}
+toggle(3)
+print(favorites.count, showsLimitAlert)
+toggle(99)
+print(favorites.count, showsLimitAlert)
+```
+- 関連例の出力: 9 false
+10 false
+- 関連例の説明: 10件の状態から解除は通り、その後の追加は9件目なので上限に触れません。分岐の順序がこの挙動を作っています。
+- 覚えておくこと: 解除は上限に関係なく通す。状態ごとに経路を排他にする。
+
+### practice-swiftui-012 TextFieldに状態をつなぐ1行を書く [記述 / Lv1 ガイド]
+対象レッスン: swiftui-state-binding
+シリーズ: swiftui-state (4段階目)
+スキル: swiftui, syntax
+問題: @State private var name = "" を宣言済みです。プレースホルダを「名前」とする TextField を、name とつなげる1行を書いてください。
+想定する書き方: TextField("名前", text: $name)
+ヒント1: TextField は入力された文字を書き戻すため、値そのものでは受け取れません。
+ヒント2: 引数ラベルは text です。第1引数はプレースホルダの文字列です。
+ヒント3: 書き換えの通り道を渡す記号を、変数名の前に付けます。
+解説: `TextField("名前", text: $name)` と書きます。第1引数はプレースホルダとして表示される文字列で、入力欄が空のときに薄く表示されます。`text:` には `Binding<String>` を渡す必要があり、`$name` と書くことで @State が提供する Binding が得られます。ここで `name` と書くと String が渡ることになり、型が合わずコンパイルエラーになります。この `$` の有無は SwiftUI で最も頻繁に出てくる区別で、判断基準は単純です。表示するだけなら値そのもの（`Text(name)`）、相手が値を書き換えるなら `$` を付ける（`TextField`, `Toggle`, `Slider`, `Picker` など）。Binding が渡っていれば、ユーザーが文字を入力するたびに name が更新され、name を参照している箇所が自動的に再描画されます。
+- 使っている考え方: `$` は @State などのプロパティラッパーが提供する「投影値（projectedValue）」を取り出す記法です。@State の場合、投影値は Binding になります。
+- 手順: `@State private var name = ""` … 値の本体は SwiftUI 管理下にある。
+- 手順: `name` … 値そのもの（String）。表示に使う。
+- 手順: `$name` … Binding<String>。書き換えの通り道。
+- 手順: TextField は入力内容を書き戻すため Binding を要求する。
+- 動く理由: TextField の text 引数が Binding<String> を要求しており、$name がちょうどその型になります。入力のたびに @State が更新され、再描画が自動的に起きます。
+- よくある間違い: `TextField("名前", text: name)` と書く間違いです。型が String なのでコンパイルエラーになります。
+- よくある間違い: `.constant(name)` を渡して型を合わせる間違いです。ビルドは通りますが、入力しても文字が表示されません。
+- よくある間違い: 引数ラベル text を省略する間違いです。SwiftUI の TextField はラベル付きの引数を要求します。
+- 関連例:
+```swift
+struct Binding2<T> { let get: () -> T; let set: (T) -> Void }
+var storage = ""
+let binding = Binding2(get: { storage }, set: { storage = $0 })
+binding.set("Yuki")
+print(binding.get())
+```
+- 関連例の出力: Yuki
+- 関連例の説明: Binding の正体は「読む関数と書く関数の組」です。$ はこの組を取り出す記法にあたります。
+- 覚えておくこと: 表示は name、書き換えてもらうなら $name。
+
+### practice-swiftui-013 監視できるモデルの定義を完成させる [穴埋め / Lv2 基本]
+対象レッスン: swiftui-observation
+シリーズ: swiftui-observation (1段階目)
+スキル: swiftui, types
+問題: 画面から観察できるモデルクラスと、それを保持する View の定義です。空欄を埋めてください。
+埋めたあと:
+```swift
+import Observation
+
+@Observable
+final class CartModel {
+    var items: [String] = []
+}
+
+struct CartView: View {
+    @State private var model = CartModel()
+
+    var body: some View {
+        Text("\(model.items.count) 件")
+    }
+}
+```
+ヒント1: クラス側に付ける属性は、プロパティの読み取りを追跡できるようにするものです。
+ヒント2: View 側は、そのモデルを「所有して、View が作り直されても保持する」必要があります。
+ヒント3: ObservableObject 時代の属性名は、Observation では使いません。
+解説: クラスには `@Observable` を付けます。これは Observation フレームワークのマクロで、付けるとプロパティの読み取りと書き込みが追跡されるようになります。View の body が `model.items` を読むと、SwiftUI は「この View は items に依存している」と記録し、items が変わったときにだけ再描画します。プロパティごとに `@Published` を書く必要はありません。View 側は `@State private var model = CartModel()` とします。View は struct なので何度も作り直されますが、@State を付けると値が SwiftUI 管理下に置かれ、初期化は最初の1回だけになります。付けずに `let model = CartModel()` と書くと、View が作り直されるたびに新しい CartModel が生成され、追加した中身が毎回消えてしまいます。`@Model` は SwiftData 用、`@Published` は古い ObservableObject 用の属性です。
+- 使っている考え方: Observation は「読まれたプロパティを記録し、そのプロパティが変わったときだけ再描画する」仕組みです。依存関係が自動で決まるため、更新範囲が必要最小限になります。
+- 手順: `@Observable` … クラスのプロパティアクセスを追跡できるようにする。
+- 手順: body が `model.items` を読む → 依存として記録される。
+- 手順: `model.items.append(...)` → items が変化する。
+- 手順: items に依存している View だけが再描画される。
+- 手順: `@State` … View が作り直されてもモデルのインスタンスを保持する。
+- 動く理由: @Observable で変化を検知でき、@State でインスタンスの寿命が View の再生成から独立します。この2つがそろって初めて「操作しても消えない、変えたら反映される」画面になります。
+- よくある間違い: `let model = CartModel()` と書く間違いです。View が作り直されるたびにモデルが作り直され、状態が消えます。
+- よくある間違い: @Observable のクラスの全プロパティに @Published を付ける間違いです。Observation では不要で、コンパイルも通りません。
+- よくある間違い: モデルを struct にする間違いです。@Observable は参照型を前提としており、class にしか付けられません。
+- 関連例:
+```swift
+final class CartModel { var items: [String] = [] }
+let model = CartModel()
+model.items.append("りんご")
+model.items.append("みかん")
+print("\(model.items.count) 件")
+```
+- 関連例の出力: 2 件
+- 関連例の説明: 参照型なので、どこから触っても同じインスタンスの中身が更新されます。@State はこのインスタンスを作り直さないための指定です。
+- 覚えておくこと: モデルは @Observable な class、View での保持は @State。
+
+### practice-swiftui-014 入力するたびに状態が消えるViewを直す [修正 / Lv3 実装]
+対象レッスン: swiftui-observation
+シリーズ: swiftui-observation (2段階目)
+スキル: swiftui, debugging
+問題: 検索欄に文字を入れるたびに、選択済みのタグが消えてしまいます。修正として最も適切なものを選んでください。
+正解: struct SearchView: View {
+    @State private var keyword = ""
+    @State private var filter = FilterModel()
+
+    var body: some View {
+        VStack {
+            TextField("検索", text: $keyword)
+            Text("選択中: \(filter.selectedTags.count)")
+        }
+    }
+}
+ヒント1: 文字を入れると keyword が変わり、View の struct が作り直されます。
+ヒント2: そのとき、let で初期化しているプロパティはどうなるでしょうか。
+ヒント3: モデルのインスタンスを、View の再生成から切り離して保持する必要があります。
+解説: 問題は `let filter = FilterModel()` です。View は struct であり、@State が変化するたびに新しいインスタンスとして作り直されます。let プロパティの初期化式は、その作り直しのたびに実行されるため、`FilterModel()` が毎回新規生成され、選択済みタグが初期状態に戻ります。TextField に1文字入力するたびに keyword が変わるので、そのたびにモデルが作り直されていたわけです。修正は `@State private var filter = FilterModel()` にすることです。@State は値を SwiftUI 管理下の保管領域に置き、初期化式は View が初めて現れたときの1回だけ実行されます。以後 View が作り直されても同じインスタンスが渡されます。static にする案（o2）は消えなくなりますが、この View の全インスタンスで状態を共有してしまうため、同じ画面を2つ開くと互いに干渉します。onChange を足す案（o3）は毎回リロードするだけで生成の問題は残り、@Binding にする案（o4）は親に同じ問題を押し付けるだけです。
+- 使っている考え方: SwiftUI の View は「使い捨ての設計図」です。状態はその外側に置かれ、View が何度作り直されても生き残る必要があります。@State はその置き場所を提供します。
+- 手順: TextField に入力 → keyword（@State）が変化する。
+- 手順: SwiftUI が body を呼び直すため、SearchView の struct を作り直す。
+- 手順: let プロパティの初期化式 `FilterModel()` が再実行され、新しいインスタンスになる。
+- 手順: 選択済みタグを持っていた元のインスタンスは破棄される。
+- 手順: @State に変えると初期化は初回のみになり、同じインスタンスが保持される。
+- 動く理由: @State はプロパティの値を View の外側で保持し、初期化式を初回だけ評価します。View の再生成とモデルの寿命が切り離されるため、入力しても選択状態が残ります。
+- よくある間違い: static で共有して解決する対応です。状態は残りますが、同じ View を複数表示すると互いの選択が混ざります。
+- よくある間違い: 「struct なのだから let のほうが安全」と考える間違いです。View の場合、let は毎回作り直されることを意味します。
+- よくある間違い: モデルをシングルトンにする対応です。テストで状態がテスト間に持ち越され、順序依存の失敗を生みます。
+- 関連例:
+```swift
+final class Model { var tags: [String] = [] }
+func rebuildWithLet() -> Model { Model() }
+var kept = Model()
+kept.tags.append("新着")
+print("@State相当:", kept.tags.count)
+print("let相当:", rebuildWithLet().tags.count)
+```
+- 関連例の出力: @State相当: 1
+let相当: 0
+- 関連例の説明: 作り直しのたびに初期化されるか、保持されるか。この差が画面上の「消える／残る」になります。
+- 覚えておくこと: View が所有するモデルは @State で持つ。let だと毎回作り直される。
+
+### practice-swiftui-015 画面用モデルに置くべきものを選ぶ [ブロック選択 / Lv3 実装]
+対象レッスン: swiftui-observation
+スキル: swiftui, architecture
+問題: 一覧画面のためのモデルです。このクラスに置くべきブロックだけを、正しい順に選んでください。View の責務に属するブロックが混ざっています。
+使うブロック:
+- @Observable
+final class WorkoutListModel {
+-     private(set) var workouts: [Workout] = []
+-     private(set) var isLoading = false
+-     private let repository: WorkoutRepository
+-     init(repository: WorkoutRepository) {
+        self.repository = repository
+    }
+- }
+ヒント1: モデルが持つべきなのは「何を表示するか」であって「どう見せるか」ではありません。
+ヒント2: body を持つのは View の役割です。モデルが View を返すと、テストから使えなくなります。
+ヒント3: 色の指定は表示の都合なので、モデルではなく View 側の関心事です。
+解説: 必要なのは、クラス宣言、表示するデータ `workouts`、読み込み状態 `isLoading`、依存する `repository`、イニシャライザ、閉じかっこの6ブロックです。画面用モデルの役割は「画面が表示すべき状態」と「その状態を変える操作」を持つことです。データと読み込み中フラグはどちらも画面の状態なので、モデルに置きます。どちらも `private(set)` にしているのは、外から勝手に書き換えられず、変更はモデルのメソッドを通してのみ起きるようにするためです。repository はイニシャライザで注入するので、テストではスタブを渡せます。`var body: some View` は View プロトコルの要求そのものなので、モデルに置くと役割が混ざり、UIフレームワークなしではテストできなくなります。`rowColor: Color` も見た目の決定であり、SwiftUI に依存するためモデルからは外します。モデルが「色」を返し始めると、ダークモード対応やテーマ変更のたびにモデルを直すことになります。
+- 使っている考え方: 画面用モデルと View の境界は「UIフレームワークに依存するか」で引くと分かりやすくなります。依存しない部分をモデルに集めると、そこは素の Swift としてテストできます。
+- 手順: `workouts` … 表示すべきデータ。UIに依存しない。
+- 手順: `isLoading` … 画面の状態。真偽値なのでUIに依存しない。
+- 手順: `repository` … データ取得の依存。プロトコル経由で注入する。
+- 手順: `init(repository:)` … 依存を外から受け取り、テストで差し替え可能にする。
+- 手順: body と Color は SwiftUI の型なので View 側に残す。
+- 動く理由: 残った6ブロックはすべて素の Swift だけで書けており、SwiftUI をimportしなくてもテストできます。View 側は、このモデルの状態を読んで見た目に変換するだけになります。
+- よくある間違い: モデルに Color や Font を持たせる間違いです。ダークモードやテーマの変更がモデルの修正を必要とします。
+- よくある間違い: workouts を `var` の公開プロパティにする間違いです。View から直接書き換えられ、状態変更の経路が追えなくなります。
+- よくある間違い: repository をモデル内部で生成する間違いです。テストで実際の通信や保存が走ります。
+- 関連例:
+```swift
+final class ListModel {
+    private(set) var items: [String] = []
+    private(set) var isLoading = false
+    func load(from source: [String]) { isLoading = true; items = source; isLoading = false }
+}
+let m = ListModel()
+m.load(from: ["Run", "Swim"])
+print(m.items, m.isLoading)
+```
+- 関連例の出力: ["Run", "Swim"] false
+- 関連例の説明: UIをimportせずに状態遷移を検証できます。これがモデルとViewを分ける実利です。
+- 覚えておくこと: モデルは状態と操作だけ。見た目とUI型は View に残す。
+
+### practice-swiftui-016 どのViewが再描画されるかを追う [実行追跡 / Lv3 実装]
+対象レッスン: swiftui-observation
+スキル: swiftui, debugging
+問題: model.title だけを変更しました。@Observable を使っている場合、body が呼び直されるのはどれですか。
+正解: TitleView だけ。CountView は title を読んでいないため再描画されない
+ヒント1: Observation が記録しているのは「どの View がどのプロパティを読んだか」です。
+ヒント2: 同じインスタンスを参照していることと、同じプロパティを読んでいることは別です。
+ヒント3: let で宣言されているのはインスタンスへの参照であり、中身の変更を妨げません。
+解説: 再描画されるのは TitleView だけです。`@Observable` は body の実行中にどのプロパティが読まれたかを記録します。TitleView の body は `model.title` を読むので title に依存し、CountView の body は `model.count` を読むので count に依存します。`model.title = "B"` で変化するのは title だけなので、title に依存している TitleView の body だけが呼び直されます。同じ Model インスタンスを参照していても、読んでいるプロパティが違えば依存関係も別です。これは以前の ObservableObject との大きな違いで、`objectWillChange` は「オブジェクトのどれかが変わった」としか伝えられないため、count しか使っていない View まで再描画されていました。`let model: Model` の let はインスタンスへの参照が変わらないという意味で、クラスの中身が変わることは妨げません。したがって「どちらも再描画されない」も誤りです。
+- 使っている考え方: Observation はプロパティ単位の依存追跡です。body の実行を観測範囲として、読まれたプロパティだけを依存として登録します。
+- 手順: TitleView の body が実行され、`model.title` の読み取りが記録される。
+- 手順: CountView の body が実行され、`model.count` の読み取りが記録される。
+- 手順: `model.title = "B"` で title の変更が通知される。
+- 手順: title を依存に持つ View（TitleView）だけが再描画対象になる。
+- 手順: count しか読んでいない CountView は対象外のまま。
+- 動く理由: 依存関係が「インスタンス単位」ではなく「プロパティ単位」で記録されるため、変更されたプロパティを読んでいる View だけが更新されます。これが Observation の主な利点です。
+- よくある間違い: 参照が同じなら全部再描画されると考える間違いです。ObservableObject 時代の挙動と混同しています。
+- よくある間違い: `let model: Model` だから中身は変わらないと考える間違いです。let は参照先の変更を禁じるだけです。
+- よくある間違い: body の中で使わないプロパティを「念のため」読む間違いです。不要な依存が増え、再描画が広がります。
+- 関連例:
+```swift
+var readBy: [String: [String]] = [:]
+func record(_ view: String, reads property: String) { readBy[property, default: []].append(view) }
+record("TitleView", reads: "title")
+record("CountView", reads: "count")
+print("title 変更で再描画:", readBy["title"] ?? [])
+```
+- 関連例の出力: title 変更で再描画: ["TitleView"]
+- 関連例の説明: Observation が内部で行っているのは、この対応表の記録と参照です。
+- 覚えておくこと: 依存は読んだプロパティ単位。読まなければ再描画されない。
+
+### practice-swiftui-017 一覧から詳細へ進む画面を並べ替える [並べ替え / Lv2 基本]
+対象レッスン: swiftui-list-navigation
+シリーズ: swiftui-list (1段階目)
+スキル: swiftui
+問題: 一覧の行をタップすると詳細画面へ進みます。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+NavigationStack {
+    List(workouts) { workout in
+        NavigationLink(workout.name, value: workout)
+    }
+    .navigationDestination(for: Workout.self) { workout in
+        WorkoutDetailView(workout: workout)
+    }
+}
+```
+ヒント1: 遷移を管理する入れ物が、いちばん外側になります。
+ヒント2: navigationDestination は List に対して付ける modifier です。List の閉じかっこのあとに来ます。
+ヒント3: リンクが持つ値の型と、遷移先を宣言する型が対応しています。
+解説: 正しい順は「NavigationStack → List → NavigationLink → List を閉じる → .navigationDestination → 遷移先の View → destination を閉じる → NavigationStack を閉じる」です。この構成の要点は、値ベースのナビゲーションという考え方です。`NavigationLink(workout.name, value: workout)` は「タップされたら workout という値をナビゲーションの経路に積む」という宣言だけを行い、遷移先の View をその場では作りません。実際にどの View を表示するかは `.navigationDestination(for: Workout.self)` が型ごとに一括で宣言します。この分離のおかげで、行が100個あっても詳細 View が100個作られることはなく、必要になった1つだけが生成されます。`.navigationDestination` は List に付ける modifier なので、List の閉じかっこの直後に置きます。NavigationStack はこの一連の遷移を管理する入れ物なので、いちばん外側です。
+- 使っている考え方: 値ベースのナビゲーションは「どこへ行くか（値）」と「そこで何を表示するか（View）」を分離します。経路は値の配列として表現され、プログラムからも操作できます。
+- 手順: `NavigationStack { }` … 遷移の経路を管理する入れ物。
+- 手順: `List(workouts) { workout in` … 行を並べる。
+- 手順: `NavigationLink(_:value:)` … タップ時に積む値だけを宣言する。View は作らない。
+- 手順: `.navigationDestination(for: Workout.self)` … その型の値が積まれたときに表示する View を宣言する。
+- 手順: `WorkoutDetailView(workout: workout)` … 実際に表示される画面。
+- 動く理由: 外側から内側へ、入れ物・一覧・行の順に入れ子になっており、遷移先の宣言が一覧全体に対する modifier として正しい位置にあります。値と表示先が型で結び付くため、行数によらず遷移先の宣言は1つで済みます。
+- よくある間違い: `NavigationLink { WorkoutDetailView(...) } label: { ... }` の形で行ごとに View を作る間違いです。行数ぶんの View が先に構築され、一覧が重くなります。
+- よくある間違い: `.navigationDestination` を NavigationStack の外に置く間違いです。経路を管理する入れ物の中になければ機能しません。
+- よくある間違い: NavigationStack を各行の中に置く間違いです。遷移のたびに新しいスタックができ、戻る動作が壊れます。
+- 関連例:
+```swift
+struct Workout: Hashable { let name: String }
+var path: [Workout] = []
+path.append(Workout(name: "Run"))
+print("経路の深さ:", path.count, "表示するのは:", path.last!.name)
+```
+- 関連例の出力: 経路の深さ: 1 表示するのは: Run
+- 関連例の説明: NavigationStack が管理しているのはこの配列です。値を積むことが遷移、取り除くことが戻るにあたります。
+- 覚えておくこと: 値を積む NavigationLink と、型で受ける navigationDestination を組にする。
+
+### practice-swiftui-018 行を削除するメソッドを組み立てる [関数組み立て / Lv3 実装]
+対象レッスン: swiftui-list-navigation
+シリーズ: swiftui-list (2段階目)
+スキル: swiftui, collections, foundation
+問題: List の onDelete から呼ばれ、指定された行を配列とストアの両方から削除するメソッドを作ります。必要なブロックだけを正しい順に選んでください。
+正解の並び:
+```swift
+func delete(at offsets: IndexSet) {
+    let removed = offsets.map { workouts[$0] }
+    workouts.remove(atOffsets: offsets)
+    for workout in removed {
+        context.delete(workout)
+    }
+    try? context.save()
+}
+```
+ヒント1: 削除する対象は、配列から取り除く前に控えておく必要があります。
+ヒント2: IndexSet は複数の行を同時に含みます。1つずつ index で消すと、2件目以降の位置がずれます。
+ヒント3: ストアからの削除は、確定させる呼び出しがなければ次回起動で復活します。
+解説: 必要なのは、メソッド宣言、削除対象の控え、配列からの一括削除、ストアからの削除ループ、save、閉じかっこの8ブロックです。順序の要点は、`removed` を先に取ることです。配列から先に取り除いてしまうと、どのオブジェクトを永続ストアから消すべきか分からなくなります。次に `workouts.remove(atOffsets:)` を使う点が重要です。IndexSet は複数の位置を同時に含み得るため、`for index in offsets { workouts.remove(at: index) }` のように1つずつ消すと、最初の削除で後続の要素が前に詰まり、2件目以降が意図しない行を消します。`remove(atOffsets:)` はこのずれを内部で処理してくれます。`removeAll()` は指定に関係なく全件消すため、明確なバグです。最後に `context.save()` を呼ばないと、画面上は消えても永続ストアには残り、次回起動で復活します。
+- 使っている考え方: onDelete が渡す IndexSet は「複数行の同時削除」を表します。インデックスは削除のたびにずれるため、まとめて処理する API を使うのが安全です。
+- 手順: `offsets.map { workouts[$0] }` … 消す対象のオブジェクトを、ずれる前に控える。
+- 手順: `workouts.remove(atOffsets: offsets)` … 表示用の配列から一括で取り除く。
+- 手順: 控えておいた `removed` を回して `context.delete` … ストアからも消す。
+- 手順: `try? context.save()` … 削除を確定させる。
+- 手順: 画面とストアの両方が同じ状態になる。
+- 動く理由: 対象の特定が削除より前にあり、削除はずれの起きない API で一括実行され、最後に永続化が確定します。3つの順序制約がすべて満たされています。
+- よくある間違い: `for index in offsets { remove(at: index) }` と書く間違いです。複数行選択時、2件目以降が1つずつずれて誤った行を消します。
+- よくある間違い: 配列から消してから removed を求めようとする間違いです。既に存在しないため、ストア側を消せません。
+- よくある間違い: save を呼び忘れる間違いです。画面からは消えますが、再起動すると戻ってきます。
+- 関連例:
+```swift
+import Foundation
+var items = ["A", "B", "C", "D"]
+for i in [1, 2] {
+    print("index \(i) が指しているのは:", items[i])
+    items.remove(at: i)
+}
+print("残ったのは:", items)
+```
+- 関連例の出力: index 1 が指しているのは: B
+index 2 が指しているのは: D
+残ったのは: ["A", "C"]
+- 関連例の説明: 1件目を消した時点で後続が前へ詰まるため、2件目の index 2 は C ではなく D を指しています。remove(atOffsets:) は内部で後ろから消すことで、このずれを起こしません。
+- 覚えておくこと: IndexSet はまとめて処理する。対象は消す前に控える。
+
+### practice-swiftui-019 並べ替えると表示がずれる一覧の原因を見つける [バグ発見 / Lv3 実装]
+対象レッスン: swiftui-list-navigation
+シリーズ: swiftui-list (3段階目)
+スキル: swiftui, debugging, collections
+問題: 一覧を並べ替えると、行に表示される内容と選択状態が入れ替わってしまいます。原因となっている行を1つ選んでください。
+問題のある行:     ForEach(workouts.indices, id: \.self) { index in
+ヒント1: SwiftUI は id を手がかりに「前回のどの行が今回のどの行か」を対応づけます。
+ヒント2: 並べ替えても変わらない値を id にする必要があります。
+ヒント3: 配列の位置は、並べ替えると意味が変わってしまう値です。
+解説: 問題は3行目で、`workouts.indices` を `id: \.self` で回していることです。この書き方では各行の識別子が配列内の位置（0, 1, 2...）になります。SwiftUI は再描画のとき、この識別子を手がかりに「前回の行と今回の行の対応」を判断し、同じ識別子なら同じ行とみなして状態（選択、アニメーション、スクロール位置など）を引き継ぎます。並べ替えを行うと、位置0にあった要素は別の中身に変わっているのに識別子は0のままなので、SwiftUI は「中身が更新された同じ行」と解釈します。その結果、選択状態が別の項目に付いたまま残り、アニメーションも入れ替わりではなく差し替えとして表示されます。修正は `ForEach(workouts)` として要素そのものを回すことです。Workout が Identifiable に準拠していれば、その `id` プロパティが識別子として使われ、並べ替えても各行の同一性が保たれます。1行目の @State、4行目の行 View、その他は問題ありません。
+- 使っている考え方: ForEach の id は「この行は前回のどの行と同じものか」を SwiftUI に伝える値です。並べ替えや挿入で変わってしまう値を使うと、対応づけが崩れます。
+- 手順: `id: \.self` on indices … 識別子は 0, 1, 2 という位置になる。
+- 手順: 並べ替えで中身の順序が変わる。
+- 手順: しかし識別子は依然 0, 1, 2 のまま。
+- 手順: SwiftUI は「同じ行の中身が変わった」と解釈し、状態を引き継いでしまう。
+- 手順: `ForEach(workouts)` に直すと、Identifiable の id が使われ、要素とともに識別子も移動する。
+- 動く理由: 識別子が要素に紐づくようになるため、並べ替えは「行の移動」として正しく認識されます。選択状態やアニメーションも要素についていきます。
+- よくある間違い: `id: \.self` を要素そのものに使う間違いです。Hashable な値型なら動きますが、中身が同じ要素が2件あると識別子が衝突します。
+- よくある間違い: 並べ替え後に一覧全体を作り直して回避する対応です。アニメーションが失われ、スクロール位置もリセットされます。
+- よくある間違い: id に配列のインデックスを使い、削除でクラッシュする間違いです。削除直後の再描画で範囲外アクセスが起きることがあります。
+- 関連例:
+```swift
+struct W { let id: Int; let name: String }
+let before = [W(id: 1, name: "Run"), W(id: 2, name: "Swim")]
+let after = [before[1], before[0]]
+print("位置をidにした場合:", after.indices.map { "\($0)->\(after[$0].name)" })
+print("要素のidを使う場合:", after.map { "\($0.id)->\($0.name)" })
+```
+- 関連例の出力: 位置をidにした場合: ["0->Swim", "1->Run"]
+要素のidを使う場合: ["2->Swim", "1->Run"]
+- 関連例の説明: 要素のidを使えば Swim は常に id 2 のままです。位置をidにすると、同じ 0 が別の中身を指すようになります。
+- 覚えておくこと: ForEach の id は要素に固有で不変な値にする。インデックスは使わない。
+
+### practice-swiftui-020 一覧で使える型にする1行を書く [記述 / Lv2 基本]
+対象レッスン: swiftui-list-navigation
+スキル: swiftui, protocols, types
+問題: Workout を ForEach にそのまま渡せるようにします。struct の宣言行を書いてください（型名は Workout、識別子として使える id プロパティは既にあります）。
+想定する書き方: struct Workout: Identifiable {
+ヒント1: ForEach が要素をそのまま受け取れるのは、要素が「自分の識別子を持つ」と宣言している場合です。
+ヒント2: そのプロトコルは id プロパティを1つ要求するだけです。
+ヒント3: Hashable や Equatable ではなく、識別のためのプロトコルを選びます。
+解説: `struct Workout: Identifiable {` と書きます。`Identifiable` は「この型は自分自身を識別する id を持つ」ことを表すプロトコルで、要求されるのは `var id: ID { get }` というプロパティ1つだけです。ここでは `let id: UUID` が既にあるため、プロトコル名を書き足すだけで準拠が完了します（ID の型は UUID と推論されます）。準拠すると `ForEach(workouts) { workout in ... }` のように、id を明示せずに要素を直接渡せるようになります。SwiftUI はこの id を使って行の同一性を判断するため、並べ替えや挿入・削除でも各行の状態が正しく追従します。`Hashable` に準拠しても `ForEach(workouts, id: \.self)` という書き方はできますが、中身が同じ要素が2件あると識別子が衝突するため、明示的な id を持つ Identifiable のほうが安全です。
+- 使っている考え方: Identifiable は「同一性」を表明するプロトコルです。値が等しいこと（Equatable）と、同じものであること（Identifiable）は別の概念で、一覧の差分更新には後者が必要です。
+- 手順: `Identifiable` が要求するのは `var id: ID { get }` のみ。
+- 手順: `let id: UUID` が既にあるため、その要求は自動的に満たされる。
+- 手順: ID の型は UUID と推論され、typealias の記述も不要。
+- 手順: 以後 `ForEach(workouts)` が id を自動で使う。
+- 動く理由: 必要なプロパティが既に存在するため、宣言にプロトコル名を追加するだけで準拠が成立します。これで ForEach が識別子を自力で取得できるようになります。
+- よくある間違い: `id: \.self` で済ませようとする間違いです。Hashable が必要になるうえ、内容が同じ要素があると識別子が重複します。
+- よくある間違い: id を `Int` の連番にして配列の位置と一致させる間違いです。並べ替えや削除でずれます。
+- よくある間違い: id を毎回 `UUID()` で計算プロパティとして返す間違いです。読むたびに値が変わり、毎回別の行として扱われます。
+- 関連例:
+```swift
+struct Workout: Identifiable { let id: Int; let name: String }
+let list = [Workout(id: 1, name: "Run"), Workout(id: 2, name: "Swim")]
+for w in list { print(w.id, w.name) }
+```
+- 関連例の出力: 1 Run
+2 Swim
+- 関連例の説明: ForEach が内部で行っているのは、この id を鍵にした対応づけです。
+- 覚えておくこと: 一覧に渡す型は Identifiable にする。id は固有で変わらない値にする。
+
+### practice-swiftui-021 削除のテスト結果から実装の不足を読み取る [テスト読解 / Lv3 実装]
+対象レッスン: swiftui-list-navigation
+スキル: swiftui, testing, collections
+問題: 一覧の削除処理のテスト結果です。1件削除は成功し、複数件の同時削除だけ失敗しています。原因として最も適切な説明を選んでください。
+正解: 1件消すたびに後続要素のインデックスが1つ前へずれるため、2件目以降の index が別の要素を指してしまう
+ヒント1: 成功しているのは、どちらも削除が1回で終わるケースです。
+ヒント2: 配列から要素を1つ取り除いたあと、その後ろにあった要素の位置はどうなりますか。
+ヒント3: 期待値 [A, D] と実際の [A, C] を見比べると、どの要素が消えたかが分かります。
+解説: テスト結果が示しているのは、削除が1回で済むケースはすべて成功し、2回以上ループするケースだけが失敗するということです。原因は、配列から要素を取り除くと、その後ろにあった要素がすべて1つ前へ詰まることです。`[A,B,C,D]` で index 1（B）を削除すると `[A,C,D]` になり、このとき C は index 1、D は index 2 に移動します。続けて index 2 を削除すると、削除されるのは元の C ではなく D です。実際の結果 `[A, C]` は、B と D が消えたことを示しており、この説明と一致します。IndexSet は昇順にソートされた集合なので順序は保証されており、o2 は誤りです。`remove(at:)` の戻り値は削除された要素で、使わなくても動作に影響しないため o3 も誤りです。@State は変更の反映方法の話であり、配列操作の結果そのものは変わらないため o4 も誤りです。修正は `workouts.remove(atOffsets: offsets)` を使うか、`offsets.sorted(by: >)` として後ろから削除することです。
+- 使っている考え方: 配列のインデックスは「今この瞬間の位置」であって、要素そのものへの参照ではありません。配列を変更すると、控えておいたインデックスの意味が変わります。
+- 手順: 要件は「IndexSet に含まれるすべての行を削除する」。
+- 手順: 1件削除のテストはループが1回なのでずれが起きず成功する。
+- 手順: 連続2件のテストは、1回目の削除で後続が前へ詰まる。
+- 手順: 2回目の index 2 は、元の index 3（D）を指すようになっている。
+- 手順: 結果として B と D が消え、期待した B と C の削除にならない。
+- 動く理由: 成功と失敗の差が「削除回数が1回か複数回か」に完全に一致しており、実際の結果 [A, C] も「B と D が消えた」という予測と一致します。他の説明では、末尾1件の削除が成功していることを説明できません。
+- よくある間違い: テストを1件削除だけにして通す対応です。複数選択削除は実際のUIから発生するため、本番で再現します。
+- よくある間違い: 後ろから削除する対策だけを覚えて、`remove(atOffsets:)` の存在を知らない間違いです。標準APIのほうが意図が明確です。
+- よくある間違い: IndexSet を Array に変換して同じループを書く間違いです。ずれの原因は型ではなく削除順なので解決しません。
+- 関連例:
+```swift
+var a = ["A","B","C","D"]
+for i in [1,2] { a.remove(at: i) }
+print("前から順に:", a)
+var b = ["A","B","C","D"]
+for i in [1,2].sorted(by: >) { b.remove(at: i) }
+print("後ろから順に:", b)
+```
+- 関連例の出力: 前から順に: ["A", "C"]
+後ろから順に: ["A", "D"]
+- 関連例の説明: 後ろから消せば、まだ処理していない前方の要素の位置は変わりません。これがずれを避ける原理です。
+- 覚えておくこと: 削除でインデックスはずれる。まとめて消すか、後ろから消す。
+
+### practice-swiftui-022 画面表示時の読み込み処理を組み立てる [関数組み立て / Lv3 実装]
+対象レッスン: swiftui-task-concurrency
+シリーズ: swiftui-task (1段階目)
+スキル: swiftui, concurrency, errors
+問題: 画面が現れたときにデータを読み込み、読み込み中フラグを正しく戻すメソッドを作ります。必要なブロックだけを正しい順に選んでください。
+正解の並び:
+```swift
+func load() async {
+    isLoading = true
+    defer { isLoading = false }
+    do {
+        workouts = try await repository.fetchAll()
+    } catch {
+        errorMessage = error.localizedDescription
+    }
+}
+```
+ヒント1: 読み込み中フラグは、成功しても失敗しても必ず戻す必要があります。
+ヒント2: 関数を抜けるときに必ず実行される仕組みが Swift にあります。
+ヒント3: エラーで落ちる書き方や、成功時にしか実行されない後始末は避けます。
+解説: 必要なのは、`func load() async`、フラグを立てる、`defer` で戻す予約、do-catch、取得、catch、エラーメッセージの設定、閉じかっこ2つの9ブロックです。要点は `defer { isLoading = false }` の使い方です。defer に登録した処理は、関数がどう抜けても（正常終了でも、エラーが catch されても）必ず実行されます。これをフラグを立てた直後に置くことで、後始末の書き忘れが構造的に起きなくなります。もし `isLoading = false` を do ブロックの末尾に書くと、エラーが起きた場合に実行されず、失敗したあと読み込み中インジケータが回り続けます。catch の中にも書けば動きますが、経路が増えるたびに書き足す必要があり、いずれ漏れます。`try!` を使う案は、通信エラーという想定内の失敗でアプリを落とすため使えません。エラーは catch で受け、`errorMessage` として画面に伝えます。
+- 使っている考え方: 非同期処理では「開始したことの後始末」を必ず行う必要があります。defer は、その後始末を開始位置のすぐ隣に書けるようにする仕組みです。
+- 手順: `isLoading = true` … 読み込み開始を画面に伝える。
+- 手順: `defer { isLoading = false }` … 関数を抜けるときの後始末を、この時点で予約する。
+- 手順: `do { try await ... }` … 失敗し得る処理を実行する。
+- 手順: `catch` … 失敗を受け取り、エラーメッセージとして状態に反映する。
+- 手順: どちらの経路でも defer が走り、isLoading が false に戻る。
+- 動く理由: フラグを立てる行と戻す行が隣り合っているため、対応関係が一目で分かります。経路が増えても defer は常に実行されるため、インジケータが回り続ける不具合が構造的に起きません。
+- よくある間違い: `isLoading = false` を do の末尾だけに書く間違いです。エラー時に実行されず、読み込み中の表示が残ります。
+- よくある間違い: `try!` で書く間違いです。通信断のような日常的な失敗でアプリが落ちます。
+- よくある間違い: catch でエラーを握りつぶして何も表示しない間違いです。利用者には空の画面が出るだけで、原因が分かりません。
+- 関連例:
+```swift
+func run(shouldFail: Bool) {
+    var isLoading = true
+    defer { isLoading = false; print("終了時 isLoading:", isLoading) }
+    if shouldFail { print("失敗経路"); return }
+    print("成功経路")
+}
+run(shouldFail: false)
+run(shouldFail: true)
+```
+- 関連例の出力: 成功経路
+終了時 isLoading: false
+失敗経路
+終了時 isLoading: false
+- 関連例の説明: どちらの経路を通っても defer が実行されます。これが後始末の書き忘れを防ぎます。
+- 覚えておくこと: 開始フラグの直後に defer で後始末を予約する。
+
+### practice-swiftui-023 古い書き方の非同期更新を直す [修正 / Lv4 応用]
+対象レッスン: swiftui-task-concurrency
+シリーズ: swiftui-task (2段階目)
+スキル: swiftui, concurrency
+問題: 読み込み処理が古い書き方のままで、画面表示時のキャンセルも効きません。修正として最も適切なものを選んでください。
+正解: // View 側
+.task {
+    workouts = (try? await repository.fetchAll()) ?? []
+}
+
+// モデル側
+@MainActor
+@Observable
+final class WorkoutListModel { /* ... */ }
+ヒント1: 画面が消えたときに処理を止める仕組みが、SwiftUI の modifier に用意されています。
+ヒント2: メインスレッドへの切り替えは、手動のディスパッチではなく型レベルで保証できます。
+ヒント3: 同期的に待つ書き方は、その間ずっと画面が固まります。
+解説: 問題は2つあります。1つ目は `.onAppear` + `Task { }` の組み合わせで、View が消えても Task が生き残ることです。一覧をすばやくスクロールしたり画面を閉じたりすると、不要になった通信が走り続けます。`.task { }` に変えると、View が消えた時点でタスクが自動的にキャンセルされます。2つ目は `DispatchQueue.main.async` による手動のスレッド切り替えで、これは書き忘れても実行時まで気づけません。モデルを `@MainActor` にすると、そのプロパティへの書き込みが必ずメインアクター上で行われることをコンパイラが保証し、手動のディスパッチが不要になります。`Task { @MainActor in }` を使う案（o2）はキャンセルの問題が残り、DispatchQueue も残っています。`Task.detached` を使う案（o3）は親のコンテキストから切り離されるためキャンセルが伝わらず、メインアクター外から UI 状態を書き換えることになります。同期版を呼ぶ案（o4）は、通信が終わるまでメインスレッドをブロックするため画面が固まります。
+- 使っている考え方: Swift Concurrency では「どのアクター上で動くか」を型で宣言し、「いつ止まるか」を構造で決めます。手動のスレッド切り替えとタスク管理は、どちらもこの2つに置き換えられます。
+- 手順: `.task { }` … View の生存期間にタスクを紐づける。View が消えるとキャンセルされる。
+- 手順: `try? await repository.fetchAll()` … 失敗時は nil、成功時は配列。
+- 手順: `@MainActor` を付けたモデル … プロパティ更新が必ずメインアクター上で行われる。
+- 手順: コンパイラが違反を検出するため、DispatchQueue.main.async が不要になる。
+- 動く理由: キャンセルは View の寿命に、スレッドは型の宣言に、それぞれ委ねられます。人が忘れうる2つの管理が構造とコンパイラに置き換わるため、書き忘れによる不具合が起きません。
+- よくある間違い: `.onAppear` で Task を起こす間違いです。View が消えても止まらず、無駄な通信と不要な更新が残ります。
+- よくある間違い: @MainActor を付けたうえで DispatchQueue.main.async も残す間違いです。冗長なうえ、更新が1フレーム遅れます。
+- よくある間違い: `Task.detached` を「速そうだから」使う間違いです。キャンセルも優先度も引き継がれず、管理対象から外れます。
+- 関連例:
+```swift
+enum TaskKind { case onAppearTask, dotTask }
+func cancelled(when viewDisappears: Bool, kind: TaskKind) -> Bool {
+    switch kind {
+    case .onAppearTask: return false
+    case .dotTask: return viewDisappears
+    }
+}
+print("onAppear+Task:", cancelled(when: true, kind: .onAppearTask))
+print(".task:", cancelled(when: true, kind: .dotTask))
+```
+- 関連例の出力: onAppear+Task: false
+.task: true
+- 関連例の説明: View が消えたときにキャンセルされるかどうかが、この2つの決定的な違いです。
+- 覚えておくこと: キャンセルは .task に、スレッドは @MainActor に任せる。
+
+### practice-swiftui-024 キャンセルを正しく扱う読み込みを組む [ブロック選択 / Lv4 応用]
+対象レッスン: swiftui-task-concurrency
+スキル: swiftui, concurrency, errors
+問題: 検索語が変わるたびに再検索します。キャンセルされた場合はエラー表示を出さないようにします。必要なブロックだけを正しい順に選んでください。
+使うブロック:
+- func search(_ keyword: String) async {
+-     do {
+-         try await Task.sleep(for: .milliseconds(300))
+-         results = try await repository.search(keyword)
+-     } catch is CancellationError {
+-         return
+-     } catch {
+-         errorMessage = error.localizedDescription
+-     }
+- }
+ヒント1: キャンセルは「失敗」ではありません。利用者に見せるべきものではありません。
+ヒント2: catch は上から順に照合されるため、特定の型を先に書く必要があります。
+ヒント3: 入力のたびに通信しないよう、待機を1つ挟みます。
+解説: 必要なのは、関数宣言、do、待機、検索、`catch is CancellationError`、return、汎用 catch、エラーメッセージ、閉じかっこ2つの10ブロックです。要点は2つあります。1つ目は `Task.sleep` による待機で、これは入力のたびに通信しないための間引き（デバウンス）です。`.task(id:)` などと組み合わせると、300ミリ秒以内に次の入力があった時点で前のタスクがキャンセルされ、sleep 中に処理が打ち切られるため通信自体が発生しません。2つ目は catch の順序です。Swift の catch 節は上から順に照合されるため、`catch is CancellationError` を汎用 catch より前に置く必要があります。逆順にすると、キャンセルも汎用 catch に捕まってエラーメッセージが表示され、文字を打つたびに「検索に失敗しました」と出る画面になります。キャンセルは利用者の操作の結果であって失敗ではないので、`return` して何も表示しません。固定文言のエラーブロックは原因が分からなくなるため使わず、`results = []` を無条件に置くと、キャンセル時に前回の結果まで消えてしまいます。
+- 使っている考え方: キャンセルは「利用者がもう必要としていない」という正常な状態です。失敗と同じ扱いにすると、正常な操作でエラー表示が出る画面になります。
+- 手順: `Task.sleep(for:)` … 連続入力を間引く。キャンセルされるとここで CancellationError を投げる。
+- 手順: `repository.search(keyword)` … 待機を通過した場合だけ通信する。
+- 手順: `catch is CancellationError { return }` … キャンセルは黙って終了する。
+- 手順: `catch { errorMessage = ... }` … それ以外の失敗だけ画面に伝える。
+- 手順: catch は上から照合されるため、特定型の節が先である必要がある。
+- 動く理由: 待機によって無駄な通信が減り、catch の順序によってキャンセルと失敗が分離されます。結果として、入力中にエラー表示が出ず、本当の失敗だけが利用者に伝わります。
+- よくある間違い: 汎用 catch を先に書く間違いです。キャンセルもそこで捕まり、入力のたびにエラーが表示されます。
+- よくある間違い: キャンセル時に `results = []` としてしまう間違いです。次の結果が来るまでの一瞬、画面が空になってちらつきます。
+- よくある間違い: `error.localizedDescription` の代わりに固定文言を出す間違いです。通信断なのか認証切れなのか区別できなくなります。
+- 関連例:
+```swift
+enum E: Error { case cancelled, network }
+func handle(_ e: E) -> String {
+    switch e {
+    case .cancelled: return "（表示なし）"
+    case .network: return "通信に失敗しました"
+    }
+}
+print(handle(.cancelled))
+print(handle(.network))
+```
+- 関連例の出力: （表示なし）
+通信に失敗しました
+- 関連例の説明: キャンセルと失敗を先に分岐させることで、利用者に見せる情報を正しく選べます。
+- 覚えておくこと: CancellationError は先に捕まえて黙って終わる。失敗とは分けて扱う。
+
+### practice-swiftui-025 検索語の変化で再実行する1行を書く [記述 / Lv3 実装]
+対象レッスン: swiftui-task-concurrency
+スキル: swiftui, concurrency
+問題: keyword が変わるたびに前のタスクをキャンセルして search(keyword) を実行し直す modifier の開始行を書いてください（クロージャの開きかっこまで）。
+想定する書き方: .task(id: keyword) {
+ヒント1: View の寿命にタスクを紐づける modifier に、再実行の条件を渡す形があります。
+ヒント2: 引数ラベルは、監視したい値を識別するためのものです。
+ヒント3: onChange とは違い、非同期処理をそのまま書けるほうを選びます。
+解説: `.task(id: keyword) {` と書きます。`.task(id:)` は `.task` の派生で、渡した値が変化したときに「実行中のタスクをキャンセルしてから、クロージャを最初から実行し直す」という動作をします。keyword を id に渡しているので、検索語が変わるたびに前の検索が自動的に打ち切られ、新しい検索が始まります。View が画面から消えたときにもキャンセルされるため、後始末を自分で書く必要がありません。`.onChange(of:)` でも変化は検知できますが、クロージャが同期的なので中で Task を起こす必要があり、前のタスクのキャンセルは自分で管理することになります。`.onAppear` は初回しか実行されないため、検索語の変化には反応しません。id に渡す値は Equatable である必要があり、String はこれを満たします。
+- 使っている考え方: `.task(id:)` は「値の変化とタスクの寿命を結びつける」modifier です。開始・キャンセル・再開始という3つの管理をまとめて引き受けます。
+- 手順: View が現れる → クロージャが実行される。
+- 手順: keyword が変わる → 実行中のタスクがキャンセルされる。
+- 手順: 続けて、新しい keyword でクロージャが最初から実行される。
+- 手順: View が消える → 実行中のタスクがキャンセルされる。
+- 動く理由: 要件の「変わるたびにキャンセルして実行し直す」が、この modifier の定義そのものです。自前のタスク管理コードが一切不要になります。
+- よくある間違い: `.onChange(of: keyword) { Task { ... } }` と書く間違いです。前のタスクが止まらず、古い結果があとから画面を上書きすることがあります。
+- よくある間違い: `.task { }` を id なしで書く間違いです。初回しか実行されず、検索語を変えても再検索されません。
+- よくある間違い: id に毎回異なる値（UUID() など）を渡す間違いです。再描画のたびに再実行され、通信が止まらなくなります。
+- 関連例:
+```swift
+var current = ""
+var cancelledCount = 0
+func taskId(_ newValue: String) {
+    if current != newValue && !current.isEmpty { cancelledCount += 1 }
+    current = newValue
+}
+for k in ["s", "sw", "swi"] { taskId(k) }
+print("キャンセル回数:", cancelledCount, "最終:", current)
+```
+- 関連例の出力: キャンセル回数: 2 最終: swi
+- 関連例の説明: 3回入力すると、前の2回がキャンセルされ、最後の1回だけが生き残ります。
+- 覚えておくこと: 値の変化で再実行したい非同期処理は .task(id:) に任せる。
+
+### practice-swiftui-026 遅い応答が新しい結果を上書きする問題を読み取る [テスト読解 / Lv4 応用]
+対象レッスン: swiftui-task-concurrency
+スキル: swiftui, concurrency, testing
+問題: 検索のテスト結果です。応答が順番どおり返る場合は成功し、遅い応答が混じる場合だけ失敗しています。原因として最も適切な説明を選んでください。
+正解: 前のタスクをキャンセルしていないため、遅れて完了した古い検索の結果が、あとから results を上書きしている
+ヒント1: 失敗しているのは、あとから始めた検索のほうが先に終わるケースだけです。
+ヒント2: 2つの Task が同時に走ったとき、どちらが results に最後に書き込むかを考えます。
+ヒント3: 書き込む順番は、開始した順ではなく完了した順です。
+解説: テスト結果が示しているのは、複数の検索が同時に走り、かつ完了順が入力順と違う場合にだけ失敗するということです。原因は、`onKeywordChanged` が呼ばれるたびに新しい Task を起こすだけで、前の Task をキャンセルしていないことです。"a" の検索（300ms）と "ab" の検索（50ms）が並行して走り、"ab" が先に完了して results に書き込みます。その250ms後に "a" が完了し、同じ results を上書きします。results に最後に書き込むのは「最後に開始した検索」ではなく「最後に完了した検索」なので、要件が破れます。この現象は競合状態の一種で、応答時間が安定している環境では再現しないため、実機の通信環境で初めて表面化することがよくあります。o2 のスレッドセーフ性の問題なら入力1回のテストも不安定になるはずで、o3 の優先度は完了順を保証しません。o4 が原因なら、どのテストでも結果が表示されないはずです。修正は `.task(id: keyword)` を使うか、保持している Task を明示的に cancel してから新しい Task を起こすことです。
+- 使っている考え方: 並行処理では「開始順」と「完了順」が一致しません。共有された状態に複数の処理が書き込む場合、最後に書いたものが残るため、完了順を制御しない設計は結果が不定になります。
+- 手順: 要件は「最後に入力された検索語の結果だけを表示する」。
+- 手順: "a" の Task が開始し、300ms かかる。
+- 手順: "ab" の Task が開始し、50ms で完了して results に書き込む。
+- 手順: 250ms 後、"a" の Task が完了して results を上書きする。
+- 手順: 画面には古い "a" の結果が残る。
+- 動く理由: 3つのテストのうち失敗するのは、完了順が入力順と逆転するケースだけです。他の説明では「応答が入力順なら成功する」ことを説明できません。
+- よくある間違い: 「開発中に再現しないから問題ない」と判断する間違いです。応答時間の差が大きい実環境で必ず起きます。
+- よくある間違い: 結果に検索語を添えて、一致しない場合だけ捨てる対応です。動きはしますが、無駄な通信は走り続けます。
+- よくある間違い: 書き込みに排他制御をかける対応です。順序の問題は解決せず、遅い応答が最後に書き込む点は変わりません。
+- 関連例:
+```swift
+var results = ""
+let completions = [("a", 300), ("ab", 50)]
+for (keyword, ms) in completions.sorted(by: { $0.1 < $1.1 }) {
+    results = keyword
+    print("\(ms)ms後に完了 → results = \(results)")
+}
+```
+- 関連例の出力: 50ms後に完了 → results = ab
+300ms後に完了 → results = a
+- 関連例の説明: 完了が遅いほうが最後に書き込むため、古い結果が残ります。これがテストの失敗そのものです。
+- 覚えておくこと: 並行処理では完了順が保証されない。新しい要求を出す前に古い要求をキャンセルする。
+
+### practice-swiftui-027 読み込み状態を1つの値で表す型を組み立てる [関数組み立て / Lv4 応用]
+対象レッスン: swiftui-task-concurrency
+スキル: swiftui, types, architecture
+問題: 読み込み中・成功・失敗を、矛盾した組み合わせが作れない形で表します。必要なブロックだけを正しい順に選んでください。
+正解の並び:
+```swift
+enum LoadState<Value> {
+    case idle
+    case loading
+    case loaded(Value)
+    case failed(String)
+}
+```
+ヒント1: 3つのフラグを別々に持つと、ありえない組み合わせが表現できてしまいます。
+ヒント2: 同時に1つしか成り立たない状態は、列挙型の case として並べます。
+ヒント3: 成功時のデータと失敗時のメッセージは、それぞれの case に持たせられます。
+解説: 必要なのは enum の宣言、4つの case、閉じかっこの6ブロックです。`isLoading` / `errorMessage` / `value` を別々のプロパティとして持つと、組み合わせは 2×2×2 の8通りになりますが、実際に意味を持つのは4通りだけです。「読み込み中なのにエラーメッセージも値もある」といった、ありえない状態が型の上では表現できてしまい、画面側は毎回「どれを優先して見るか」を判断する分岐を書くことになります。enum にすると、同時に成り立つのは必ず1つの case だけになり、ありえない状態は作れなくなります。さらに、成功時のデータは `loaded(Value)` の中に、失敗理由は `failed(String)` の中に入るため、「成功したのに値が nil」という状況も型の上で排除されます。画面側は switch で4つの case を書けばよく、コンパイラが漏れを検出してくれます。
+- 使っている考え方: 「ありえない状態を表現できないようにする」のは型設計の基本方針です。フラグの組み合わせで状態を表すと、組み合わせ爆発と矛盾した状態が同時に発生します。
+- 手順: 3つの独立したフラグ → 8通りの組み合わせが型として可能。
+- 手順: 実際に意味があるのは idle / loading / loaded / failed の4通り。
+- 手順: enum の case にすると、同時に成り立つのは1つだけになる。
+- 手順: `loaded(Value)` … 成功時にだけ値が存在する。
+- 手順: `failed(String)` … 失敗時にだけ理由が存在する。
+- 手順: 画面側は switch で網羅でき、漏れはコンパイルエラーになる。
+- 動く理由: 状態が排他であるという事実を型で表現しているため、矛盾した状態を作るコードがそもそも書けません。値の有無も case に結び付いているので、Optional のアンラップ漏れも起きません。
+- よくある間違い: isLoading と errorMessage を併用する間違いです。エラー後に isLoading を戻し忘れると、両方が真の状態になります。
+- よくある間違い: `loaded` に Optional の値を持たせる間違いです。「成功したが値がない」という状態が復活します。
+- よくある間違い: switch を default で締める間違いです。case を追加したときに対応漏れがコンパイルエラーにならず、実行時に無視されます。
+- 関連例:
+```swift
+enum LoadState<Value> { case idle, loading, loaded(Value), failed(String) }
+func describe(_ s: LoadState<[String]>) -> String {
+    switch s {
+    case .idle: return "未読み込み"
+    case .loading: return "読み込み中"
+    case .loaded(let items): return "\(items.count)件"
+    case .failed(let message): return "失敗: \(message)"
+    }
+}
+print(describe(.loading))
+print(describe(.loaded(["Run", "Swim"])))
+print(describe(.failed("通信エラー")))
+```
+- 関連例の出力: 読み込み中
+2件
+失敗: 通信エラー
+- 関連例の説明: 値は case の中にあるため、成功時にだけ items が取り出せます。Optional の判定が不要になります。
+- 覚えておくこと: 排他な状態は enum で表す。値は case に持たせる。
 
 ---
