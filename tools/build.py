@@ -179,8 +179,7 @@ def render_practice(data):
     return "\n".join(out)
 
 
-strict = len(practice.get("challenges") or []) == validate_practice.TOTAL
-report, _ = validate_practice.validate(practice, strict=strict)
+report, _ = validate_practice.validate(practice, strict=True)
 if report.errors:
     for e in report.errors[:40]:
         print("ERROR %s" % e)
@@ -201,7 +200,7 @@ for track in tracks:
 if write_if_changed(root / "source/practice.txt", render_practice(practice)):
     written.append("practice.txt")
 
-print("Validated source/practice.json: %d challenge(s)%s" % (
-    len(practice.get("challenges") or []), "" if strict else " (partial mode)"))
+print("Validated source/practice.json: %d challenge(s)" %
+      len(practice.get("challenges") or []))
 print("Embedded content.json + practice.json into index.html" + ("" if embedded else " (unchanged)"))
 print("Regenerated %d file(s): %s" % (len(written), ", ".join(written) if written else "none (all up to date)"))

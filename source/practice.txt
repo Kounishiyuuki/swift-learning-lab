@@ -2168,7 +2168,7 @@ for (i, item) in items.enumerated() {
 対象レッスン: swift-loops-ranges
 シリーズ: swift-loop-basics (4段階目)
 スキル: functions, controlFlow
-問題: n の倍数のうち limit 未満のものを合計して返す関数を作ります。必要なブロックだけを選んで正しい順に並べてください。
+問題: 正の整数 n の倍数のうち limit 未満のものを合計して返す関数を作ります（n > 0 を前提とします）。必要なブロックだけを選んで正しい順に並べてください。
 正解の並び:
 ```swift
 func sumOfMultiples(of n: Int, below limit: Int) -> Int {
@@ -5548,6 +5548,7 @@ extension Notification.Name { static let didUpdate = Notification.Name("didUpdat
 final class Watcher {
     private var token: NSObjectProtocol?
     func start() {
+        guard token == nil else { return }
         token = NotificationCenter.default.addObserver(forName: .didUpdate, object: nil, queue: nil) { [weak self] _ in self?.handle() }
     }
     func handle() { print("更新") }
@@ -5556,16 +5557,18 @@ final class Watcher {
 ```
 ヒント1: クロージャがそのまま self を強く捕捉すると、解除するまでインスタンスが解放されません。
 ヒント2: 解除に必要なトークンは、あとで使えるようにプロパティとして保持します。
-ヒント3: import → 通知名 → クラス宣言 → トークン → start → 登録 → start を閉じる → handle → deinit → クラスを閉じる、の10行です。
-解説: ブロック形式の addObserver は、渡したクロージャを NotificationCenter が保持し続けます。そのクロージャが self を強参照すると、removeObserver するまでインスタンスが解放されず、deinit も呼ばれないため解除の機会が永久に来ません。`[weak self]` にすることでこの循環が切れ、インスタンスが解放されるときに deinit が実行されて登録も解除されます。トークンをプロパティに保持しているのは、解除時に必要だからです。
+ヒント3: import → 通知名 → クラス宣言 → トークン → start → 二重登録の防止 → 登録 → start を閉じる → handle → deinit → クラスを閉じる、の11行です。
+解説: ブロック形式の addObserver は、渡したクロージャを NotificationCenter が保持し続けます。そのクロージャが self を強参照すると、removeObserver するまでインスタンスが解放されず、deinit も呼ばれません。`[weak self]` にすることで循環を切り、deinit で登録を解除します。また `start()` が複数回呼ばれて token を上書きすると、以前の登録を解除できなくなるため、`guard token == nil else { return }` で二重登録を防ぎます。
 - 使っている考え方: 購読の登録は「解除まで含めて1組」です。解除のタイミングを deinit に置くなら、deinit が確実に呼ばれるように参照の強さを設計する必要があります。
 - 手順: `private var token: NSObjectProtocol?` … 解除に使うトークンを保持する。
+- 手順: `guard token == nil else { return }` … start が複数回呼ばれても登録を増やさない。
 - 手順: `addObserver(...) { [weak self] _ in self?.handle() }` … 弱参照で self を捕捉する。
 - 手順: NotificationCenter はクロージャを保持するが、self は弱参照なので解放を妨げない。
 - 手順: インスタンスが解放されると deinit が呼ばれ、removeObserver が実行される。
-- 動く理由: weak によって NotificationCenter → self の強参照が切れ、参照カウントが正しく0になります。その結果 deinit が呼ばれ、登録解除まで自動的に完了します。
+- 動く理由: weak によって NotificationCenter → self の強参照が切れ、二重登録ガードによって保持できない古いトークンも生まれません。その結果 deinit が呼ばれ、唯一の登録を確実に解除できます。
 - よくある間違い: `{ _ in self.handle() }` と強参照で書く間違いです。deinit が呼ばれなくなり、解除もされず、通知のたびに古いインスタンスが動き続けます。
 - よくある間違い: トークンを保持せずに登録する間違いです。解除のしようがなくなります。
+- よくある間違い: start のたびに token を上書きする間違いです。以前の登録が残り、deinit でも最後の1件しか解除できません。
 - よくある間違い: セレクタ形式の addObserver は解除を忘れても比較的安全ですが、こちらのブロック形式では明示的な解除が必要です。
 - 関連例:
 ```swift
@@ -5573,11 +5576,15 @@ import Foundation
 extension Notification.Name { static let didUpdate = Notification.Name("didUpdate") }
 final class Watcher {
     private var token: NSObjectProtocol?
-    func start() { token = NotificationCenter.default.addObserver(forName: .didUpdate, object: nil, queue: nil) { [weak self] _ in self?.handle() } }
+    func start() {
+        guard token == nil else { return }
+        token = NotificationCenter.default.addObserver(forName: .didUpdate, object: nil, queue: nil) { [weak self] _ in self?.handle() }
+    }
     func handle() { print("更新") }
     deinit { print("deinit"); if let token { NotificationCenter.default.removeObserver(token) } }
 }
 var w: Watcher? = Watcher()
+w?.start()
 w?.start()
 NotificationCenter.default.post(name: .didUpdate, object: nil)
 w = nil
@@ -5585,7 +5592,7 @@ w = nil
 - 関連例の出力: 更新
 deinit
 - 関連例の説明: 通知を受け取ったあと、参照を切ると deinit が呼ばれて解除まで完了しています。
-- 覚えておくこと: ブロック形式の購読は [weak self] + トークン保持 + deinit で解除、の3点セット。
+- 覚えておくこと: ブロック形式の購読は [weak self]・二重登録の防止・トークン保持・deinit での解除を一組で設計する。
 
 ### practice-foundation-036 数字が含まれるか判定する1行を書く [記述 / Lv3 実装]
 対象レッスン: foundation-regex
@@ -6699,7 +6706,7 @@ func fetch(_ id: Int) async -> String { "item\(id)" }
 func fetchAll(_ ids: [Int]) async -> [String] {
     await withTaskGroup(of: (Int, String).self) { group in
         var pairs: [(Int, String)] = []
-        for id in ids { group.addTask { (id, await fetch(id)) } }
+        for (offset, id) in ids.enumerated() { group.addTask { (offset, await fetch(id)) } }
         for await pair in group { pairs.append(pair) }
         return pairs.sorted { $0.0 < $1.0 }.map(\.1)
     }
@@ -6708,14 +6715,15 @@ func fetchAll(_ ids: [Int]) async -> [String] {
 ヒント1: 完了順に届くので、あとから並べ直すための情報が必要です。
 ヒント2: 子タスクの戻り値に、元の位置が分かるものを含めます。
 ヒント3: 集めたあとに並べ替えてから、必要な値だけを取り出します。
-解説: TaskGroup は完了した順に結果を返すため、入力の順序を保ちたい場合は子タスクの戻り値に元のID（や添字）を含めます。`(Int, String)` のタプルで返し、集めたあとに `sorted { $0.0 < $1.0 }` で並べ直してから `map(\.1)` で値だけを取り出します。`pairs.map(\.1)` だけでは完了順のままなので、実行のたびに順序が変わります。IDを含めない `group.addTask { await fetch(id) }` では、そもそも並べ直す手がかりがありません。
+解説: TaskGroup は完了した順に結果を返すため、入力の順序を保ちたい場合は子タスクの戻り値に元の添字を含めます。`ids.enumerated()` で得た `(offset, id)` のうち offset と取得結果を返し、集めたあとに `sorted { $0.0 < $1.0 }` で並べ直してから `map(\.1)` で値だけを取り出します。IDそのものをキーにすると、入力が `[3, 1, 2]` のとき数値順へ変わり、重複IDも区別できません。`pairs.map(\.1)` だけでは完了順のままです。
 - 使っている考え方: 並行処理では順序が保証されません。順序が必要なら「順序の情報を結果に持たせて、あとで復元する」のが定石です。
-- 手順: `withTaskGroup(of: (Int, String).self)` … 戻り値の型にIDを含める。
-- 手順: `group.addTask { (id, await fetch(id)) }` … 各子タスクが自分のIDを返す。
+- 手順: `withTaskGroup(of: (Int, String).self)` … 戻り値の型に元の添字を含める。
+- 手順: `ids.enumerated()` … IDとは別に入力位置 offset を得る。
+- 手順: `group.addTask { (offset, await fetch(id)) }` … 各子タスクが元の位置を返す。
 - 手順: `for await pair in group` … 完了順に受け取る（順序は不定）。
-- 手順: `sorted { $0.0 < $1.0 }` … IDで並べ直す。
+- 手順: `sorted { $0.0 < $1.0 }` … 元の添字（offset）で並べ直す。
 - 手順: `map(\.1)` … 値だけを取り出して返す。
-- 動く理由: 順序の情報を結果に埋め込んだため、完了順がどうであっても復元できます。並べ替えは全件そろったあとに行うので、確定した順序が得られます。
+- 動く理由: 元の添字を結果に埋め込んだため、完了順がどうであっても、IDの大小や重複に影響されず入力順を復元できます。並べ替えは全件そろったあとに行います。
 - よくある間違い: テストで偶然順序が合っていたために「順序は保たれる」と判断する間違いです。負荷や件数が変わると崩れます。
 - よくある間違い: 共有配列に直接添字で書き込む実装は、データ競合の危険があります。結果を集めてから並べ替えるほうが安全です。
 - 関連例:
@@ -6724,14 +6732,14 @@ func fetch(_ id: Int) async -> String { "item\(id)" }
 func fetchAll(_ ids: [Int]) async -> [String] {
     await withTaskGroup(of: (Int, String).self) { group in
         var pairs: [(Int, String)] = []
-        for id in ids { group.addTask { (id, await fetch(id)) } }
+        for (offset, id) in ids.enumerated() { group.addTask { (offset, await fetch(id)) } }
         for await pair in group { pairs.append(pair) }
         return pairs.sorted { $0.0 < $1.0 }.map(\.1)
     }
 }
-print(await fetchAll([1, 2, 3]))
+print(await fetchAll([3, 1, 2]))
 ```
-- 関連例の出力: ["item1", "item2", "item3"]
+- 関連例の出力: ["item3", "item1", "item2"]
 - 関連例の説明: 並行に取得しても、並べ直しによって入力どおりの順序で返っています。
 - 覚えておくこと: 並行処理は完了順。順序が要るなら情報を持たせて後で並べ直す。
 
@@ -7040,7 +7048,7 @@ print(await vm.items)
 ヒント1: 「並行に受け渡しても安全」であることを表す標準のプロトコルがあります。
 ヒント2: そのプロトコルは要求メンバーを持たず、準拠を宣言するだけで検査が働きます。
 ヒント3: struct のあとに型名、コロン、プロトコル名、中かっこを続けます。
-解説: `struct Config: Sendable {` と書きます。Sendable は「この型の値は並行実行の境界を越えて安全に渡せる」ことを表すマーカープロトコルで、実装すべきメンバーはありません。準拠を宣言すると、コンパイラがその型の中身（全プロパティが Sendable か、可変な参照を持っていないか）を検査します。let のみを持つ値型は条件を満たすため、宣言するだけで準拠できます。実際には、すべてのプロパティが Sendable な struct は暗黙的に Sendable になりますが、公開する型では明示しておくと意図が伝わります。
+解説: `struct Config: Sendable {` と書きます。Sendable は「この型の値は並行実行の境界を越えて安全に渡せる」ことを表すマーカープロトコルで、実装すべきメンバーはありません。準拠を宣言すると、コンパイラがその型の中身（全プロパティが Sendable か、可変な参照を持っていないか）を検査します。let のみを持つ値型は条件を満たすため、宣言するだけで準拠できます。内部型など一定の条件では暗黙に Sendable が推論される場合もありますが、公開範囲や resilience によって推論条件が異なるため、ここでは明示して意図と検査をはっきりさせます。
 - 使っている考え方: Sendable は「型が並行境界を越えられるか」を表す軸です。actor が「状態をどう守るか」であるのに対し、Sendable は「値を渡してよいか」を扱います。
 - 手順: `struct Config: Sendable` … 値型として宣言し、Sendable に準拠する。
 - 手順: `let retries: Int` … Int は Sendable なので条件を満たす。
@@ -8746,7 +8754,7 @@ struct NameLabel: View {
 ヒント1: 1つ目は、SwiftUI が「これは画面部品だ」と判断するためのプロトコル名です。
 ヒント2: 2つ目は戻り値の型で、具体的な型名を書かずに済ませる書き方を使います。
 ヒント3: UIKit の型名は SwiftUI の View 宣言には登場しません。
-解説: 1つ目は `View` です。SwiftUI の画面部品は View プロトコルに準拠することで初めて画面に置けるようになります。2つ目は `some View` です。これは opaque return type（不透明な戻り値型）という機能で、「View に準拠した何か1つの具体的な型を返す」という意味になります。実際の body の型は Text や `ModifiedContent<Text, ...>` のように modifier を足すたびに変化する複雑な型ですが、`some View` と書けばその型名を人が書く必要がありません。`any View` でもコンパイルは通りますが、こちらは実行時に型を包む仕組み（existential）になるため、SwiftUI が型情報を使って行う差分更新の最適化が効きにくくなります。`Text` と具体的に書いてしまうと、あとから `.padding()` を足しただけで型が変わり、宣言を書き直す必要が出ます。
+解説: 1つ目は `View` です。SwiftUI の画面部品は View プロトコルに準拠することで初めて画面に置けるようになります。2つ目は `some View` です。これは opaque return type（不透明な戻り値型）という機能で、「View に準拠した何か1つの具体的な型を返す」という意味になります。実際の body の型は Text や `ModifiedContent<Text, ...>` のように modifier を足すたびに変化する複雑な型ですが、`some View` と書けばその型名を人が書く必要がありません。`any View` は existential（プロトコル型の値）であり、`View` の関連型 `Body` を満たす具体型としては使えないため、ここを `any View` にするとコンパイルできません。`Text` と具体的に書いてしまうと、あとから `.padding()` を足しただけで型が変わり、宣言を書き直す必要が出ます。
 - 使っている考え方: `some View` は「型は1つに決まっているが、その名前をここには書かない」という宣言です。呼び出し側からは具体的な型が隠れ、実装側は自由に型を変えられます。
 - 手順: `: View` … このstructがSwiftUIの画面部品であることを宣言する。
 - 手順: `var body: some View` … View に準拠した具体的な型を1つ返すと宣言する。
@@ -9356,7 +9364,7 @@ print("経路の深さ:", path.count, "表示するのは:", path.last!.name)
 対象レッスン: swiftui-list-navigation
 シリーズ: swiftui-list (2段階目)
 スキル: swiftui, collections, foundation
-問題: List の onDelete から呼ばれ、指定された行を配列とストアの両方から削除するメソッドを作ります。必要なブロックだけを正しい順に選んでください。
+問題: List の onDelete から呼ばれ、指定された行を配列とストアの両方から削除するメソッドを作ります。この課題では自動保存に頼らず、その場で明示的に保存します。必要なブロックだけを正しい順に選んでください。
 正解の並び:
 ```swift
 func delete(at offsets: IndexSet) {
@@ -9370,8 +9378,8 @@ func delete(at offsets: IndexSet) {
 ```
 ヒント1: 削除する対象は、配列から取り除く前に控えておく必要があります。
 ヒント2: IndexSet は複数の行を同時に含みます。1つずつ index で消すと、2件目以降の位置がずれます。
-ヒント3: ストアからの削除は、確定させる呼び出しがなければ次回起動で復活します。
-解説: 必要なのは、メソッド宣言、削除対象の控え、配列からの一括削除、ストアからの削除ループ、save、閉じかっこの8ブロックです。順序の要点は、`removed` を先に取ることです。配列から先に取り除いてしまうと、どのオブジェクトを永続ストアから消すべきか分からなくなります。次に `workouts.remove(atOffsets:)` を使う点が重要です。IndexSet は複数の位置を同時に含み得るため、`for index in offsets { workouts.remove(at: index) }` のように1つずつ消すと、最初の削除で後続の要素が前に詰まり、2件目以降が意図しない行を消します。`remove(atOffsets:)` はこのずれを内部で処理してくれます。`removeAll()` は指定に関係なく全件消すため、明確なバグです。最後に `context.save()` を呼ばないと、画面上は消えても永続ストアには残り、次回起動で復活します。
+ヒント3: この課題では自動保存に頼らないため、ストアの変更を明示的に保存します。
+解説: 必要なのは、メソッド宣言、削除対象の控え、配列からの一括削除、ストアからの削除ループ、save、閉じかっこの8ブロックです。順序の要点は、`removed` を先に取ることです。配列から先に取り除くと、永続ストアから消す対象を取得できません。次に `workouts.remove(atOffsets:)` を使います。IndexSet の位置を先頭から1件ずつ消すと、後続要素が詰まり、2件目以降が意図しない行を指します。`remove(atOffsets:)` はこのずれを処理します。SwiftData の ModelContext には自動保存もありますが、タイミングや設定に依存します。この課題は削除をその場で永続化する方針なので、最後に `context.save()` を明示的に呼びます。実アプリでは `try?` で失敗を捨てず、利用者への通知や再試行などの方針に沿ってエラーを処理します。
 - 使っている考え方: onDelete が渡す IndexSet は「複数行の同時削除」を表します。インデックスは削除のたびにずれるため、まとめて処理する API を使うのが安全です。
 - 手順: `offsets.map { workouts[$0] }` … 消す対象のオブジェクトを、ずれる前に控える。
 - 手順: `workouts.remove(atOffsets: offsets)` … 表示用の配列から一括で取り除く。
@@ -9381,7 +9389,7 @@ func delete(at offsets: IndexSet) {
 - 動く理由: 対象の特定が削除より前にあり、削除はずれの起きない API で一括実行され、最後に永続化が確定します。3つの順序制約がすべて満たされています。
 - よくある間違い: `for index in offsets { remove(at: index) }` と書く間違いです。複数行選択時、2件目以降が1つずつずれて誤った行を消します。
 - よくある間違い: 配列から消してから removed を求めようとする間違いです。既に存在しないため、ストア側を消せません。
-- よくある間違い: save を呼び忘れる間違いです。画面からは消えますが、再起動すると戻ってきます。
+- よくある間違い: 明示保存する設計なのに save を呼び忘れる間違いです。自動保存のタイミング任せになり、削除直後の永続化を保証できません。
 - 関連例:
 ```swift
 import Foundation
@@ -10096,8 +10104,8 @@ label.centerY == view.centerY
 ヒント1: 制約自体は正しく書かれ、有効化もされています。
 ヒント2: 「競合」ということは、別の制約がどこかから来ているということです。
 ヒント3: frame から制約を自動生成する仕組みが、まだ有効なままです。
-解説: 問題は3行目で、`translatesAutoresizingMaskIntoConstraints` を `true` のままにしていることです。これが true だと、UIKit はその view の frame と autoresizingMask から制約を自動生成します。button の frame は初期値の `CGRect.zero` なので、「幅0・高さ0で左上（0,0）に固定」という制約が作られます。そこへ自分で書いた中央揃えの制約が加わるため、位置について矛盾する指定が同時に存在することになり、Auto Layout エンジンが競合を検出して警告を出し、片方を無効化します。多くの場合、自動生成された制約のほうが必須（required）の優先度で残るため、ボタンは左上に0サイズで表示されます。修正は false にすることで、自動生成が止まり、自分で書いた制約だけが効くようになります。2行目の addSubview、4〜7行目の制約はいずれも正しく、原因ではありません。
-- 使っている考え方: `translatesAutoresizingMaskIntoConstraints` は「frame ベースのレイアウトと Auto Layout のどちらを使うか」を切り替えるフラグです。両方を同時に有効にすると必ず競合します。
+解説: 問題は3行目で、`translatesAutoresizingMaskIntoConstraints` を `true` のままにしていることです。これが true だと、UIKit は frame と autoresizingMask から制約を自動生成します。そこへ自分で書いた中央揃えの制約が加わるため、矛盾する指定が同時に存在し、Auto Layout エンジンは競合を警告していずれかの制約を破棄します。どの制約が破棄され、最終的にどの位置や大きさになるかは制約・優先度・実行環境に左右されるため、特定の崩れ方を前提にはできません。修正は false にして自動生成を止め、自分で書いた制約だけを効かせることです。2行目の addSubview、4〜7行目の制約はいずれも正しく、原因ではありません。
+- 使っている考え方: `translatesAutoresizingMaskIntoConstraints` が true だと frame と autoresizingMask から制約が生成されます。自分で追加した制約と両立する場合もありますが、この例のように同じ位置を矛盾して指定すると競合します。
 - 手順: true のとき、UIKit が frame から制約を自動生成する。
 - 手順: button の frame は .zero なので「幅0・高さ0・左上固定」という制約になる。
 - 手順: 自分で書いた centerX / centerY の制約が追加される。
@@ -10443,14 +10451,14 @@ print("代入直後の delegate:", u.delegate == nil ? "nil" : "生存")
 ヒント1: セルは毎回新しく作るのではなく、画面外へ出たものを使い回します。
 ヒント2: 使い回したセルには前の行の内容が残っているため、必ず設定し直します。
 ヒント3: このメソッドの中で一覧全体を再読み込みすると、呼び出しが無限に繰り返されます。
-解説: 必要なのは、メソッド宣言、`dequeueReusableCell` によるセルの取得、内容の設定、return、閉じかっこの5ブロックです。要点はセルの再利用です。`dequeueReusableCell(withIdentifier:for:)` は、画面外へスクロールして不要になったセルを再利用キューから取り出し、なければ新しく作ります。この仕組みによって、行が1万件あっても実際に生成されるセルは画面に見える数＋数個で済みます。`WorkoutCell()` を毎回生成すると、スクロールのたびにインスタンスが増え、メモリと生成コストが行数に比例します。次に `cell.configure(with:)` で必ず内容を設定します。再利用されたセルには前に表示していた行の内容が残っているため、設定を省くと別の行のデータが表示されます。`tableView.reloadData()` をこのメソッドの中に置くと、再読み込みが cellForRowAt を再び呼び、無限に繰り返してアプリが固まります。
+解説: 必要なのは、メソッド宣言、`dequeueReusableCell` によるセルの取得、内容の設定、return、閉じかっこの5ブロックです。要点はセルの再利用です。`dequeueReusableCell(withIdentifier:for:)` は、画面外へスクロールして不要になったセルを再利用キューから取り出し、なければ新しく作ります。この仕組みによって、行が1万件あっても実際に保持するセルは主に画面に見える数と予備分で済みます。`WorkoutCell()` を毎回生成すると、スクロールのたびに不要な生成と破棄が発生し、割り当てコストが増えます。次に `cell.configure(with:)` で必ず内容を設定します。再利用されたセルには前に表示していた行の内容が残るため、設定を省くと別の行のデータが表示されます。`tableView.reloadData()` をこのメソッドの中に置くと、再読み込みが cellForRowAt を再び呼び、繰り返しを招きます。
 - 使っている考え方: UITableView は「見えている数ぶんのセルを使い回す」設計です。そのため、セルは常に「前の行の状態を持っているかもしれないもの」として扱う必要があります。
 - 手順: `dequeueReusableCell(withIdentifier:for:)` … 再利用キューから取得する。なければ生成される。
 - 手順: 取得したセルには、前に表示していた行の内容が残っている可能性がある。
 - 手順: `cell.configure(with: workouts[indexPath.row])` … この行の内容で必ず上書きする。
 - 手順: `return cell` … 設定済みのセルを返す。
 - 動く理由: 取得・設定・返却という3段階が過不足なくそろっています。再利用によって生成コストが行数に依存せず、毎回設定するため内容の残りも起きません。
-- よくある間違い: セルを毎回 `WorkoutCell()` で生成する間違いです。スクロールが重くなり、メモリも増え続けます。
+- よくある間違い: セルを毎回 `WorkoutCell()` で生成する間違いです。スクロールのたびに不要な割り当てと破棄が起き、処理負荷が増えます。
 - よくある間違い: configure を条件付きにする間違いです。設定されない経路でセルに前の行の内容が残ります。
 - よくある間違い: cellForRowAt の中で reloadData を呼ぶ間違いです。呼び出しが再帰し、アプリが応答しなくなります。
 - 関連例:
@@ -10524,6 +10532,7 @@ func configure(with workout: Workout) {
     imageView?.image = nil
     currentTask?.cancel()
     let url = workout.imageURL
+    let loader = self.loader
     currentTask = Task { [weak self] in
         let image = await loader.image(for: url)
         guard !Task.isCancelled else { return }

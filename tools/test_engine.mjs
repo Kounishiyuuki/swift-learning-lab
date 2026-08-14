@@ -189,6 +189,10 @@ S.practiceReveal();
 ok(S.practiceState.solutionShown === true, "解答表示フラグが立つ");
 ok(S.practiceRecord(target.id).needsReview === true, "解答を見た問題は要復習になる");
 ok(S.practiceRecord(target.id).solutionViewed === true, "解答表示が記録される");
+ok(S.practiceRecord(target.id).attempts === 0, "未回答で解答を見ても試行回数は増えない");
+ok(S.practiceStatus(target.id) === "review", "未回答で解答を見た問題も review と表示される");
+ok(S.practiceSummary().review >= 1, "未回答で解答を見た問題も全体の要復習件数に含まれる");
+ok(S.practiceSkillStats().some(row => row.review >= 1), "未回答で解答を見た問題もスキル別の要復習件数に含まれる");
 
 /* ---- 8. 採点・保存・復習・クリーンな解き直し ---- */
 const t2 = CH.find(c => c.type === "bugHunt");
@@ -230,9 +234,43 @@ const saved = JSON.parse(store["swiftLearningPracticeStatsV1"]);
 ok(saved.challenges[t2.id].bestScore === 100, "保存内容に bestScore が含まれる");
 ok(saved.challenges[t2.id].attempts >= 4, "保存内容に attempts が含まれる");
 ok(saved.challenges[t2.id].hintsUsed === 3, "保存内容に hintsUsed が含まれる");
-ok(store["swiftLearningStats"] === undefined || true, "知識問題のキーとは別に保存される");
-const broken = { getItem: () => "{{{", setItem(){}, };
-ok(typeof S.loadPracticeStats === "function", "壊れた保存データ用の読み込み関数がある");
+store["swiftLearningStats"]="knowledge-sentinel";
+const persistenceProbe=CH.find(c=>c.type==="trace" && !S.practiceRecord(c.id));
+S.openChallenge(persistenceProbe.id);
+S.practiceReveal();
+ok(store["swiftLearningStats"] === "knowledge-sentinel", "実装練習の保存は知識問題のキーを変更しない");
+store["swiftLearningPracticeStatsV1"] = "{{{";
+ok(Object.keys(S.loadPracticeStats().challenges).length === 0, "壊れたJSONは空の保存状態として読み込む");
+store["swiftLearningPracticeStatsV1"] = JSON.stringify({version:99,challenges:{
+  valid:{attempts:2,solved:true,bestScore:85,hintsUsed:1,solutionViewed:false,lastResult:"correct",needsReview:false},
+  partial:{attempts:1,needsReview:true}, malformed:["not","a","record"],
+  inconsistent:{attempts:1,solved:false,bestScore:100,hintsUsed:0,lastResult:"wrong",needsReview:false}
+}});
+const sanitized=S.loadPracticeStats();
+ok(sanitized.version === 1 && sanitized.challenges.valid.bestScore === 85,
+   "保存データを現行versionへ正規化し、有効なレコードを保持する");
+ok(sanitized.challenges.partial.attempts === 1 && sanitized.challenges.partial.bestScore === 0 && sanitized.challenges.partial.needsReview,
+   "部分的なレコードは安全な既定値で補完する");
+ok(!("malformed" in sanitized.challenges), "壊れた1レコードだけを破棄する");
+ok(sanitized.challenges.inconsistent.bestScore === 0 && sanitized.challenges.inconsistent.needsReview,
+   "未解決レコードの不正な最高点を破棄し、要復習として正規化する");
+const inconsistentId=CH.find(c=>!S.practiceRecord(c.id)).id;
+S.practiceStats.challenges[inconsistentId]={attempts:1,solved:false,bestScore:100,needsReview:true};
+const inconsistentSummary=S.practiceSummary();
+ok(inconsistentSummary.mastered <= inconsistentSummary.solved && inconsistentSummary.noHintPct <= 100,
+   "矛盾した保存レコードでも未解決を習得扱いせず、割合は100%を超えない");
+delete S.practiceStats.challenges[inconsistentId];
+store["swiftLearningPracticeStatsV1"] = JSON.stringify(saved);
+
+/* ---- 9b. 状態通知のアクセシビリティ ---- */
+S.openChallenge(target.id);
+S.practiceHint();
+ok(getEl("content").innerHTML.includes('id="pHints" role="status" aria-live="polite"'),
+   "ヒント領域が支援技術へ更新を通知する");
+S.practiceState.work=wrongWork(target);
+S.practiceCheck();
+ok(getEl("content").innerHTML.includes('role="status" aria-live="assertive"'),
+   "採点結果が支援技術へ即時通知される");
 
 /* ---- 10. 絞り込み ---- */
 function count(f) {

@@ -525,7 +525,9 @@
       "solution": {
         "accepted": [
           "var count = 0",
-          "var count: Int = 0"
+          "var count: Int = 0",
+          "var count = Int.zero",
+          "var count: Int = .zero"
         ]
       },
       "hints": [
@@ -2487,7 +2489,9 @@
       "solution": {
         "accepted": [
           "return a + b",
-          "return b + a"
+          "return b + a",
+          "return (a + b)",
+          "return (b + a)"
         ]
       },
       "hints": [
@@ -4574,7 +4578,7 @@
       "type": "buildFunction",
       "difficulty": 3,
       "title": "倍数の合計を返す関数を組み立てる",
-      "prompt": "n の倍数のうち limit 未満のものを合計して返す関数を作ります。必要なブロックだけを選んで正しい順に並べてください。",
+      "prompt": "正の整数 n の倍数のうち limit 未満のものを合計して返す関数を作ります（n > 0 を前提とします）。必要なブロックだけを選んで正しい順に並べてください。",
       "skills": [
         "functions",
         "controlFlow"
@@ -7083,7 +7087,8 @@
       "solution": {
         "accepted": [
           "let total = prices.reduce(0, +)",
-          "let total = prices.reduce(0) { $0 + $1 }"
+          "let total = prices.reduce(0) { $0 + $1 }",
+          "let total = prices.reduce(0, { $0 + $1 })"
         ]
       },
       "hints": [
@@ -11916,6 +11921,10 @@
           {
             "id": "b11",
             "code": "        token = NotificationCenter.default.addObserver(forName: .didUpdate, object: nil, queue: nil) { _ in self.handle() }"
+          },
+          {
+            "id": "b12",
+            "code": "        guard token == nil else { return }"
           }
         ]
       },
@@ -11926,6 +11935,7 @@
           "b3",
           "b4",
           "b5",
+          "b12",
           "b6",
           "b7",
           "b8",
@@ -11936,26 +11946,28 @@
       "hints": [
         "クロージャがそのまま self を強く捕捉すると、解除するまでインスタンスが解放されません。",
         "解除に必要なトークンは、あとで使えるようにプロパティとして保持します。",
-        "import → 通知名 → クラス宣言 → トークン → start → 登録 → start を閉じる → handle → deinit → クラスを閉じる、の10行です。"
+        "import → 通知名 → クラス宣言 → トークン → start → 二重登録の防止 → 登録 → start を閉じる → handle → deinit → クラスを閉じる、の11行です。"
       ],
-      "explanation": "ブロック形式の addObserver は、渡したクロージャを NotificationCenter が保持し続けます。そのクロージャが self を強参照すると、removeObserver するまでインスタンスが解放されず、deinit も呼ばれないため解除の機会が永久に来ません。`[weak self]` にすることでこの循環が切れ、インスタンスが解放されるときに deinit が実行されて登録も解除されます。トークンをプロパティに保持しているのは、解除時に必要だからです。",
+      "explanation": "ブロック形式の addObserver は、渡したクロージャを NotificationCenter が保持し続けます。そのクロージャが self を強参照すると、removeObserver するまでインスタンスが解放されず、deinit も呼ばれません。`[weak self]` にすることで循環を切り、deinit で登録を解除します。また `start()` が複数回呼ばれて token を上書きすると、以前の登録を解除できなくなるため、`guard token == nil else { return }` で二重登録を防ぎます。",
       "detail": {
         "concept": "購読の登録は「解除まで含めて1組」です。解除のタイミングを deinit に置くなら、deinit が確実に呼ばれるように参照の強さを設計する必要があります。",
         "steps": [
           "`private var token: NSObjectProtocol?` … 解除に使うトークンを保持する。",
+          "`guard token == nil else { return }` … start が複数回呼ばれても登録を増やさない。",
           "`addObserver(...) { [weak self] _ in self?.handle() }` … 弱参照で self を捕捉する。",
           "NotificationCenter はクロージャを保持するが、self は弱参照なので解放を妨げない。",
           "インスタンスが解放されると deinit が呼ばれ、removeObserver が実行される。"
         ],
-        "whyCorrect": "weak によって NotificationCenter → self の強参照が切れ、参照カウントが正しく0になります。その結果 deinit が呼ばれ、登録解除まで自動的に完了します。",
+        "whyCorrect": "weak によって NotificationCenter → self の強参照が切れ、二重登録ガードによって保持できない古いトークンも生まれません。その結果 deinit が呼ばれ、唯一の登録を確実に解除できます。",
         "commonMistakes": [
           "`{ _ in self.handle() }` と強参照で書く間違いです。deinit が呼ばれなくなり、解除もされず、通知のたびに古いインスタンスが動き続けます。",
           "トークンを保持せずに登録する間違いです。解除のしようがなくなります。",
+          "start のたびに token を上書きする間違いです。以前の登録が残り、deinit でも最後の1件しか解除できません。",
           "セレクタ形式の addObserver は解除を忘れても比較的安全ですが、こちらのブロック形式では明示的な解除が必要です。"
         ],
-        "takeaway": "ブロック形式の購読は [weak self] + トークン保持 + deinit で解除、の3点セット。",
+        "takeaway": "ブロック形式の購読は [weak self]・二重登録の防止・トークン保持・deinit での解除を一組で設計する。",
         "example": {
-          "code": "import Foundation\nextension Notification.Name { static let didUpdate = Notification.Name(\"didUpdate\") }\nfinal class Watcher {\n    private var token: NSObjectProtocol?\n    func start() { token = NotificationCenter.default.addObserver(forName: .didUpdate, object: nil, queue: nil) { [weak self] _ in self?.handle() } }\n    func handle() { print(\"更新\") }\n    deinit { print(\"deinit\"); if let token { NotificationCenter.default.removeObserver(token) } }\n}\nvar w: Watcher? = Watcher()\nw?.start()\nNotificationCenter.default.post(name: .didUpdate, object: nil)\nw = nil",
+          "code": "import Foundation\nextension Notification.Name { static let didUpdate = Notification.Name(\"didUpdate\") }\nfinal class Watcher {\n    private var token: NSObjectProtocol?\n    func start() {\n        guard token == nil else { return }\n        token = NotificationCenter.default.addObserver(forName: .didUpdate, object: nil, queue: nil) { [weak self] _ in self?.handle() }\n    }\n    func handle() { print(\"更新\") }\n    deinit { print(\"deinit\"); if let token { NotificationCenter.default.removeObserver(token) } }\n}\nvar w: Watcher? = Watcher()\nw?.start()\nw?.start()\nNotificationCenter.default.post(name: .didUpdate, object: nil)\nw = nil",
           "output": "更新\ndeinit",
           "explanation": "通知を受け取ったあと、参照を切ると deinit が呼ばれて解除まで完了しています。"
         }
@@ -14191,7 +14203,7 @@
           },
           {
             "id": "b5",
-            "code": "        for id in ids { group.addTask { (id, await fetch(id)) } }"
+            "code": "        for (offset, id) in ids.enumerated() { group.addTask { (offset, await fetch(id)) } }"
           },
           {
             "id": "b6",
@@ -14237,25 +14249,26 @@
         "子タスクの戻り値に、元の位置が分かるものを含めます。",
         "集めたあとに並べ替えてから、必要な値だけを取り出します。"
       ],
-      "explanation": "TaskGroup は完了した順に結果を返すため、入力の順序を保ちたい場合は子タスクの戻り値に元のID（や添字）を含めます。`(Int, String)` のタプルで返し、集めたあとに `sorted { $0.0 < $1.0 }` で並べ直してから `map(\\.1)` で値だけを取り出します。`pairs.map(\\.1)` だけでは完了順のままなので、実行のたびに順序が変わります。IDを含めない `group.addTask { await fetch(id) }` では、そもそも並べ直す手がかりがありません。",
+      "explanation": "TaskGroup は完了した順に結果を返すため、入力の順序を保ちたい場合は子タスクの戻り値に元の添字を含めます。`ids.enumerated()` で得た `(offset, id)` のうち offset と取得結果を返し、集めたあとに `sorted { $0.0 < $1.0 }` で並べ直してから `map(\\.1)` で値だけを取り出します。IDそのものをキーにすると、入力が `[3, 1, 2]` のとき数値順へ変わり、重複IDも区別できません。`pairs.map(\\.1)` だけでは完了順のままです。",
       "detail": {
         "concept": "並行処理では順序が保証されません。順序が必要なら「順序の情報を結果に持たせて、あとで復元する」のが定石です。",
         "steps": [
-          "`withTaskGroup(of: (Int, String).self)` … 戻り値の型にIDを含める。",
-          "`group.addTask { (id, await fetch(id)) }` … 各子タスクが自分のIDを返す。",
+          "`withTaskGroup(of: (Int, String).self)` … 戻り値の型に元の添字を含める。",
+          "`ids.enumerated()` … IDとは別に入力位置 offset を得る。",
+          "`group.addTask { (offset, await fetch(id)) }` … 各子タスクが元の位置を返す。",
           "`for await pair in group` … 完了順に受け取る（順序は不定）。",
-          "`sorted { $0.0 < $1.0 }` … IDで並べ直す。",
+          "`sorted { $0.0 < $1.0 }` … 元の添字（offset）で並べ直す。",
           "`map(\\.1)` … 値だけを取り出して返す。"
         ],
-        "whyCorrect": "順序の情報を結果に埋め込んだため、完了順がどうであっても復元できます。並べ替えは全件そろったあとに行うので、確定した順序が得られます。",
+        "whyCorrect": "元の添字を結果に埋め込んだため、完了順がどうであっても、IDの大小や重複に影響されず入力順を復元できます。並べ替えは全件そろったあとに行います。",
         "commonMistakes": [
           "テストで偶然順序が合っていたために「順序は保たれる」と判断する間違いです。負荷や件数が変わると崩れます。",
           "共有配列に直接添字で書き込む実装は、データ競合の危険があります。結果を集めてから並べ替えるほうが安全です。"
         ],
         "takeaway": "並行処理は完了順。順序が要るなら情報を持たせて後で並べ直す。",
         "example": {
-          "code": "func fetch(_ id: Int) async -> String { \"item\\(id)\" }\nfunc fetchAll(_ ids: [Int]) async -> [String] {\n    await withTaskGroup(of: (Int, String).self) { group in\n        var pairs: [(Int, String)] = []\n        for id in ids { group.addTask { (id, await fetch(id)) } }\n        for await pair in group { pairs.append(pair) }\n        return pairs.sorted { $0.0 < $1.0 }.map(\\.1)\n    }\n}\nprint(await fetchAll([1, 2, 3]))",
-          "output": "[\"item1\", \"item2\", \"item3\"]",
+          "code": "func fetch(_ id: Int) async -> String { \"item\\(id)\" }\nfunc fetchAll(_ ids: [Int]) async -> [String] {\n    await withTaskGroup(of: (Int, String).self) { group in\n        var pairs: [(Int, String)] = []\n        for (offset, id) in ids.enumerated() { group.addTask { (offset, await fetch(id)) } }\n        for await pair in group { pairs.append(pair) }\n        return pairs.sorted { $0.0 < $1.0 }.map(\\.1)\n    }\n}\nprint(await fetchAll([3, 1, 2]))",
+          "output": "[\"item3\", \"item1\", \"item2\"]",
           "explanation": "並行に取得しても、並べ直しによって入力どおりの順序で返っています。"
         }
       },
@@ -14912,7 +14925,7 @@
         "そのプロトコルは要求メンバーを持たず、準拠を宣言するだけで検査が働きます。",
         "struct のあとに型名、コロン、プロトコル名、中かっこを続けます。"
       ],
-      "explanation": "`struct Config: Sendable {` と書きます。Sendable は「この型の値は並行実行の境界を越えて安全に渡せる」ことを表すマーカープロトコルで、実装すべきメンバーはありません。準拠を宣言すると、コンパイラがその型の中身（全プロパティが Sendable か、可変な参照を持っていないか）を検査します。let のみを持つ値型は条件を満たすため、宣言するだけで準拠できます。実際には、すべてのプロパティが Sendable な struct は暗黙的に Sendable になりますが、公開する型では明示しておくと意図が伝わります。",
+      "explanation": "`struct Config: Sendable {` と書きます。Sendable は「この型の値は並行実行の境界を越えて安全に渡せる」ことを表すマーカープロトコルで、実装すべきメンバーはありません。準拠を宣言すると、コンパイラがその型の中身（全プロパティが Sendable か、可変な参照を持っていないか）を検査します。let のみを持つ値型は条件を満たすため、宣言するだけで準拠できます。内部型など一定の条件では暗黙に Sendable が推論される場合もありますが、公開範囲や resilience によって推論条件が異なるため、ここでは明示して意図と検査をはっきりさせます。",
       "detail": {
         "concept": "Sendable は「型が並行境界を越えられるか」を表す軸です。actor が「状態をどう守るか」であるのに対し、Sendable は「値を渡してよいか」を扱います。",
         "steps": [
@@ -17066,7 +17079,10 @@
       },
       "solution": {
         "accepted": [
-          "#expect(result == 1100)"
+          "#expect(result == 1100)",
+          "#expect(result == 1_100)",
+          "#expect(1100 == result)",
+          "#expect(1_100 == result)"
         ]
       },
       "hints": [
@@ -18550,7 +18566,7 @@
         "2つ目は戻り値の型で、具体的な型名を書かずに済ませる書き方を使います。",
         "UIKit の型名は SwiftUI の View 宣言には登場しません。"
       ],
-      "explanation": "1つ目は `View` です。SwiftUI の画面部品は View プロトコルに準拠することで初めて画面に置けるようになります。2つ目は `some View` です。これは opaque return type（不透明な戻り値型）という機能で、「View に準拠した何か1つの具体的な型を返す」という意味になります。実際の body の型は Text や `ModifiedContent<Text, ...>` のように modifier を足すたびに変化する複雑な型ですが、`some View` と書けばその型名を人が書く必要がありません。`any View` でもコンパイルは通りますが、こちらは実行時に型を包む仕組み（existential）になるため、SwiftUI が型情報を使って行う差分更新の最適化が効きにくくなります。`Text` と具体的に書いてしまうと、あとから `.padding()` を足しただけで型が変わり、宣言を書き直す必要が出ます。",
+      "explanation": "1つ目は `View` です。SwiftUI の画面部品は View プロトコルに準拠することで初めて画面に置けるようになります。2つ目は `some View` です。これは opaque return type（不透明な戻り値型）という機能で、「View に準拠した何か1つの具体的な型を返す」という意味になります。実際の body の型は Text や `ModifiedContent<Text, ...>` のように modifier を足すたびに変化する複雑な型ですが、`some View` と書けばその型名を人が書く必要がありません。`any View` は existential（プロトコル型の値）であり、`View` の関連型 `Body` を満たす具体型としては使えないため、ここを `any View` にするとコンパイルできません。`Text` と具体的に書いてしまうと、あとから `.padding()` を足しただけで型が変わり、宣言を書き直す必要が出ます。",
       "detail": {
         "concept": "`some View` は「型は1つに決まっているが、その名前をここには書かない」という宣言です。呼び出し側からは具体的な型が隠れ、実装側は自由に型を変えられます。",
         "steps": [
@@ -19308,7 +19324,8 @@
       },
       "solution": {
         "accepted": [
-          "TextField(\"名前\", text: $name)"
+          "TextField(\"名前\", text: $name)",
+          "TextField(text: $name, prompt: Text(\"名前\"))"
         ]
       },
       "hints": [
@@ -19743,7 +19760,7 @@
       "type": "buildFunction",
       "difficulty": 3,
       "title": "行を削除するメソッドを組み立てる",
-      "prompt": "List の onDelete から呼ばれ、指定された行を配列とストアの両方から削除するメソッドを作ります。必要なブロックだけを正しい順に選んでください。",
+      "prompt": "List の onDelete から呼ばれ、指定された行を配列とストアの両方から削除するメソッドを作ります。この課題では自動保存に頼らず、その場で明示的に保存します。必要なブロックだけを正しい順に選んでください。",
       "skills": [
         "swiftui",
         "collections",
@@ -19809,9 +19826,9 @@
       "hints": [
         "削除する対象は、配列から取り除く前に控えておく必要があります。",
         "IndexSet は複数の行を同時に含みます。1つずつ index で消すと、2件目以降の位置がずれます。",
-        "ストアからの削除は、確定させる呼び出しがなければ次回起動で復活します。"
+        "この課題では自動保存に頼らないため、ストアの変更を明示的に保存します。"
       ],
-      "explanation": "必要なのは、メソッド宣言、削除対象の控え、配列からの一括削除、ストアからの削除ループ、save、閉じかっこの8ブロックです。順序の要点は、`removed` を先に取ることです。配列から先に取り除いてしまうと、どのオブジェクトを永続ストアから消すべきか分からなくなります。次に `workouts.remove(atOffsets:)` を使う点が重要です。IndexSet は複数の位置を同時に含み得るため、`for index in offsets { workouts.remove(at: index) }` のように1つずつ消すと、最初の削除で後続の要素が前に詰まり、2件目以降が意図しない行を消します。`remove(atOffsets:)` はこのずれを内部で処理してくれます。`removeAll()` は指定に関係なく全件消すため、明確なバグです。最後に `context.save()` を呼ばないと、画面上は消えても永続ストアには残り、次回起動で復活します。",
+      "explanation": "必要なのは、メソッド宣言、削除対象の控え、配列からの一括削除、ストアからの削除ループ、save、閉じかっこの8ブロックです。順序の要点は、`removed` を先に取ることです。配列から先に取り除くと、永続ストアから消す対象を取得できません。次に `workouts.remove(atOffsets:)` を使います。IndexSet の位置を先頭から1件ずつ消すと、後続要素が詰まり、2件目以降が意図しない行を指します。`remove(atOffsets:)` はこのずれを処理します。SwiftData の ModelContext には自動保存もありますが、タイミングや設定に依存します。この課題は削除をその場で永続化する方針なので、最後に `context.save()` を明示的に呼びます。実アプリでは `try?` で失敗を捨てず、利用者への通知や再試行などの方針に沿ってエラーを処理します。",
       "detail": {
         "concept": "onDelete が渡す IndexSet は「複数行の同時削除」を表します。インデックスは削除のたびにずれるため、まとめて処理する API を使うのが安全です。",
         "steps": [
@@ -19825,7 +19842,7 @@
         "commonMistakes": [
           "`for index in offsets { remove(at: index) }` と書く間違いです。複数行選択時、2件目以降が1つずつずれて誤った行を消します。",
           "配列から消してから removed を求めようとする間違いです。既に存在しないため、ストア側を消せません。",
-          "save を呼び忘れる間違いです。画面からは消えますが、再起動すると戻ってきます。"
+          "明示保存する設計なのに save を呼び忘れる間違いです。自動保存のタイミング任せになり、削除直後の永続化を保証できません。"
         ],
         "takeaway": "IndexSet はまとめて処理する。対象は消す前に控える。",
         "example": {
@@ -20750,7 +20767,8 @@
       },
       "solution": {
         "accepted": [
-          "view.addSubview(button)"
+          "view.addSubview(button)",
+          "self.view.addSubview(button)"
         ]
       },
       "hints": [
@@ -21294,9 +21312,9 @@
         "「競合」ということは、別の制約がどこかから来ているということです。",
         "frame から制約を自動生成する仕組みが、まだ有効なままです。"
       ],
-      "explanation": "問題は3行目で、`translatesAutoresizingMaskIntoConstraints` を `true` のままにしていることです。これが true だと、UIKit はその view の frame と autoresizingMask から制約を自動生成します。button の frame は初期値の `CGRect.zero` なので、「幅0・高さ0で左上（0,0）に固定」という制約が作られます。そこへ自分で書いた中央揃えの制約が加わるため、位置について矛盾する指定が同時に存在することになり、Auto Layout エンジンが競合を検出して警告を出し、片方を無効化します。多くの場合、自動生成された制約のほうが必須（required）の優先度で残るため、ボタンは左上に0サイズで表示されます。修正は false にすることで、自動生成が止まり、自分で書いた制約だけが効くようになります。2行目の addSubview、4〜7行目の制約はいずれも正しく、原因ではありません。",
+      "explanation": "問題は3行目で、`translatesAutoresizingMaskIntoConstraints` を `true` のままにしていることです。これが true だと、UIKit は frame と autoresizingMask から制約を自動生成します。そこへ自分で書いた中央揃えの制約が加わるため、矛盾する指定が同時に存在し、Auto Layout エンジンは競合を警告していずれかの制約を破棄します。どの制約が破棄され、最終的にどの位置や大きさになるかは制約・優先度・実行環境に左右されるため、特定の崩れ方を前提にはできません。修正は false にして自動生成を止め、自分で書いた制約だけを効かせることです。2行目の addSubview、4〜7行目の制約はいずれも正しく、原因ではありません。",
       "detail": {
-        "concept": "`translatesAutoresizingMaskIntoConstraints` は「frame ベースのレイアウトと Auto Layout のどちらを使うか」を切り替えるフラグです。両方を同時に有効にすると必ず競合します。",
+        "concept": "`translatesAutoresizingMaskIntoConstraints` が true だと frame と autoresizingMask から制約が生成されます。自分で追加した制約と両立する場合もありますが、この例のように同じ位置を矛盾して指定すると競合します。",
         "steps": [
           "true のとき、UIKit が frame から制約を自動生成する。",
           "button の frame は .zero なので「幅0・高さ0・左上固定」という制約になる。",
@@ -21405,7 +21423,10 @@
       },
       "solution": {
         "accepted": [
-          "headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)"
+          "headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)",
+          "headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0)",
+          "view.safeAreaLayoutGuide.topAnchor.constraint(equalTo: headerView.topAnchor)",
+          "view.safeAreaLayoutGuide.topAnchor.constraint(equalTo: headerView.topAnchor, constant: 0)"
         ]
       },
       "hints": [
@@ -21874,7 +21895,7 @@
       "noRunSolution": true,
       "content": {
         "requirement": "Uploader が完了したとき、登録された delegate の uploaderDidFinish が呼ばれること。",
-        "code": "final class Uploader {\n    weak var delegate: UploaderDelegate?\n    func finish() { delegate?.uploaderDidFinish(self) }\n}\n\n// テスト（失敗するほう）\nlet uploader = Uploader()\nuploader.delegate = SpyDelegate()\nuploader.finish()\n#expect(spy.callCount == 1)",
+        "code": "final class Uploader {\n    weak var delegate: UploaderDelegate?\n    func finish() { delegate?.uploaderDidFinish(self) }\n}\n\n// テスト（失敗するほう）\nlet uploader = Uploader()\nweak var spy: SpyDelegate?\ndo {\n    let temporary = SpyDelegate()\n    spy = temporary\n    uploader.delegate = temporary\n}\nuploader.finish()\n#expect(spy?.callCount == 1)",
         "tests": [
           {
             "name": "spy をローカル変数で保持",
@@ -22013,7 +22034,7 @@
         "使い回したセルには前の行の内容が残っているため、必ず設定し直します。",
         "このメソッドの中で一覧全体を再読み込みすると、呼び出しが無限に繰り返されます。"
       ],
-      "explanation": "必要なのは、メソッド宣言、`dequeueReusableCell` によるセルの取得、内容の設定、return、閉じかっこの5ブロックです。要点はセルの再利用です。`dequeueReusableCell(withIdentifier:for:)` は、画面外へスクロールして不要になったセルを再利用キューから取り出し、なければ新しく作ります。この仕組みによって、行が1万件あっても実際に生成されるセルは画面に見える数＋数個で済みます。`WorkoutCell()` を毎回生成すると、スクロールのたびにインスタンスが増え、メモリと生成コストが行数に比例します。次に `cell.configure(with:)` で必ず内容を設定します。再利用されたセルには前に表示していた行の内容が残っているため、設定を省くと別の行のデータが表示されます。`tableView.reloadData()` をこのメソッドの中に置くと、再読み込みが cellForRowAt を再び呼び、無限に繰り返してアプリが固まります。",
+      "explanation": "必要なのは、メソッド宣言、`dequeueReusableCell` によるセルの取得、内容の設定、return、閉じかっこの5ブロックです。要点はセルの再利用です。`dequeueReusableCell(withIdentifier:for:)` は、画面外へスクロールして不要になったセルを再利用キューから取り出し、なければ新しく作ります。この仕組みによって、行が1万件あっても実際に保持するセルは主に画面に見える数と予備分で済みます。`WorkoutCell()` を毎回生成すると、スクロールのたびに不要な生成と破棄が発生し、割り当てコストが増えます。次に `cell.configure(with:)` で必ず内容を設定します。再利用されたセルには前に表示していた行の内容が残るため、設定を省くと別の行のデータが表示されます。`tableView.reloadData()` をこのメソッドの中に置くと、再読み込みが cellForRowAt を再び呼び、繰り返しを招きます。",
       "detail": {
         "concept": "UITableView は「見えている数ぶんのセルを使い回す」設計です。そのため、セルは常に「前の行の状態を持っているかもしれないもの」として扱う必要があります。",
         "steps": [
@@ -22024,7 +22045,7 @@
         ],
         "whyCorrect": "取得・設定・返却という3段階が過不足なくそろっています。再利用によって生成コストが行数に依存せず、毎回設定するため内容の残りも起きません。",
         "commonMistakes": [
-          "セルを毎回 `WorkoutCell()` で生成する間違いです。スクロールが重くなり、メモリも増え続けます。",
+          "セルを毎回 `WorkoutCell()` で生成する間違いです。スクロールのたびに不要な割り当てと破棄が起き、処理負荷が増えます。",
           "configure を条件付きにする間違いです。設定されない経路でセルに前の行の内容が残ります。",
           "cellForRowAt の中で reloadData を呼ぶ間違いです。呼び出しが再帰し、アプリが応答しなくなります。"
         ],
@@ -22152,7 +22173,7 @@
         "options": [
           {
             "id": "o1",
-            "code": "private var currentTask: Task<Void, Never>?\n\nfunc configure(with workout: Workout) {\n    titleLabel.text = workout.name\n    imageView?.image = nil\n    currentTask?.cancel()\n    let url = workout.imageURL\n    currentTask = Task { [weak self] in\n        let image = await loader.image(for: url)\n        guard !Task.isCancelled else { return }\n        self?.imageView?.image = image\n    }\n}\n\noverride func prepareForReuse() {\n    super.prepareForReuse()\n    currentTask?.cancel()\n    imageView?.image = nil\n}"
+            "code": "private var currentTask: Task<Void, Never>?\n\nfunc configure(with workout: Workout) {\n    titleLabel.text = workout.name\n    imageView?.image = nil\n    currentTask?.cancel()\n    let url = workout.imageURL\n    let loader = self.loader\n    currentTask = Task { [weak self] in\n        let image = await loader.image(for: url)\n        guard !Task.isCancelled else { return }\n        self?.imageView?.image = image\n    }\n}\n\noverride func prepareForReuse() {\n    super.prepareForReuse()\n    currentTask?.cancel()\n    imageView?.image = nil\n}"
           },
           {
             "id": "o2",
@@ -22170,7 +22191,7 @@
       },
       "solution": {
         "optionId": "o1",
-        "fixedCode": "private var currentTask: Task<Void, Never>?\n\nfunc configure(with workout: Workout) {\n    titleLabel.text = workout.name\n    imageView?.image = nil\n    currentTask?.cancel()\n    let url = workout.imageURL\n    currentTask = Task { [weak self] in\n        let image = await loader.image(for: url)\n        guard !Task.isCancelled else { return }\n        self?.imageView?.image = image\n    }\n}\n\noverride func prepareForReuse() {\n    super.prepareForReuse()\n    currentTask?.cancel()\n    imageView?.image = nil\n}"
+        "fixedCode": "private var currentTask: Task<Void, Never>?\n\nfunc configure(with workout: Workout) {\n    titleLabel.text = workout.name\n    imageView?.image = nil\n    currentTask?.cancel()\n    let url = workout.imageURL\n    let loader = self.loader\n    currentTask = Task { [weak self] in\n        let image = await loader.image(for: url)\n        guard !Task.isCancelled else { return }\n        self?.imageView?.image = image\n    }\n}\n\noverride func prepareForReuse() {\n    super.prepareForReuse()\n    currentTask?.cancel()\n    imageView?.image = nil\n}"
       },
       "hints": [
         "同じセルが別の行に使い回されたとき、前の行の読み込みはまだ走り続けています。",

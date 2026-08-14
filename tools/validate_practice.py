@@ -94,6 +94,8 @@ def check_common(c, rep, lesson_ids):
     for s in skills:
         if s not in SKILLS:
             rep.error(cid, "unknown skill tag %r" % s)
+    if any(skills.count(s) > 1 for s in skills):
+        rep.error(cid, "skill tags must be unique")
 
     hints = c.get("hints") or []
     if len(hints) != 3:
@@ -191,9 +193,14 @@ def check_by_type(c, rep):
             rep.error(cid, "chooseBlocks needs at least 4 candidate blocks")
         if len(set(ids)) != len(ids):
             rep.error(cid, "block ids must be unique")
+        for b in content.get("blocks") or []:
+            if not str(b.get("code", "")).strip():
+                rep.error(cid, "block %r has empty code" % b.get("id"))
         for bid in selected:
             if bid not in ids:
                 rep.error(cid, "solution references unknown block %r" % bid)
+        if len(set(selected)) != len(selected):
+            rep.error(cid, "solution repeats a selected block")
         if not selected:
             rep.error(cid, "solution needs the selected blocks")
         if len(selected) >= len(ids):
@@ -239,6 +246,9 @@ def check_by_type(c, rep):
             rep.error(cid, "bugHunt needs at least 3 code lines")
         if len(set(ids)) != len(ids):
             rep.error(cid, "line ids must be unique")
+        for line in lines:
+            if not str(line.get("code", "")).strip():
+                rep.error(cid, "line %r has empty code" % line.get("id"))
         if sol.get("optionId") not in ids:
             rep.error(cid, "solution.optionId is not one of the lines")
         if not sol.get("fixedCode"):
@@ -261,6 +271,11 @@ def check_by_type(c, rep):
             rep.error(cid, "matching needs at least as many right items as left items")
         if len(set(lids)) != len(lids) or len(set(rids)) != len(rids):
             rep.error(cid, "matching ids must be unique")
+        for side, items in (("left", left), ("right", right)):
+            for item in items:
+                if not str(item.get("label", "")).strip():
+                    rep.error(cid, "matching %s item %r has empty label" %
+                              (side, item.get("id")))
         if sorted(pairs) != sorted(lids):
             rep.error(cid, "solution.pairs must cover exactly the left items")
         for k, v in pairs.items():
@@ -284,6 +299,13 @@ def check_by_type(c, rep):
             rep.error(cid, "testReasoning needs content.requirement")
         if len(content.get("tests") or []) < 2:
             rep.error(cid, "testReasoning needs at least 2 visible test cases")
+        for i, case in enumerate(content.get("tests") or [], 1):
+            if not isinstance(case, dict):
+                rep.error(cid, "test case %d must be an object" % i)
+                continue
+            for field in ("name", "input", "expected", "result"):
+                if not isinstance(case.get(field), str) or not case[field].strip():
+                    rep.error(cid, "test case %d needs a meaningful %s" % (i, field))
         check_choice(c, rep)
 
 
@@ -372,18 +394,30 @@ def validate(data, strict=True):
         check_leakage(c, rep)
 
     for c in challenges:
+        sid = c.get("seriesId")
         step = c.get("seriesStep")
-        if c.get("seriesId") and not isinstance(step, int):
-            rep.error(c.get("id", "?"), "seriesId requires an integer seriesStep")
+        if sid is not None and (not isinstance(sid, str) or not sid.strip()):
+            rep.error(c.get("id", "?"), "seriesId must be a non-empty string")
+        if sid and (not isinstance(step, int) or isinstance(step, bool) or step <= 0):
+            rep.error(c.get("id", "?"), "seriesId requires a positive integer seriesStep")
+        if step is not None and not sid:
+            rep.error(c.get("id", "?"), "seriesStep requires a non-empty seriesId")
     series = {}
     for c in challenges:
         if c.get("seriesId"):
-            series.setdefault(c["seriesId"], []).append(c.get("seriesStep"))
-    for sid, steps in series.items():
-        if len(steps) < 2:
+            series.setdefault(c["seriesId"], []).append(c)
+    for sid, items in series.items():
+        steps = [c.get("seriesStep") for c in items]
+        if len(items) < 2:
             rep.error(sid, "a series needs at least 2 challenges")
         if len(set(steps)) != len(steps):
             rep.error(sid, "seriesStep values repeat inside the series")
+        if all(isinstance(step, int) and not isinstance(step, bool) and step > 0 for step in steps):
+            if sorted(steps) != list(range(1, len(steps) + 1)):
+                rep.error(sid, "seriesStep values must be contiguous starting at 1")
+        tracks = {c.get("track") for c in items}
+        if len(tracks) != 1:
+            rep.error(sid, "all challenges in a series must use the same track")
 
     pairs = duplicate_audit(challenges, rep)
 
