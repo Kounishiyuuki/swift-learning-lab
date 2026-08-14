@@ -1,6 +1,6 @@
 # 実装練習 (practice)
 
-実装練習 126問。編集元は source/practice.json です。このTXTは生成物です.
+実装練習 168問。編集元は source/practice.json です。このTXTは生成物です.
 
 ## Swift Starter（42問）
 
@@ -4302,5 +4302,1535 @@ print(result, original)
 - 関連例の出力: [2, 4] [1, 2]
 - 関連例の説明: 新しい配列を作って返す実装では、呼び出し元の配列がそのまま保たれます。
 - 覚えておくこと: 非破壊を要件にするなら inout を使わない。副作用は戻り値のテストでは見えない。
+
+---
+
+## Foundation & Data（42問）
+
+### practice-foundation-001 標準プロトコルの役割を対応づける [対応づけ / Lv1 ガイド]
+対象レッスン: foundation-standard-protocols
+シリーズ: foundation-protocol-basics (1段階目)
+スキル: protocols, foundation
+問題: よく使う標準プロトコルと、それに準拠すると何ができるようになるかを対応させてください。
+対応:
+- Equatable → == で等しいかどうかを比較できるようになる
+- Hashable → Set の要素や Dictionary のキーとして使えるようになる
+- Comparable → < による大小比較ができ、sorted() が引数なしで使えるようになる
+- CustomStringConvertible → print したときの表示内容を自分で決められるようになる
+ヒント1: 等しさを比べるものと、大小を比べるものは別のプロトコルです。
+ヒント2: ハッシュ値を持つと、集合や辞書のキーとして高速に扱えるようになります。
+ヒント3: r5 は Codable の説明なので、この4つとは対応しません。
+解説: Equatable は == による等値比較、Comparable はさらに < による順序比較を提供します（Comparable は Equatable を継承しています）。Hashable はハッシュ値を持つことで Set の要素や Dictionary のキーになれます。CustomStringConvertible は description を実装することで print の表示を制御します。r5 は Codable の説明であり、この中には対応するものがありません。
+- 使っている考え方: 標準プロトコルは「その型に何ができるか」を宣言する共通の語彙です。準拠するだけで標準ライブラリの膨大な機能（sorted、Set、辞書のキーなど）が使えるようになります。
+- 手順: Equatable … == を提供する。struct なら多くの場合コンパイラが自動生成する。
+- 手順: Hashable … Equatable を含み、さらにハッシュ値を持つ。Set や辞書のキーに必要。
+- 手順: Comparable … Equatable を含み、< を提供する。sorted() や min()/max() が使える。
+- 手順: CustomStringConvertible … description プロパティで表示を定義する。
+- 動く理由: 4つのプロトコルはそれぞれ等値・ハッシュ・順序・表示という別の能力を与えます。能力と説明文が1対1で対応するため、迷う余地がありません。
+- よくある間違い: Comparable に準拠すれば Equatable は不要だと考える間違いです。Comparable は Equatable を継承しているので、== の実装（または自動生成）も必要です。
+- よくある間違い: print の表示を変えたいときに description ではなく別のメソッドを定義する間違いです。CustomStringConvertible が要求するのは description という名前のプロパティです。
+- 関連例:
+```swift
+struct Tag: Hashable, CustomStringConvertible {
+    let name: String
+    var description: String { "#\(name)" }
+}
+let tags: Set<Tag> = [Tag(name: "swift"), Tag(name: "swift")]
+print(tags.count, tags.first!)
+```
+- 関連例の出力: 1 #swift
+- 関連例の説明: Hashable のおかげで Set の重複が排除され、description のおかげで表示が #swift になっています。
+- 覚えておくこと: 準拠は「できること」の宣言。必要な能力から逆算してプロトコルを選ぶ。
+
+### practice-foundation-002 Setの要素にできる型を作る [穴埋め / Lv2 基本]
+対象レッスン: foundation-standard-protocols
+シリーズ: foundation-protocol-basics (2段階目)
+スキル: protocols, collections
+問題: Point を Set の要素として使えるようにします。空欄を埋めてください。
+埋めたあと:
+```swift
+struct Point: Hashable {
+    let x: Int
+    let y: Int
+}
+let set: Set<Point> = [Point(x: 1, y: 2), Point(x: 1, y: 2)]
+print(set.count)
+```
+ヒント1: Set は要素をハッシュ値で管理するため、要素の型にはハッシュ値が必要です。
+ヒント2: 等値比較だけでは足りません。Set に入れるにはもう一段の能力が要ります。
+ヒント3: 要素数を返すのはメソッドではなくプロパティで、コレクション共通の名前です。
+解説: Set は要素をハッシュ値で分類して高速に検索するため、要素の型は Hashable でなければなりません。すべての格納プロパティが Hashable なら、`: Hashable` と書くだけでコンパイラが実装を自動生成します。Equatable だけでは 'Type Point does not conform to protocol Hashable' になります。要素数は count プロパティで、同じ値の Point は1つにまとめられるため出力は1です。
+- 使っている考え方: Hashable は「同じ値なら同じハッシュ値になる」ことを保証します。この保証があるからこそ、Set や Dictionary は要素数に関わらず高速に検索できます。
+- 手順: `struct Point: Hashable` と書くと、x と y から == と hash(into:) が自動生成される。
+- 手順: Set のリテラルに同じ値の Point を2つ入れる。
+- 手順: ハッシュ値が同じで == も真なので、2つは同一の要素とみなされる。
+- 手順: 結果として set.count は 1 になる。
+- 動く理由: Hashable の自動生成は、全プロパティが Hashable のときに使えます。Int は Hashable なので Point も条件を満たし、宣言だけで実装が得られます。
+- よくある間違い: Equatable を書けば Set に入れられると考える間違いです。Set はハッシュ値を必要とするため Hashable が要ります。
+- よくある間違い: == と hash(into:) の実装が食い違うと、等しい値が Set の中で重複します。自動生成に任せられる場合は任せるのが安全です。
+- 関連例:
+```swift
+struct Point: Hashable { let x: Int; let y: Int }
+var set: Set<Point> = []
+print(set.insert(Point(x: 1, y: 2)).inserted)
+print(set.insert(Point(x: 1, y: 2)).inserted)
+print(set.count)
+```
+- 関連例の出力: true
+false
+1
+- 関連例の説明: 同じ値の Point は2回目の挿入で拒否され、要素数は1のままです。
+- 覚えておくこと: Set や辞書のキーにするなら Hashable。全プロパティが Hashable なら宣言だけでよい。
+
+### practice-foundation-003 準拠を宣言しただけの型を見つける [バグ発見 / Lv3 実装]
+対象レッスン: foundation-standard-protocols
+シリーズ: foundation-protocol-basics (3段階目)
+スキル: protocols, debugging
+問題: このコードはビルドできません。原因になっている行を選んでください。
+問題のある行: struct Version: Comparable {
+ヒント1: 準拠を宣言すると、そのプロトコルが要求するものをすべて実装する義務が生じます。
+ヒント2: Equatable と違い、Comparable の要求は自動生成されません。
+ヒント3: Comparable が要求しているのは `<` の実装です。型の宣言だけがあって実装がありません。
+解説: バグは1行目の準拠宣言です。Comparable は `static func <` の実装を要求しますが、この型はそれを持たないため 'Type Version does not conform to protocol Comparable' というコンパイルエラーになります。Equatable や Hashable は条件を満たせばコンパイラが自動生成しますが、Comparable の `<` は「何を基準に大小を決めるか」を型が決められないため自動生成されません。ビルドが止まるだけで実行時の問題ではありません。修正は `static func < (a: Version, b: Version) -> Bool { a.major < b.major }` を追加することです。追加すれば sorted() が使えるようになり、最小の Version が表示されます。
+- 使っている考え方: 準拠の宣言は約束であり、実装はその履行です。自動生成が効くプロトコルと効かないプロトコルの違いを知っておくと、エラーの意味が読み取れます。
+- 手順: `: Comparable` により、この型は < を提供すると約束する。
+- 手順: 型の本体に < の実装がないため、約束が果たされていない。
+- 手順: コンパイラは準拠エラーとして宣言行を指摘する。
+- 手順: < を実装すると、== は Equatable の自動生成で補われ、sorted() も使えるようになる。
+- 動く理由: エラーの原因は「実装がないのに準拠を宣言した」ことなので、責任の所在は宣言行にあります。4行目の sorted() 呼び出しは、準拠さえ成立していれば正しいコードです。
+- よくある間違い: sorted() の呼び出し方が悪いと考えて呼び出し側を書き換える間違いです。原因は型側の実装不足です。
+- よくある間違い: < だけでなく <= や > も実装しなければならないと考える間違いです。Comparable は < さえあれば、残りを既定実装で導出します。
+- 関連例:
+```swift
+struct Version: Comparable {
+    let major: Int
+    static func < (a: Version, b: Version) -> Bool { a.major < b.major }
+}
+let vs = [Version(major: 2), Version(major: 1)]
+print(vs.sorted().map(\.major), vs.max()!.major)
+```
+- 関連例の出力: [1, 2] 2
+- 関連例の説明: < を1つ実装するだけで、sorted も max も使えるようになります。
+- 覚えておくこと: Comparable の < は自動生成されない。準拠宣言と実装はセット。
+
+### practice-foundation-004 比較と表示を自前で持つ型を組み立てる [関数組み立て / Lv3 実装]
+対象レッスン: foundation-standard-protocols
+シリーズ: foundation-protocol-basics (4段階目)
+スキル: protocols, types
+問題: major で大小を比較でき、print すると v1 のように表示される型を作ります。必要なブロックだけを選んで正しい順に並べてください。
+正解の並び:
+```swift
+struct Version: Comparable, CustomStringConvertible {
+    let major: Int
+    var description: String { "v\(major)" }
+    static func < (a: Version, b: Version) -> Bool { a.major < b.major }
+}
+```
+ヒント1: CustomStringConvertible が要求するのはメソッドではなくプロパティです。名前も決まっています。
+ヒント2: Comparable が要求するのも名前が決まった演算子の実装です。自分で名前を決めたメソッドでは準拠できません。
+ヒント3: 型の宣言 → プロパティ → description → < の実装 → 型を閉じる、の5行です。
+解説: CustomStringConvertible の要求は `var description: String { get }` というプロパティなので、`func description() -> String` というメソッドでは準拠できません。Comparable の要求も `static func <` という決まった名前と形なので、`compare(a:b:)` のような独自名では満たせません。プロトコル準拠は「名前と型が一致すること」で判定されるため、意味が同じでも形が違えばエラーになります。この5行で、sorted() も print も期待どおりに動きます。
+- 使っている考え方: プロトコル準拠はダックタイピングではなく、宣言された名前・型・種別（プロパティかメソッドか）の厳密な一致で判定されます。だからこそコンパイル時に検証できます。
+- 手順: `: Comparable, CustomStringConvertible` で2つの約束をする。
+- 手順: `var description: String { ... }` … 計算プロパティとして実装する。
+- 手順: `static func < (a:b:) -> Bool` … 型メソッドとして演算子を実装する。
+- 手順: この2つで両方の要求が満たされ、準拠が成立する。
+- 動く理由: 要求されている形（プロパティか、静的な演算子か）と実装の形が一致しているためです。名前が1文字違うだけでも準拠は成立しません。
+- よくある間違い: description をメソッドとして実装し、'does not conform' の理由が分からず悩む間違いです。エラーメッセージの「Candidate has non-matching type」に注目します。
+- よくある間違い: print の表示を変えるために toString() のような独自メソッドを作る間違いです。標準の print に反映させるには description が必要です。
+- 関連例:
+```swift
+struct Version: Comparable, CustomStringConvertible {
+    let major: Int
+    var description: String { "v\(major)" }
+    static func < (a: Version, b: Version) -> Bool { a.major < b.major }
+}
+print([Version(major: 2), Version(major: 1)].sorted())
+```
+- 関連例の出力: [v1, v2]
+- 関連例の説明: sorted() で並び替えられ、配列の表示にも description が使われていることが分かります。
+- 覚えておくこと: 準拠は名前と形の完全一致。要求の定義（プロパティかメソッドか）を確認する。
+
+### practice-foundation-005 JSONから型へデコードする [穴埋め / Lv2 基本]
+対象レッスン: foundation-codable
+シリーズ: foundation-codable-flow (1段階目)
+スキル: foundation, types
+問題: JSON文字列を User にデコードして名前を表示します。空欄を埋めてください。
+埋めたあと:
+```swift
+import Foundation
+struct User: Codable {
+    let id: Int
+    let name: String
+}
+let json = #"{"id": 1, "name": "Yuki"}"#
+do {
+    let user = try JSONDecoder().decode(User.self, from: Data(json.utf8))
+    print(user.name)
+} catch {
+    print("失敗")
+}
+```
+ヒント1: JSONとの相互変換を可能にするプロトコルがあります。エンコードとデコードの両方をまとめた別名です。
+ヒント2: JSONDecoder が行うのは、データから型への変換です。
+ヒント3: 1つめは Encodable と Decodable をまとめた別名、2つめは「型情報とデータを渡して値を得る」メソッドです。
+解説: `Codable` は Encodable と Decodable をまとめた typealias で、準拠するとコンパイラが変換処理を自動生成します。`JSONDecoder().decode(_:from:)` は「復元したい型」と「Data」を渡して値を得るメソッドです。プロパティ名と JSON のキーが一致しているため追加の設定は不要で、"Yuki" が表示されます。decode は失敗しうるので throws であり、do-catch か try? で扱う必要があります。
+- 使っている考え方: Codable は「型の構造から変換コードを自動生成する」仕組みです。手書きのパース処理を書かずに済むぶん、キー名の不一致や型の食い違いはデコード時の実行時エラーとして現れます。
+- 手順: `struct User: Codable` により、id と name の変換コードが自動生成される。
+- 手順: `Data(json.utf8)` で String を Data に変換する。
+- 手順: `decode(User.self, from:)` で Data から User を復元する。
+- 手順: 失敗すると throws するため、do-catch で受け止めている。
+- 動く理由: Codable 準拠によって decode の要求（Decodable）が満たされ、キー名がプロパティ名と一致しているため既定の設定のまま変換できます。
+- よくある間違い: `decode(User.self, from:)` の第1引数に `User()` のようなインスタンスを渡す間違いです。渡すのは型そのもの（メタタイプ）です。
+- よくある間違い: デコードの失敗を try? で握りつぶすと、キー名の誤りなのか型の誤りなのか分からなくなります。開発中は do-catch で error を出力するほうが早く直せます。
+- 関連例:
+```swift
+import Foundation
+struct User: Codable { let id: Int; let name: String }
+let json = #"{"id": 1, "name": "Yuki"}"#
+let user = try? JSONDecoder().decode(User.self, from: Data(json.utf8))
+print(user?.name ?? "失敗")
+```
+- 関連例の出力: Yuki
+- 関連例の説明: try? を使うと失敗が nil になります。手軽ですが、失敗の理由は失われます。
+- 覚えておくこと: Codable 準拠 + decode(型.self, from: Data) が基本形。失敗は必ず扱う。
+
+### practice-foundation-006 エンコードの手順を並べ替える [並べ替え / Lv2 基本]
+対象レッスン: foundation-codable
+シリーズ: foundation-codable-flow (2段階目)
+スキル: foundation, functions
+問題: User を JSON 文字列に変換する関数を作ります。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+import Foundation
+struct User: Codable { let id: Int; let name: String }
+func makeJSON(_ user: User) throws -> String {
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = .sortedKeys
+    let data = try encoder.encode(user)
+    return String(decoding: data, as: UTF8.self)
+}
+```
+ヒント1: import は最初、型の定義は関数より前に必要です。
+ヒント2: エンコーダの設定は、encode を呼ぶ前に済ませなければ反映されません。
+ヒント3: import → 型 → 関数の宣言 → エンコーダ生成 → 設定 → encode → String へ変換 → 関数を閉じる、の順です。
+解説: JSONEncoder は生成してから設定し、その後 encode を呼びます。設定を encode のあとに書いても、すでに変換は終わっているため反映されません。`outputFormatting = .sortedKeys` はキーを名前順に並べる設定で、出力が実行のたびに変わらなくなるためテストとの比較に役立ちます。`String(decoding:as:)` は Data を UTF-8 として文字列に変換する、失敗しない初期化子です。
+- 使っている考え方: エンコーダやデコーダは設定を持つオブジェクトです。「生成 → 設定 → 実行」という順序は、日付形式やキー変換など他の設定でも共通します。
+- 手順: `import Foundation` … JSONEncoder は Foundation にある。
+- 手順: `struct User: Codable` … 変換対象の型を先に定義する。
+- 手順: `let encoder = JSONEncoder()` のあとに `outputFormatting` を設定する。
+- 手順: `try encoder.encode(user)` が Data を返す。
+- 手順: `String(decoding: data, as: UTF8.self)` で JSON 文字列にする。
+- 動く理由: 設定が encode より前にあるため、出力形式が確実に適用されます。また import と型定義が関数より前にあるので、名前解決も成立します。
+- よくある間違い: sortedKeys を指定しないと、辞書のキー順序が保証されず、出力文字列がテストと一致しないことがあります。
+- よくある間違い: `String(data: data, encoding: .utf8)!` を使うと Optional の強制アンラップになります。`String(decoding:as:)` なら失敗しません。
+- 関連例:
+```swift
+import Foundation
+struct User: Codable { let id: Int; let name: String }
+let encoder = JSONEncoder()
+encoder.outputFormatting = .sortedKeys
+let data = try! encoder.encode(User(id: 1, name: "Yuki"))
+print(String(decoding: data, as: UTF8.self))
+```
+- 関連例の出力: {"id":1,"name":"Yuki"}
+- 関連例の説明: sortedKeys によってキーが名前順に並び、出力が毎回同じになります。
+- 覚えておくこと: エンコーダは「生成 → 設定 → 実行」。設定を後に書いても効かない。
+
+### practice-foundation-007 キー名が合わずデコードできない原因を見つける [バグ発見 / Lv3 実装]
+対象レッスン: foundation-codable
+シリーズ: foundation-codable-flow (3段階目)
+スキル: foundation, debugging
+問題: 「デコード失敗」と表示されます。原因になっている行を選んでください。
+問題のある行:     let userName: String
+ヒント1: JSON のキーと、構造体のプロパティ名を見比べてください。
+ヒント2: Codable は既定でプロパティ名とキー名が同じであることを前提にします。
+ヒント3: JSON 側は user_name、プロパティ側は userName です。この不一致でキーが見つからず失敗しています。
+解説: バグの位置はプロパティ名（2行目）と JSON のキー名の対応です。Codable の自動生成は「プロパティ名 = JSONのキー名」を前提とするため、JSON の user_name に対して userName というプロパティは見つからず、keyNotFound エラーで decode が throws します。try? がそれを nil に変えるため、画面には「デコード失敗」とだけ出て理由が見えません。修正方法は2つあり、デコーダに `keyDecodingStrategy = .convertFromSnakeCase` を設定してスネークケースを自動変換するか、CodingKeys を定義して明示的に対応付けます。サーバ側の命名規則が全体で統一されているなら、前者のほうが変更が1か所で済みます。
+- 使っている考え方: Codable の自動生成は「名前が一致している」ことに強く依存します。外部APIの命名規則が Swift の慣習と違う場合、その差を埋める設定が必要になります。
+- 手順: JSON のキーは user_name（スネークケース）。
+- 手順: プロパティ名は userName（キャメルケース）。
+- 手順: 既定の対応付けでは user_name というキーを探しに行かないため keyNotFound になる。
+- 手順: convertFromSnakeCase を設定すると、user_name が userName に変換されてから照合される。
+- 動く理由: 失敗の原因は decode の呼び出し方ではなく、型のプロパティ名と外部データのキー名の対応です。5行目・6行目のコードは、対応さえ取れていれば正しく動きます。
+- よくある間違い: try? のまま原因を探そうとして時間を使う間違いです。まず do-catch にして error を出力すると keyNotFound と鍵名がすぐ分かります。
+- よくある間違い: プロパティ名を user_name に変えて解決する対応です。Swift 側の命名規則が崩れ、以降のコードすべてが読みにくくなります。
+- 関連例:
+```swift
+import Foundation
+struct User: Codable { let userName: String }
+let json = #"{"user_name": "Yuki"}"#
+let decoder = JSONDecoder()
+decoder.keyDecodingStrategy = .convertFromSnakeCase
+print((try? decoder.decode(User.self, from: Data(json.utf8)))?.userName ?? "デコード失敗")
+```
+- 関連例の出力: Yuki
+- 関連例の説明: キー変換の設定を1行足すだけで、プロパティ名を変えずにデコードできます。
+- 覚えておくこと: デコード失敗はまずキー名の対応を疑う。原因表示は do-catch で得る。
+
+### practice-foundation-008 失敗の理由が分かるデコードに直す [修正 / Lv3 実装]
+対象レッスン: foundation-codable
+シリーズ: foundation-codable-flow (4段階目)
+スキル: foundation, errors, debugging
+問題: デコードに失敗していますが、理由が分かりません。4〜5行目を書き換えて、失敗の内容が確認できるようにします。適切なものを選んでください。
+正解: do {
+    let user = try JSONDecoder().decode(User.self, from: Data(json.utf8))
+    print(user.id)
+} catch {
+    print("デコード失敗: \(error)")
+}
+ヒント1: try? は失敗の情報を nil に潰してしまいます。理由を残す書き方が必要です。
+ヒント2: エラーの値を受け取れるのは、例外を捕まえる構文だけです。
+ヒント3: 強制アンラップやクラッシュではなく、失敗しても実行を続けたうえで理由を表示する形にします。
+解説: 問題は4行目の try? で、デコードが投げたエラーを nil に潰しているため「なぜ失敗したか」が失われます。この JSON は id が文字列 "one" なので、実際には typeMismatch エラーが起きています。do-catch に書き換えると catch 節で error を受け取れ、期待した型と実際の型、どのキーで起きたかまで出力されます。try! はビルドは通りますが失敗した瞬間にクラッシュし、原因調査どころか実行が止まります。`print(user as Any)` は nil と表示されるだけで理由は分からず、既定値で埋める選択肢は失敗を隠したまま処理を続けてしまいます。
+- 使っている考え方: エラーハンドリングの選択は「失敗したときに何を知りたいか」で決まります。開発中は理由が必要、本番では回復手段が必要、という違いを意識します。
+- 手順: `{"id": "one"}` の id は文字列だが、User.id は Int。
+- 手順: デコード時に typeMismatch エラーが投げられる。
+- 手順: try? はそれを nil に変換するため、エラーの中身が失われる。
+- 手順: do-catch なら error をそのまま出力でき、原因のキーと型が分かる。
+- 動く理由: catch 節はエラー値そのものを受け取れる唯一の構文です。DecodingError は原因のキーや期待した型を含むため、そのまま出力するだけで調査に十分な情報が得られます。
+- よくある間違い: try? を既定の書き方として使い続ける間違いです。失敗が起きない前提が崩れたときに、原因が一切残りません。
+- よくある間違い: catch でエラーを握りつぶして固定メッセージだけ出す実装も、同じ理由で調査を難しくします。error の内容を含めるべきです。
+- 関連例:
+```swift
+import Foundation
+struct User: Codable { let id: Int }
+let json = #"{"id": "one"}"#
+do {
+    _ = try JSONDecoder().decode(User.self, from: Data(json.utf8))
+} catch let DecodingError.typeMismatch(type, context) {
+    print("型の不一致:", type, context.codingPath.map(\.stringValue))
+} catch {
+    print("その他:", error)
+}
+```
+- 関連例の出力: 型の不一致: Int ["id"]
+- 関連例の説明: DecodingError をパターンマッチすると、どのキーでどの型を期待したのかまで取り出せます。
+- 覚えておくこと: try? は理由を捨てる。原因を知りたいなら do-catch で error を出す。
+
+### practice-foundation-009 CodingKeysでキー名を対応づける [穴埋め / Lv3 実装]
+対象レッスン: foundation-codable-custom
+シリーズ: foundation-codable-custom (1段階目)
+スキル: foundation, types
+問題: JSON の user_name を userName プロパティに対応させます。空欄を埋めてください。
+埋めたあと:
+```swift
+import Foundation
+struct User: Codable {
+    let userName: String
+    enum CodingKeys: String, CodingKey {
+        case userName = "user_name"
+    }
+}
+let json = #"{"user_name": "Yuki"}"#
+let user = try? JSONDecoder().decode(User.self, from: Data(json.utf8))
+print(user?.userName ?? "失敗")
+```
+ヒント1: Codable が探しに来る入れ子の enum は、名前が決まっています。単数形ではありません。
+ヒント2: rawValue には、実際のJSONに書かれている文字列を指定します。
+ヒント3: ケース名は Swift のプロパティ名、rawValue は JSON 側のキー名です。文字列なので引用符が必要です。
+解説: Codable の自動生成は `CodingKeys` という名前の入れ子 enum を探します（この名前でなければ認識されません）。ケース名は Swift のプロパティ名と一致させ、rawValue に JSON 側のキー名 "user_name" を書くことで対応付けが成立します。CodingKey はプロトコル名であり、enum の名前として使うものではありません。設定後は "Yuki" が正しくデコードされます。
+- 使っている考え方: CodingKeys は「Swift の名前」と「外部データの名前」の対応表です。プロパティ単位で個別に指定できるため、一部のキーだけ命名規則が違う場合にも対応できます。
+- 手順: `enum CodingKeys: String, CodingKey` … この名前と準拠が認識の条件。
+- 手順: `case userName = "user_name"` … 左がプロパティ名、右が JSON のキー名。
+- 手順: デコード時、userName を探す代わりに user_name を探すようになる。
+- 手順: 値が見つかるので userName に "Yuki" が入る。
+- 動く理由: 自動生成される変換コードは CodingKeys の定義を優先して使います。ケース名がプロパティ名と一致しているため、どのプロパティの対応かも一意に決まります。
+- よくある間違い: enum の名前を CodingKey や Keys にしてしまうと、自動生成に無視され、既定のキー名のままデコードが失敗します。
+- よくある間違い: CodingKeys を定義すると、そこに書かなかったプロパティはエンコード/デコードの対象から外れます。全プロパティを列挙する必要があります。
+- 関連例:
+```swift
+import Foundation
+struct User: Codable {
+    let userName: String
+    enum CodingKeys: String, CodingKey { case userName = "user_name" }
+}
+let encoder = JSONEncoder()
+let data = try! encoder.encode(User(userName: "Yuki"))
+print(String(decoding: data, as: UTF8.self))
+```
+- 関連例の出力: {"user_name":"Yuki"}
+- 関連例の説明: CodingKeys はエンコード時にも使われるため、出力される JSON のキーも user_name になります。
+- 覚えておくこと: 対応表は enum CodingKeys: String, CodingKey。名前が違うと認識されない。
+
+### practice-foundation-010 キー変換の設定に必要な行だけ選ぶ [ブロック選択 / Lv3 実装]
+対象レッスン: foundation-codable-custom
+シリーズ: foundation-codable-custom (2段階目)
+スキル: foundation
+問題: CodingKeys を書かずに、スネークケースのJSONをデコードします。必要な行だけを選び、正しい順に並べてください。
+使うブロック:
+- import Foundation
+- struct User: Codable { let userName: String }
+- let decoder = JSONDecoder()
+- decoder.keyDecodingStrategy = .convertFromSnakeCase
+- let json = #"{"user_name": "Yuki"}"#
+- print((try? decoder.decode(User.self, from: Data(json.utf8)))?.userName ?? "失敗")
+ヒント1: デコードするので、必要なのはデコーダです。エンコーダではありません。
+ヒント2: 設定は decode を呼ぶ前に行う必要があります。
+ヒント3: 日付の設定はこのJSONに日付が含まれないため不要です。キー変換の設定だけを選びます。
+解説: `keyDecodingStrategy = .convertFromSnakeCase` を設定すると、JSON のスネークケースのキーがキャメルケースに変換されてからプロパティと照合されます。CodingKeys を書かずに済むため、キーが多い型では記述量が大きく減ります。JSONEncoder はエンコード用なので decode を持たず、dateDecodingStrategy はこのJSONに日付が含まれないため意味がありません。設定は必ず decode より前に行います。
+- 使っている考え方: デコーダの各種 strategy は、外部データの表現と Swift の型の間の変換ルールです。個別の型に散らばる設定を1か所にまとめられるのが利点です。
+- 手順: `JSONDecoder()` を生成する。
+- 手順: `keyDecodingStrategy = .convertFromSnakeCase` を設定する。
+- 手順: user_name → userName という変換が適用されるようになる。
+- 手順: decode するとプロパティ名と一致し、"Yuki" が得られる。
+- 動く理由: 設定がデコーダ側にあるため、対象の型を変更せずに命名規則の差を吸収できます。API全体が同じ規則なら、この1行がすべての型に効きます。
+- よくある間違い: 設定を decode のあとに書いてしまう間違いです。すでに変換が終わっているため効果がありません。
+- よくある間違い: 一部のキーだけ規則が違う場合、convertFromSnakeCase では対応できません。その型だけ CodingKeys を併用します。
+- 関連例:
+```swift
+import Foundation
+struct User: Codable { let userName: String; let isActive: Bool }
+let decoder = JSONDecoder()
+decoder.keyDecodingStrategy = .convertFromSnakeCase
+let json = #"{"user_name": "Yuki", "is_active": true}"#
+let user = try? decoder.decode(User.self, from: Data(json.utf8))
+print(user?.userName ?? "失敗", user?.isActive ?? false)
+```
+- 関連例の出力: Yuki true
+- 関連例の説明: 設定は1行のまま、複数のキーすべてに適用されます。
+- 覚えておくこと: 命名規則の差はデコーダの strategy で吸収できる。設定は decode より前。
+
+### practice-foundation-011 日付形式を指定するデコード関数を組み立てる [関数組み立て / Lv4 応用]
+対象レッスン: foundation-codable-custom
+シリーズ: foundation-codable-custom (3段階目)
+スキル: foundation, functions, errors
+問題: ISO8601形式の日付を含むJSONをデコードする関数を作ります。必要なブロックだけを選んで正しい順に並べてください。
+正解の並び:
+```swift
+import Foundation
+struct Log: Codable { let at: Date }
+func decodeLog(_ json: String) throws -> Log {
+    let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = .iso8601
+    return try decoder.decode(Log.self, from: Data(json.utf8))
+}
+```
+ヒント1: Date の既定のデコード方式は ISO8601 ではありません。明示的な指定が必要です。
+ヒント2: 設定したデコーダを使って decode しなければ、設定は意味を持ちません。
+ヒント3: import → 型 → 関数宣言 → デコーダ生成 → 日付形式の指定 → 設定したデコーダで decode → 関数を閉じる、の7行です。
+解説: JSONDecoder の dateDecodingStrategy は既定で `.deferredToDate`（Appleの基準時刻からの秒数）なので、"2026-01-01T00:00:00Z" のような文字列は解釈できずデコードに失敗します。`.iso8601` を指定して初めて正しく Date になります。b9 のように新しい JSONDecoder を作って decode すると、せっかく設定したデコーダが使われないため設定が無効になります。キー変換の設定はこの型に必要ないため不要です。
+- 使っている考え方: Date は表現方法が多数あるため、Codable は既定の解釈を1つ決めています。実際のAPIはISO8601やUnix時刻などを使うため、ほぼ必ず戦略の指定が必要になります。
+- 手順: `let decoder = JSONDecoder()` … 設定を保持するインスタンスを作る。
+- 手順: `decoder.dateDecodingStrategy = .iso8601` … 文字列形式の日付を解釈できるようにする。
+- 手順: `try decoder.decode(...)` … 設定済みのインスタンスを使うことが重要。
+- 手順: throws にすることで、失敗の理由を呼び出し側に伝えられる。
+- 動く理由: 設定を持つインスタンスをそのまま decode に使っているため、日付戦略が実際に適用されます。関数を throws にしたことで、失敗を握りつぶさずに呼び出し側へ渡せます。
+- よくある間違い: 設定したデコーダとは別に `JSONDecoder()` を作って decode してしまい、「設定したのに効かない」と悩む間違いです。
+- よくある間違い: 日付の形式が合わないときのエラーは dataCorrupted として現れます。keyNotFound ではないため、キー名を疑って時間を使いがちです。
+- 関連例:
+```swift
+import Foundation
+struct Log: Codable { let at: Date }
+let decoder = JSONDecoder()
+decoder.dateDecodingStrategy = .iso8601
+let json = #"{"at": "2026-01-01T00:00:00Z"}"#
+let log = try! decoder.decode(Log.self, from: Data(json.utf8))
+print(log.at.timeIntervalSince1970)
+```
+- 関連例の出力: 1767225600.0
+- 関連例の説明: ISO8601 の文字列が Date に変換され、Unix時刻として確認できます。
+- 覚えておくこと: Date のデコードは戦略の指定が前提。設定したインスタンスで decode する。
+
+### practice-foundation-012 エンコード結果の文字列を追う [実行追跡 / Lv3 実装]
+対象レッスン: foundation-data-json
+シリーズ: foundation-json-io (1段階目)
+スキル: foundation, debugging
+問題: 次のコードを実行したとき、表示される内容を選んでください。
+正解: {"id":1,"name":"Yuki"}
+ヒント1: sortedKeys はキーをどう並べる設定でしょうか。
+ヒント2: prettyPrinted を指定していないので、余分な空白や改行は入りません。
+ヒント3: キーはアルファベット順に並び、区切りの空白もありません。id が name より先に来ます。
+解説: `.sortedKeys` はキーをアルファベット順に並べる指定なので、id が name より先になります。`.prettyPrinted` を指定していないため空白や改行は挿入されず、`{"id":1,"name":"Yuki"}` という詰まった形式になります。print しているのは encode 結果の Data を UTF-8 文字列に変換したもので、Swift の構造体の表示ではありません。sortedKeys を付けない場合、キーの順序は保証されないため、出力を文字列比較するテストは不安定になります。
+- 使っている考え方: JSONEncoder の outputFormatting は出力の見た目を制御します。テストで文字列比較する場合は、順序を固定する sortedKeys が事実上必須です。
+- 手順: `.sortedKeys` … キーを名前順に並べる。id → name。
+- 手順: `.prettyPrinted` は指定していないので、整形用の空白・改行は入らない。
+- 手順: encode は Data を返す。
+- 手順: `String(decoding:as:)` で UTF-8 として文字列化し、そのまま出力される。
+- 動く理由: 指定した2つの条件（キー順の固定、整形なし）だけで出力形式が一意に決まります。構造体の description ではなく JSON 文字列が表示される点も、encode を経ているためです。
+- よくある間違い: sortedKeys がないときの出力順を「宣言順になる」と考える間違いです。順序は未定義で、実行環境やバージョンによって変わり得ます。
+- よくある間違い: prettyPrinted を付けたまま文字列比較のテストを書くと、改行やインデントの差で失敗しやすくなります。
+- 関連例:
+```swift
+import Foundation
+struct User: Codable { let id: Int; let name: String }
+let encoder = JSONEncoder()
+encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
+let data = try! encoder.encode(User(id: 1, name: "Yuki"))
+print(String(decoding: data, as: UTF8.self))
+```
+- 関連例の出力: {
+  "id" : 1,
+  "name" : "Yuki"
+}
+- 関連例の説明: prettyPrinted を足すと人が読みやすい形になりますが、文字列比較には向かなくなります。
+- 覚えておくこと: JSON文字列を比較するなら sortedKeys。整形は人が読むときだけ。
+
+### practice-foundation-013 DataをStringに戻す書き方に直す [修正 / Lv3 実装]
+対象レッスン: foundation-data-json
+シリーズ: foundation-json-io (2段階目)
+スキル: foundation, types, debugging
+問題: 3行目がビルドできません。修正として最も適切なものを選んでください。
+正解: let text = String(decoding: data, as: UTF8.self)
+ヒント1: Data は「バイトの並び」なので、文字列に戻すには文字コードの指定が必要です。
+ヒント2: 文字コードを引数として渡す初期化子を探します。ラベルの形が決まっています。
+ヒント3: 失敗しない書き方は、デコード方式を型として渡す形です。不正なバイトは置換文字になります。
+解説: バグは3行目で、String には Data だけを受け取る初期化子が存在しないため 'No exact matches in call to initializer' になります。ビルド時のエラーで、実行には至りません。修正は `String(decoding: data, as: UTF8.self)` で、これは不正なバイト列があっても置換文字に変換して必ず String を返すため Optional になりません。`String(data:encoding:)` は正しい API ですが引数が2つ必要で、しかも Optional を返します。`data.description` は「5 bytes」のような説明文字列になり内容ではありません。
+- 使っている考え方: Data はバイト列であり、テキストとして解釈するには文字エンコーディングの指定が必要です。指定方法によって、失敗しうる API と失敗しない API に分かれます。
+- 手順: `Data("Hello".utf8)` … 文字列を UTF-8 のバイト列にする。
+- 手順: `String(decoding: data, as: UTF8.self)` … バイト列を UTF-8 として解釈する。
+- 手順: 不正なバイトがあっても置換文字に変えるため、戻り値は非Optional。
+- 手順: 結果として Hello が出力される。
+- 動く理由: decoding:as: 版は仕様上失敗しないため、Optional の扱いが不要になります。ログ出力やデバッグ表示では、この単純さが実用上有利です。
+- よくある間違い: `String(data: data, encoding: .utf8)!` と強制アンラップする書き方は、不正なバイト列が来たときにクラッシュします。
+- よくある間違い: `data.description` を内容だと思い込む間違いです。表示されるのはバイト数などの説明で、テキストではありません。
+- 関連例:
+```swift
+import Foundation
+let data = Data("Hello".utf8)
+print(String(decoding: data, as: UTF8.self))
+print(String(data: data, encoding: .utf8) ?? "変換失敗")
+```
+- 関連例の出力: Hello
+Hello
+- 関連例の説明: どちらも同じ結果になりますが、下は Optional なので既定値の指定が必要です。
+- 覚えておくこと: Data → String は decoding:as: が既定の選択。失敗しないぶん扱いやすい。
+
+### practice-foundation-014 クラッシュするデコード関数のテストを読む [テスト読解 / Lv4 応用]
+対象レッスン: foundation-data-json
+シリーズ: foundation-json-io (3段階目)
+スキル: testing, foundation, debugging
+問題: テストが1件失敗しています。実装のどの点が要件に反しているかを選んでください。
+正解: try! を使っているため、デコードに失敗した時点で nil を返さずにプロセスが停止する
+ヒント1: 失敗したテストは、壊れた入力に対する動作を検証しています。
+ヒント2: 戻り値の型は User? なので、nil を返す経路自体は用意されています。問題は返す前に何が起きるかです。
+ヒント3: try! は失敗したときにエラーを伝えるのではなく、その場で実行を止めます。
+解説: 失敗したテストが表しているのは「不正な入力でも落ちずに nil を返す」という頑健性の要件です。入力はJSONとして閉じていない壊れた文字列で、パースが必ず失敗するケースを狙っています。実装は `try!` を使っているため、decode がエラーを投げた瞬間に 'Fatal error' でプロセスが停止し、nil を返す機会そのものがありません。戻り値の型は User? なので nil を返す経路は用意されており、型の問題ではありません。また `Data(json.utf8)` はどんな String でも成功するためエラーを投げず、JSONDecoder の生成もエラーの原因ではありません。修正は `try?` を使うか、do-catch で失敗時に nil を返すことです。クラッシュがテストランナー全体を止めてしまうため、この失敗は他のテストの信頼性も損ないます。
+- 使っている考え方: 「エラーを返す」と「クラッシュする」は根本的に違います。前者は呼び出し側が対処できますが、後者はプロセスごと終了するため、回復も記録もできません。
+- 手順: 要件は「不正な入力では nil」。つまりエラーは想定内の事象。
+- 手順: `try!` は「ここでは絶対に失敗しない」という宣言。
+- 手順: 壊れたJSONでは decode が dataCorrupted を投げ、try! がそれを致命的エラーに変える。
+- 手順: `try?` に変えると、同じ経路で nil が返り、要件を満たす。
+- 動く理由: 正しいJSONのテストが成功していることから、デコード処理自体と戻り値の型は正しいと分かります。差が出ているのは失敗時の扱いだけで、それを決めているのが try! です。
+- よくある間違い: try! を「短く書ける try?」と考える間違いです。失敗時の挙動がまったく違います。
+- よくある間違い: テスト側で壊れた入力を渡さないようにして通す対応です。実際のAPIやファイルは壊れた入力を返し得るため、問題は本番に残ります。
+- よくある間違い: この関数では nil しか返せないため、失敗の理由は呼び出し側に伝わりません。理由が必要なら Result や throws を返す設計にします。
+- 関連例:
+```swift
+import Foundation
+struct User: Codable { let id: Int }
+func decodeUser(_ json: String) -> User? {
+    try? JSONDecoder().decode(User.self, from: Data(json.utf8))
+}
+print(decodeUser(#"{"id": 1}"#)?.id ?? -1)
+print(decodeUser("{\"id\":")?.id ?? -1)
+```
+- 関連例の出力: 1
+-1
+- 関連例の説明: try? に変えると、壊れた入力でもクラッシュせずに nil が返ります。
+- 覚えておくこと: 想定内の失敗に try! を使わない。クラッシュは回復も記録もできない。
+
+### practice-foundation-015 日付まわりの型の役割を対応づける [対応づけ / Lv1 ガイド]
+対象レッスン: foundation-date-calendar
+シリーズ: foundation-date-basics (1段階目)
+スキル: foundation
+問題: 日付を扱う型と、その役割を対応させてください。
+対応:
+- Date → 時間軸上の一点。暦や表示形式の情報は持たない
+- Calendar → 暦そのもの。日付の加算や差分の計算を担当する
+- DateComponents → 年・月・日などの部品の集合。日付の分解と組み立てに使う
+- TimeZone → 地域ごとの時差。同じ瞬間でも表示される日時が変わる原因になる
+ヒント1: Date そのものは「何年何月」という情報を持っていません。ただの時刻です。
+ヒント2: 「3日後」を求めるには暦の知識が必要です。それを担当する型があります。
+ヒント3: r5 は DateFormatter の説明なので、この4つとは対応しません。
+解説: Date は時間軸上の一点（基準時刻からの経過秒数）にすぎず、年月日や表示形式の概念を持ちません。年月日への分解や「3日後」の計算は Calendar が行い、その結果の部品を表すのが DateComponents です。TimeZone は同じ Date が地域によって別の日時として見える理由そのものです。r5 は DateFormatter の説明で、この中には対応するものがありません。
+- 使っている考え方: 日付処理のバグの多くは「Date に暦の情報が入っている」という誤解から生まれます。Date は瞬間、Calendar は解釈、TimeZone は見え方、と役割を分けて考えると整理できます。
+- 手順: Date … 1970年からの経過秒数として表される一点。どこで見ても同じ瞬間。
+- 手順: Calendar … その瞬間を年月日に分解したり、日単位で加算したりする。
+- 手順: DateComponents … 分解した結果、あるいは組み立てるための材料。
+- 手順: TimeZone … 同じ Date を東京で見るかロンドンで見るかで、日付すら変わり得る。
+- 動く理由: 4つの型は「点・暦・部品・地域差」という別々の関心事を担当しており、説明と1対1で対応します。表示（フォーマット）だけは別の型の役割です。
+- よくある間違い: Date を文字列として保存・比較する間違いです。表示のための変換と、値としての保持は分けるべきです。
+- よくある間違い: TimeZone を指定せずに日付の境界（その日の始まり）を計算すると、実行環境によって結果が変わります。
+- 関連例:
+```swift
+import Foundation
+var cal = Calendar(identifier: .gregorian)
+cal.timeZone = TimeZone(identifier: "UTC")!
+let base = Date(timeIntervalSince1970: 0)
+print(cal.component(.year, from: base), cal.component(.day, from: base))
+```
+- 関連例の出力: 1970 1
+- 関連例の説明: 同じ Date でも、Calendar と TimeZone を与えて初めて「何年何日か」が決まります。
+- 覚えておくこと: Date は瞬間、Calendar は解釈、TimeZone は見え方。混ぜない。
+
+### practice-foundation-016 暦を使って3日後を求める [穴埋め / Lv2 基本]
+対象レッスン: foundation-date-calendar
+シリーズ: foundation-date-basics (2段階目)
+スキル: foundation
+問題: 基準日の3日後を求めて、経過秒数を表示します。空欄を埋めてください。
+埋めたあと:
+```swift
+import Foundation
+var cal = Calendar(identifier: .gregorian)
+cal.timeZone = TimeZone(identifier: "UTC")!
+let base = Date(timeIntervalSince1970: 0)
+let next = cal.date(byAdding: .day, value: 3, to: base)!
+print(next.timeIntervalSince1970)
+```
+ヒント1: Calendar のメソッドは「何を足すか」を外部ラベルで表します。
+ヒント2: Date から1970年以降の経過秒数を得るプロパティの名前を思い出してください。
+ヒント3: 1つめは「加算によって」を意味する外部ラベル、2つめは「時間の間隔」を表す語です。
+解説: `Calendar.date(byAdding:value:to:)` は、暦の単位（ここでは .day）を指定して日付を加算します。単純に86400秒を足すのと違い、夏時間や暦の切り替わりを考慮した「3日後」になります。`timeIntervalSince1970` は Date から基準時刻以降の経過秒数を返すプロパティです。UTC では夏時間がないため 3日 = 259200.0 秒がそのまま表示されます。
+- 使っている考え方: 「3日後」は物理的な秒数ではなく暦の概念です。Calendar を経由することで、地域の時制の特例を自動的に扱えます。
+- 手順: `Calendar(identifier: .gregorian)` … 使う暦を明示する。
+- 手順: `cal.timeZone = TimeZone(identifier: "UTC")!` … 地域差を固定して結果を安定させる。
+- 手順: `cal.date(byAdding: .day, value: 3, to: base)` … 暦のうえで3日進める。戻り値は Optional。
+- 手順: `timeIntervalSince1970` で経過秒数を確認すると 259200.0。
+- 動く理由: byAdding は加算する単位、value は個数、to は基準日という3つの情報を過不足なく渡す設計です。UTC を指定したことで、実行環境に依存しない結果になります。
+- よくある間違い: `base.addingTimeInterval(86400 * 3)` で代用する間違いです。夏時間のある地域では時刻がずれます。
+- よくある間違い: Calendar.current を使ったまま結果をテストと比較すると、実行環境のタイムゾーン次第で失敗します。テストでは固定した Calendar を使います。
+- 関連例:
+```swift
+import Foundation
+var cal = Calendar(identifier: .gregorian)
+cal.timeZone = TimeZone(identifier: "UTC")!
+let base = Date(timeIntervalSince1970: 0)
+print(cal.date(byAdding: .day, value: 3, to: base)!.timeIntervalSince1970)
+print(cal.date(byAdding: .month, value: 1, to: base)!.timeIntervalSince1970)
+```
+- 関連例の出力: 259200.0
+2678400.0
+- 関連例の説明: 1か月は31日（1月）として計算されており、固定秒数では表せないことが分かります。
+- 覚えておくこと: 日付の加算は Calendar.date(byAdding:value:to:)。秒数の足し算で代用しない。
+
+### practice-foundation-017 秒数を足して翌日にしている行を見つける [バグ発見 / Lv3 実装]
+対象レッスン: foundation-date-calendar
+シリーズ: foundation-date-basics (3段階目)
+スキル: foundation, debugging
+問題: 夏時間のある地域で、翌日にならないことがあります。原因になっている行を選んでください。
+問題のある行: let tomorrow = Date().addingTimeInterval(86400)
+ヒント1: 1日は常に86400秒でしょうか。夏時間の切り替え日を思い出してください。
+ヒント2: 暦の上での「1日後」と、物理的な86400秒後は同じとは限りません。
+ヒント3: 秒数を直接足している行が、暦の特例を無視しています。
+解説: バグは3行目です。`addingTimeInterval(86400)` は物理的に86400秒進めるだけなので、夏時間が始まる日（1日が23時間になる日）では翌日の1時に、終わる日（25時間になる日）では当日の23時に着地します。挙動としてはクラッシュせず、年に数日だけ判定がずれるという形で現れるため、再現も発見も難しいバグです。修正は `cal.date(byAdding: .day, value: 1, to: Date())` を使い、暦に日付を進めさせることです。これなら地域の時制に関わらず、常に翌日の同じ時刻になります。
+- 使っている考え方: カレンダー上の単位（日・月・年）は可変長です。夏時間、うるう年、うるう秒などの特例があるため、固定の秒数に換算した時点で正しさが失われます。
+- 手順: 夏時間開始日は現地時間で1日が23時間しかない。
+- 手順: そこに86400秒を足すと、翌日の同時刻を1時間超える。
+- 手順: 終了日は25時間あるため、86400秒では当日中に留まる。
+- 手順: Calendar.date(byAdding:) は暦の規則を適用するため、常に翌日の同時刻になる。
+- 動く理由: 原因は日付を進めている3行目にあります。4行目の判定は与えられた Date を正しく評価しているだけで、入力がずれていることが問題です。
+- よくある間違い: テスト環境が夏時間のない地域（日本など）だと再現しないため、「動いている」と判断してしまう間違いです。
+- よくある間違い: `86400 * 30` で1か月を表す間違いも同種です。月の長さは28〜31日で変わります。
+- 関連例:
+```swift
+import Foundation
+var cal = Calendar(identifier: .gregorian)
+cal.timeZone = TimeZone(identifier: "America/Los_Angeles")!
+var c = DateComponents(); c.year = 2026; c.month = 3; c.day = 8; c.hour = 0
+let base = cal.date(from: c)!
+let f = DateFormatter()
+f.dateFormat = "yyyy-MM-dd HH:mm"
+f.timeZone = cal.timeZone
+f.locale = Locale(identifier: "en_US_POSIX")
+print(f.string(from: cal.date(byAdding: .day, value: 1, to: base)!))
+print(f.string(from: base.addingTimeInterval(86400)))
+```
+- 関連例の出力: 2026-03-09 00:00
+2026-03-09 01:00
+- 関連例の説明: 夏時間が始まる日をまたぐと、暦による加算と秒数の加算で1時間ずれることが実際に確認できます。
+- 覚えておくこと: 日・月・年は可変長。秒数に換算した時点でバグの種になる。
+
+### practice-foundation-018 端末によって変わる日付表示を固定する [修正 / Lv3 実装]
+対象レッスン: foundation-formatting
+シリーズ: foundation-formatting (1段階目)
+スキル: foundation, debugging
+問題: どの端末でも UTC の 1970/01/01 と表示させたいです。3行目のあとに追加する設定として最も適切なものを選んでください。
+正解: f.timeZone = TimeZone(identifier: "UTC")
+f.locale = Locale(identifier: "en_US_POSIX")
+ヒント1: 同じ Date でも、地域によって日付そのものが変わります。
+ヒント2: 端末の暦設定が和暦などになっていると、yyyy が想定外の年になります。
+ヒント3: 固定の書式で機械的に出力したいときは、タイムゾーンと固定ロケールの両方を明示します。
+解説: バグは設定不足です。DateFormatter は既定で端末の TimeZone と Locale を使うため、同じ Date でも実行環境によって日付や年号が変わります（和暦設定では 0045/01/01 のようになり得ます）。挙動としてはクラッシュせず、一部の端末でだけ表示が違うという形で現れます。修正は timeZone を UTC に固定し、locale を en_US_POSIX にすることです。en_US_POSIX は「ユーザー設定の影響を受けない固定ロケール」として用意されており、機械可読な固定書式には必ずこれを使います。dateStyle は独自の書式を上書きしてしまい、Locale.current や autoupdatingCurrent はむしろ環境依存を強めます。
+- 使っている考え方: 日付の文字列化には「人に見せる表示」と「機械が読む固定書式」の2種類があります。前者は端末設定に従うべきで、後者は必ず固定しなければなりません。
+- 手順: `dateFormat` を自分で指定する時点で、これは機械可読な固定書式。
+- 手順: 既定の timeZone は端末の地域なので、UTC の0時が前日になる地域がある。
+- 手順: 既定の locale は端末設定なので、暦や数字の表記が変わり得る。
+- 手順: UTC + en_US_POSIX を指定すると、どの端末でも同じ文字列になる。
+- 動く理由: 表示のばらつきの原因は timeZone（どの地域の日付か）と locale（どの暦・表記か）の2つです。両方を固定して初めて出力が一意に決まります。
+- よくある間違い: locale だけを固定して timeZone を忘れる間違いです。日付が1日ずれる地域が残ります。
+- よくある間違い: 固定書式に Locale.current を使う間違いです。和暦やアラビア数字以外の表記になると、パース側と食い違います。
+- よくある間違い: DateFormatter は生成コストが高いため、ループの中で毎回作るのは避けます。
+- 関連例:
+```swift
+import Foundation
+let f = DateFormatter()
+f.dateFormat = "yyyy/MM/dd HH:mm"
+f.timeZone = TimeZone(identifier: "UTC")
+f.locale = Locale(identifier: "en_US_POSIX")
+print(f.string(from: Date(timeIntervalSince1970: 0)))
+f.timeZone = TimeZone(identifier: "Asia/Tokyo")
+print(f.string(from: Date(timeIntervalSince1970: 0)))
+```
+- 関連例の出力: 1970/01/01 00:00
+1970/01/01 09:00
+- 関連例の説明: 同じ Date でも timeZone を変えるだけで表示が9時間ずれます。日付が変わる時刻なら日付自体もずれます。
+- 覚えておくこと: 固定書式には UTC + en_US_POSIX。人に見せる表示だけ端末設定に従わせる。
+
+### practice-foundation-019 金額表示のテストが落ちた原因を読む [テスト読解 / Lv3 実装]
+対象レッスン: foundation-formatting
+シリーズ: foundation-formatting (2段階目)
+スキル: testing, foundation, debugging
+問題: テストが1件失敗しています。実装のどの点が要件に反しているかを選んでください。
+正解: 文字列補間は Double を最短の表現で文字列化するため、末尾の0が省かれて桁数が固定されない
+ヒント1: 成功したテストと失敗したテストの違いは、小数部の桁数だけです。
+ヒント2: 12.34 はたまたま2桁だったので通っています。桁数を固定する処理はどこにもありません。
+ヒント3: 文字列補間は「その値を表す最短の文字列」を作ります。1234.50 の末尾の0は情報として不要なので消えます。
+解説: 失敗したテストが表しているのは「表示桁数を常に2桁に固定する」という要件です。検証している入力 1234.5 は小数部が1桁しかない値で、桁を補う処理が必要になる代表的なケースです。実装は `"\(value)"` という文字列補間だけで、Double を最短表現に変換するため 1234.5 のまま出力されます。成功している 12.34 は、たまたま最短表現が要件と一致しただけで、桁数を固定できている証拠にはなりません。丸め誤差やカンマ区切りは発生しておらず、戻り値も String なので、原因は補間による表現方法だけです。修正は `String(format: "%.2f", value)` などで桁数を明示することです。
+- 使っている考え方: 数値の「値」と「表示」は別物です。表示桁数を要件にするなら、必ず書式指定を通す必要があります。補間は開発中の確認用であり、仕様を満たす整形手段ではありません。
+- 手順: 要件は小数第2位までの固定表示。
+- 手順: `"\(value)"` は Double の最短表現を返す。
+- 手順: 1234.5 の最短表現は "1234.5" なので、桁が足りない。
+- 手順: `String(format: "%.2f", value)` なら常に2桁になり、"1234.50" が得られる。
+- 動く理由: 失敗しているのは小数部が2桁未満の入力だけで、2桁ちょうどの入力は通っています。この分かれ方は「桁を補う処理がない」ことを正確に示しています。
+- よくある間違い: 1件しか落ちていないことを理由に、テストの期待値を "1234.5" に書き換える対応です。仕様のほうを壊しています。
+- よくある間違い: 通貨表示が必要な場合は %.2f ではなく NumberFormatter の currency スタイルを使います。地域ごとの記号や区切りが必要になるためです。
+- 関連例:
+```swift
+import Foundation
+print("\(1234.5)")
+print(String(format: "%.2f", 1234.5))
+print(String(format: "%.2f", 12.345))
+```
+- 関連例の出力: 1234.5
+1234.50
+12.35
+- 関連例の説明: %.2f は桁を補うだけでなく、必要に応じて四捨五入も行います。
+- 覚えておくこと: 表示桁数が仕様なら書式指定が必須。補間は最短表現を返すだけ。
+
+### practice-foundation-020 クエリ付きURLを組み立てる順に並べる [並べ替え / Lv3 実装]
+対象レッスン: foundation-url-components
+シリーズ: foundation-url-build (1段階目)
+スキル: foundation
+問題: 検索語をクエリに載せたURLを作って表示します。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+import Foundation
+var components = URLComponents(string: "https://example.com/search")!
+components.queryItems = [URLQueryItem(name: "q", value: "swift lang")]
+let url = components.url!
+print(url.absoluteString)
+```
+ヒント1: URLComponents を作ってから、クエリを設定します。
+ヒント2: url プロパティは、その時点の components の内容から URL を組み立てます。設定より前に取り出すとクエリが入りません。
+ヒント3: import → components 生成 → queryItems 設定 → url 取り出し → 表示、の順です。
+解説: URLComponents は URL を部品ごとに保持する可変の構造体で、`url` プロパティはその時点の内容から URL を組み立てて返します。したがって queryItems の設定は `components.url` を取り出す前に行う必要があります。URLQueryItem を使うと値のパーセントエンコードが自動で行われ、半角スペースは %20 になります。出力は https://example.com/search?q=swift%20lang です。
+- 使っている考え方: URL は文字列に見えますが、実際にはスキーム・ホスト・パス・クエリという構造を持ちます。構造として組み立てると、エンコード漏れという典型的なバグが原理的に起きません。
+- 手順: `URLComponents(string:)` でベースとなるURLを分解する。
+- 手順: `queryItems` に名前と値の組を設定する。値はそのまま書いてよい。
+- 手順: `components.url` が、その内容から正しくエンコードされた URL を組み立てる。
+- 手順: スペースは %20 に変換されて出力される。
+- 動く理由: url プロパティは呼び出し時点の状態から組み立てるため、設定 → 取り出しの順序が必要です。この順序が守られていれば、エンコードは自動的に正しく行われます。
+- よくある間違い: `components.url` を先に取り出してから queryItems を設定しても、すでに作られた URL には反映されません。
+- よくある間違い: 文字列連結で `?q=\(query)` と書くと、スペースや & がエンコードされず、URL が壊れたり値が途中で切れたりします。
+- 関連例:
+```swift
+import Foundation
+var components = URLComponents(string: "https://example.com/search")!
+components.queryItems = [URLQueryItem(name: "q", value: "swift lang")]
+print(components.url!.absoluteString)
+```
+- 関連例の出力: https://example.com/search?q=swift%20lang
+- 関連例の説明: 値に含まれるスペースが自動的に %20 へエンコードされています。
+- 覚えておくこと: URLは組み立てる。文字列連結はエンコード事故のもと。
+
+### practice-foundation-021 記号を含む検索語を安全に載せる [ブロック選択 / Lv3 実装]
+対象レッスン: foundation-url-components
+シリーズ: foundation-url-build (2段階目)
+スキル: foundation
+問題: 検索語 a&b をクエリの値として正しく載せます。必要な行だけを選び、正しい順に並べてください。
+使うブロック:
+- import Foundation
+- var components = URLComponents(string: "https://example.com/search")!
+- components.queryItems = [URLQueryItem(name: "q", value: "a&b")]
+- print(components.url!.absoluteString)
+ヒント1: & はクエリで「次の項目との区切り」を意味する予約文字です。
+ヒント2: 文字列に直接書くと、値の一部ではなく区切りとして解釈されてしまいます。
+ヒント3: 値をそのまま渡してエンコードを任せられる型を使います。
+解説: URLQueryItem に値を渡すと、& のような予約文字が %26 にエンコードされ、`?q=a%26b` という「q の値が a&b である」正しいURLになります。一方 `URL(string: "...?q=a&b")` は文字列としては有効なURLですが、クエリとしては q=a と b という2つの項目に分かれて解釈されるため、サーバには q=a としか届きません。クラッシュもエラーも起きず、値が静かに欠けるのが厄介な点です。
+- 使っている考え方: URL の予約文字（& = ? # + など）は、値として使うときは必ずエンコードが必要です。エンコードの要否を人が判断するのではなく、構造として組み立てて機械に任せます。
+- 手順: `URLQueryItem(name: "q", value: "a&b")` … 値をそのまま渡す。
+- 手順: `components.url` が組み立てる際に & を %26 に変換する。
+- 手順: 結果は https://example.com/search?q=a%26b。
+- 手順: 受け取り側でデコードすると、値は a&b として1つに戻る。
+- 動く理由: エンコードの責任を URLComponents に委ねているため、値にどんな文字が含まれていても構造が壊れません。検索語のようなユーザー入力では、これが必須の前提になります。
+- よくある間違い: テストデータに記号を含めず「動いている」と判断する間違いです。記号入りの入力で初めて壊れます。
+- よくある間違い: 自前で replacingOccurrences を使ってエンコードする間違いです。対象文字の抜けや二重エンコードが起きます。
+- 関連例:
+```swift
+import Foundation
+let bad = URL(string: "https://example.com/search?q=a&b")!
+print(URLComponents(url: bad, resolvingAgainstBaseURL: false)!.queryItems!)
+var good = URLComponents(string: "https://example.com/search")!
+good.queryItems = [URLQueryItem(name: "q", value: "a&b")]
+print(URLComponents(url: good.url!, resolvingAgainstBaseURL: false)!.queryItems!)
+```
+- 関連例の出力: [q=a, b]
+[q=a&b]
+- 関連例の説明: 文字列で書いた側は2つの項目に割れており、q の値が a だけになっていることが確認できます。
+- 覚えておくこと: クエリ値は URLQueryItem に任せる。文字列連結では予約文字が壊れる。
+
+### practice-foundation-022 検索URLを作る関数を組み立てる [関数組み立て / Lv3 実装]
+対象レッスン: foundation-url-components
+シリーズ: foundation-url-build (3段階目)
+スキル: foundation, functions, optional
+問題: 検索語からURLを作る関数を作ります。必要なブロックだけを選んで正しい順に並べてください。
+正解の並び:
+```swift
+import Foundation
+func searchURL(query: String) -> URL? {
+    var components = URLComponents(string: "https://example.com/search")
+    components?.queryItems = [URLQueryItem(name: "q", value: query)]
+    return components?.url
+}
+```
+ヒント1: 検索語はクエリに載せます。パスに入れると意味が変わります。
+ヒント2: 文字列補間でURLを作ると、記号を含む検索語で構造が壊れます。
+ヒント3: import → 関数宣言 → components 生成 → queryItems 設定 → url を返す → 関数を閉じる、の6行です。
+解説: URLComponents を使って組み立てると、検索語に含まれる記号が自動的にエンコードされます。`URLComponents(string:)` は失敗しうるので Optional となり、`components?.url` も Optional のまま返せるため、戻り値の型 URL? と自然に一致します。文字列補間で組み立てる b7 は、& や # を含む検索語で値が壊れます。b8 は検索語をパスに入れており、`/search/a&b` のようなまったく別のURLになってしまいます。
+- 使っている考え方: URL を作る関数は、外部入力を受け取る境界です。境界でエンコードを保証しておくと、以降のコードは安全な URL しか扱わなくて済みます。
+- 手順: `URLComponents(string:)` … 不正な文字列なら nil。だから Optional。
+- 手順: `components?.queryItems = ...` … Optional chaining で設定する。
+- 手順: `return components?.url` … 組み立てに失敗すれば nil がそのまま返る。
+- 手順: 呼び出し側は URL? を受け取り、nil のときの扱いを決める。
+- 動く理由: Optional のまま処理を進めることで、途中の失敗を握りつぶさずに呼び出し側へ伝えられます。エンコードは URLComponents が保証します。
+- よくある間違い: `URLComponents(string:)!` と強制アンラップする間違いです。定数のURLなら実害は小さいものの、ベースURLを設定から読むようになった途端に落ちます。
+- よくある間違い: パスとクエリを取り違える間違いです。検索語はリソースの位置ではなく条件なので、クエリに載せます。
+- 関連例:
+```swift
+import Foundation
+func searchURL(query: String) -> URL? {
+    var components = URLComponents(string: "https://example.com/search")
+    components?.queryItems = [URLQueryItem(name: "q", value: query)]
+    return components?.url
+}
+print(searchURL(query: "a&b")?.absoluteString ?? "作れません")
+```
+- 関連例の出力: https://example.com/search?q=a%26b
+- 関連例の説明: 記号を含む検索語でも、値として正しくエンコードされた URL が得られます。
+- 覚えておくこと: URLを作る関数は Optional を返し、エンコードは URLComponents に任せる。
+
+### practice-foundation-023 POSTリクエストを組み立てる [穴埋め / Lv3 実装]
+対象レッスン: foundation-http-request
+シリーズ: foundation-request (1段階目)
+スキル: foundation
+問題: JSONを送るPOSTリクエストを作ります。空欄を埋めてください。
+埋めたあと:
+```swift
+import Foundation
+var request = URLRequest(url: URL(string: "https://example.com/items")!)
+request.httpMethod = "POST"
+request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+request.httpBody = Data(#"{"name":"a"}"#.utf8)
+print(request.httpMethod ?? "-", request.value(forHTTPHeaderField: "Content-Type") ?? "-")
+```
+ヒント1: 最後の print で読み出しているプロパティ名が、設定側の名前のヒントになります。
+ヒント2: 「送る本文がどんな形式か」を伝えるヘッダーと、「受け取りたい形式」を伝えるヘッダーは別物です。
+ヒント3: 1つめは HTTP のメソッドを表すプロパティ、2つめは本文の形式を宣言する標準ヘッダー名です。
+解説: `httpMethod` に "POST" を設定し、`Content-Type` ヘッダーで本文が JSON であることをサーバに伝えます。Content-Type は「これから送る本文の形式」、Accept は「返してほしい形式」を意味するため、送信側の宣言には Content-Type を使います。ヘッダー名を間違えるとサーバ側でパースに失敗しますが、クライアント側ではエラーにならないため、レスポンスを見るまで気づけません。出力は「POST application/json」です。
+- 使っている考え方: URLRequest は「何を・どこへ・どうやって送るか」を保持する値です。メソッド・ヘッダー・本文の3つが揃って初めて、サーバが解釈できるリクエストになります。
+- 手順: `URLRequest(url:)` … 送り先を決める。既定のメソッドは GET。
+- 手順: `httpMethod = "POST"` … 送信の種類を変更する。
+- 手順: `setValue(_:forHTTPHeaderField:)` … 本文の形式を宣言する。
+- 手順: `httpBody` … 実際に送るバイト列を設定する。
+- 動く理由: httpMethod と Content-Type はどちらも標準で決まった名前です。read 側の `request.httpMethod` と `value(forHTTPHeaderField: "Content-Type")` が同じものを指しているため、設定が正しかったことを出力で確認できます。
+- よくある間違い: httpBody を設定したのに Content-Type を付け忘れる間違いです。サーバが本文の形式を判断できず、400系のエラーになります。
+- よくある間違い: GET リクエストに httpBody を設定する間違いです。仕様上意味を持たず、無視されるか拒否されます。
+- 関連例:
+```swift
+import Foundation
+var request = URLRequest(url: URL(string: "https://example.com/items")!)
+request.httpMethod = "POST"
+request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+request.httpBody = Data(#"{"name":"a"}"#.utf8)
+print(request.httpMethod ?? "-", request.httpBody?.count ?? 0)
+```
+- 関連例の出力: POST 12
+- 関連例の説明: 本文が12バイトのJSONとして設定されていることが確認できます。
+- 覚えておくこと: POST は method・Content-Type・body の3点セット。Accept とは役割が違う。
+
+### practice-foundation-024 リクエスト組み立ての順に並べる [並べ替え / Lv3 実装]
+対象レッスン: foundation-http-request
+シリーズ: foundation-request (2段階目)
+スキル: foundation
+問題: POSTリクエストを組み立てて内容を確認します。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+import Foundation
+let url = URL(string: "https://example.com/items")!
+var request = URLRequest(url: url)
+request.httpMethod = "POST"
+request.httpBody = Data(#"{"name":"a"}"#.utf8)
+print(request.httpMethod ?? "-", request.httpBody?.count ?? 0)
+```
+ヒント1: URLRequest を作るには、先に URL が必要です。
+ヒント2: プロパティの設定は、リクエストを作ったあとに行います。
+ヒント3: import → URL → URLRequest → メソッド → 本文 → 確認、の順です。
+解説: URLRequest の初期化には URL が必要なので、URL を先に作ります。httpMethod や httpBody は URLRequest のプロパティなので、インスタンスを作ったあとに設定します。URLRequest は struct（値型）なので、設定するには var で保持する必要があります。最後の行で、メソッドが POST、本文が12バイトであることを確認できます。
+- 使っている考え方: リクエストの組み立ては「送り先を決める → 器を作る → 中身を詰める」という段階になります。各段階で必要な材料が前の段階の成果物です。
+- 手順: `URL(string:)` … 送り先。ここが nil なら以降は成立しない。
+- 手順: `URLRequest(url: url)` … URL を持つ器を作る。既定は GET。
+- 手順: `httpMethod` と `httpBody` を設定する。値型なので var が必要。
+- 手順: 設定結果を読み出して確認する。
+- 動く理由: 各行が必要とする値が、必ず前の行で用意されています。URLRequest が値型であることから、let で受けると以降の設定がすべてコンパイルエラーになる点も順序と同じくらい重要です。
+- よくある間違い: `let request = URLRequest(url: url)` としてしまい、'Cannot assign to property' で悩む間違いです。値型なので var が必要です。
+- よくある間違い: 本文を設定してからメソッドを GET のままにする間違いです。設定の順序自体は自由ですが、メソッドの設定漏れはサーバ側で気づくことになります。
+- 関連例:
+```swift
+import Foundation
+let url = URL(string: "https://example.com/items")!
+var request = URLRequest(url: url)
+request.httpMethod = "POST"
+request.httpBody = Data(#"{"name":"a"}"#.utf8)
+print(request.httpMethod ?? "-", request.httpBody?.count ?? 0, request.url?.path ?? "-")
+```
+- 関連例の出力: POST 12 /items
+- 関連例の説明: 組み立てたリクエストの各要素を、送信前に確認できます。
+- 覚えておくこと: URL → URLRequest → プロパティ設定。URLRequest は値型なので var で持つ。
+
+### practice-foundation-025 レスポンスを強制キャストしている行を見つける [バグ発見 / Lv4 応用]
+対象レッスン: foundation-urlsession
+シリーズ: foundation-network-safety (1段階目)
+スキル: foundation, debugging, errors
+問題: この関数は特定の条件でクラッシュします。原因になっている行を選んでください。
+問題のある行:     print((response as! HTTPURLResponse).statusCode)
+ヒント1: URLResponse は必ず HTTPURLResponse だと言い切れるでしょうか。
+ヒント2: file:// のようなHTTP以外のURLを渡された場合、レスポンスは HTTPURLResponse ではありません。
+ヒント3: 失敗しうる変換に `as!` を使っている行が、その場合にプロセスを止めます。
+解説: バグは3行目です。`URLSession.shared.data(from:)` が返す response の型は URLResponse であり、HTTP通信のときだけ HTTPURLResponse になります。file:// スキームのURLなどを渡されると HTTPURLResponse ではないため、`as!` による強制キャストが失敗して 'Could not cast value' でプロセスが停止します。挙動としては、HTTPのURLでテストしている限り再現せず、想定外のURLが来たときにだけクラッシュします。修正は `as?` による条件付きキャストにし、さらにステータスコードの検査も同じ guard にまとめてエラーを throw することです。こうすると呼び出し側がエラーとして扱えます。
+- 使っている考え方: ネットワーク層は外部からの入力が最も多い場所です。「必ずこうなるはず」という前提を `as!` や `!` で書くと、想定外の入力がそのままクラッシュになります。
+- 手順: `data(from:)` の戻り値の型は (Data, URLResponse)。
+- 手順: HTTPURLResponse はその具体型のひとつに過ぎない。
+- 手順: 非HTTPのURLでは別の型が返り、`as!` が失敗する。
+- 手順: `as?` + guard にすると、失敗をエラーとして扱えるようになる。
+- 動く理由: クラッシュするのは強制キャストを書いた3行目です。2行目の通信も4行目のデコードも throws なので、失敗しても呼び出し側に伝わるだけで停止しません。
+- よくある間違い: ステータスコードを表示するだけで検査していない実装も問題です。404 のエラーページをそのままデコードしようとして、分かりにくいデコードエラーになります。
+- よくある間違い: `as?` に変えただけで検査を省くと、異常なレスポンスをそのまま処理してしまいます。キャストと検査はセットで行います。
+- 関連例:
+```swift
+import Foundation
+func check(_ response: URLResponse) throws -> Int {
+    guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
+    guard (200..<300).contains(http.statusCode) else { throw URLError(.badServerResponse) }
+    return http.statusCode
+}
+let ok = HTTPURLResponse(url: URL(string: "https://example.com")!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+print(try check(ok))
+```
+- 関連例の出力: 200
+- 関連例の説明: キャストとステータス検査を1か所にまとめると、呼び出し側は成功したステータスだけを受け取れます。
+- 覚えておくこと: レスポンスは URLResponse。HTTPURLResponse への変換は as? + ステータス検査。
+
+### practice-foundation-026 エラー応答を見逃す通信処理を直す [修正 / Lv4 応用]
+対象レッスン: foundation-urlsession
+シリーズ: foundation-network-safety (2段階目)
+スキル: foundation, errors, debugging
+問題: 404 が返ってきてもエラーページの本文をそのまま返してしまいます。関数の中に追加する処理として最も適切なものを選んでください。
+正解: guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+    throw URLError(.badServerResponse)
+}
+ヒント1: URLSession は 404 を「通信の失敗」とは見なしません。通信自体は成功しているためです。
+ヒント2: 成功か失敗かを判断する情報は、捨てているほうの戻り値に入っています。
+ヒント3: レスポンスを受け取り、ステータスコードが成功の範囲かどうかを確認する必要があります。
+解説: バグは、レスポンスを `_` で捨てていることです。URLSession は 404 や 500 でもエラーを投げません（サーバから応答が返ってきた時点で通信としては成功しているため）。そのためエラーページのHTMLがそのまま Data として返り、呼び出し側でデコードに失敗して「JSONが壊れている」という誤った診断につながります。修正は response を受け取り、HTTPURLResponse にキャストしたうえでステータスコードが 200番台かを確認し、そうでなければ throw することです。本文が空かどうかの検査（o2）はエラーページに本文があるため無意味で、スキームの検査（o3）やスリープ（o4）は問題と無関係です。
+- 使っている考え方: HTTP では「通信の成否」と「業務上の成否」が別レイヤーです。URLSession が扱うのは前者だけなので、後者の判定はアプリ側の責任になります。
+- 手順: `data(from:)` は接続できて応答が返れば成功として返る。
+- 手順: 404 のときも body（エラーページ）と response が返る。
+- 手順: response のステータスコードを見ないと、成功と区別できない。
+- 手順: 200..<300 の範囲外なら throw して、呼び出し側にエラーとして伝える。
+- 動く理由: ステータスコードは HTTP が定めた成否の表明そのものです。ここで弾くことで、後続のデコード処理は「成功応答の本文」だけを扱えばよくなります。
+- よくある間違い: デコードエラーを見て JSON の構造を疑い続ける間違いです。実際にはエラーページのHTMLをデコードしようとしていることがあります。
+- よくある間違い: 204 No Content のように本文がない成功応答もあります。空チェックを成否判定に使うと、正常系を誤って弾きます。
+- 関連例:
+```swift
+import Foundation
+func describe(_ code: Int) -> String {
+    (200..<300).contains(code) ? "成功" : "失敗として扱う"
+}
+print(describe(200), describe(204), describe(404), describe(500))
+```
+- 関連例の出力: 成功 成功 失敗として扱う 失敗として扱う
+- 関連例の説明: 成功とみなす範囲を明示しておくと、判定の基準がコードとして残ります。
+- 覚えておくこと: URLSession は 404 を投げない。ステータス検査はアプリの責任。
+
+### practice-foundation-027 URLの各部品が何を返すか追う [実行追跡 / Lv3 実装]
+対象レッスン: foundation-url-components
+シリーズ: foundation-url-build (4段階目)
+スキル: foundation, debugging
+問題: 次のコードを実行したとき、表示される3行を選んでください。
+正解: /a/b、q=1、example.com
+ヒント1: path にクエリは含まれるでしょうか。URL の構造を思い出してください。
+ヒント2: query は ? を含むのか、含まないのかを考えてください。
+ヒント3: host はスキーム（https://）を含まないホスト名だけです。
+解説: URL は「スキーム://ホスト/パス?クエリ」という構造に分解されます。`path` は先頭のスラッシュを含むパス部分だけで、クエリは含みません（/a/b）。`query` は ? より後ろの文字列で、? 自体は含みません（q=1）。`host` はホスト名だけでスキームを含みません（example.com）。それぞれが独立した部品を返すため、結合したい場合は absoluteString を使います。
+- 使っている考え方: URL の各プロパティは構造上の1部品だけを返します。どこまでが含まれるかを正確に把握しておくと、パスの結合やクエリの解析で余計な文字列処理をせずに済みます。
+- 手順: `url.path` … /a/b。クエリもフラグメントも含まない。
+- 手順: `url.query` … q=1。区切りの ? は含まない。クエリがなければ nil。
+- 手順: `url.host` … example.com。スキームやポートは含まない。
+- 手順: 全体が必要なら `url.absoluteString` を使う。
+- 動く理由: 各プロパティの定義が構造上の役割と一致しているためです。区切り文字（? や //）は部品そのものではないので、値には含まれません。
+- よくある間違い: path にクエリが含まれると考えて、文字列を自分で切り出す間違いです。分解済みのプロパティを使えば不要です。
+- よくある間違い: query を自分で分割してパラメータを取り出す間違いです。URLComponents の queryItems を使うとデコード済みの値が得られます。
+- 関連例:
+```swift
+import Foundation
+let url = URL(string: "https://example.com/a/b?q=1")!
+let items = URLComponents(url: url, resolvingAgainstBaseURL: false)!.queryItems ?? []
+print(items.first!.name, items.first!.value ?? "-")
+```
+- 関連例の出力: q 1
+- 関連例の説明: クエリの解析は自分で文字列を分割せず、queryItems から取り出せます。
+- 覚えておくこと: URLの各プロパティは1部品だけを返す。区切り文字は含まれない。
+
+### practice-foundation-028 URL組み立てのテストが落ちた原因を読む [テスト読解 / Lv4 応用]
+対象レッスン: foundation-http-request
+シリーズ: foundation-request (3段階目)
+スキル: testing, foundation, debugging
+問題: テストが1件失敗しています。実装のどの点が要件に反しているかを選んでください。
+正解: 文字列補間でURLを組み立てているため、& が項目の区切りとして解釈され、値が途中で切れている
+ヒント1: 2つのテストの入力の違いは、記号を含むかどうかだけです。
+ヒント2: & はクエリ文字列の中で特別な意味を持ちます。値の一部として送るには変換が必要です。
+ヒント3: 補間はただ文字を並べるだけで、URLとしての意味を考慮しません。
+解説: 失敗したテストが表しているのは「検索語をそのまま1つの値として送る」という要件です。検証している入力 a&b は、クエリ文字列で区切りとして使われる予約文字を含む代表的な境界ケースです。実装は文字列補間でURLを組み立てているため、生成される文字列は `?q=a&b` となり、URLとしては「q=a」と「b」という2つの項目として解釈されます。その結果 q の値が a に切り詰められ、期待値と食い違います。URL自体は文字列として有効なので nil にはならず、エラーも起きないまま値だけが静かに欠ける点が、このバグの発見を難しくしています。修正は URLComponents と URLQueryItem を使って組み立てることで、& が %26 にエンコードされ、1つの値として保たれます。
+- 使っている考え方: 「構文としては有効だが意味が違う」バグは、テストで境界文字を入れないと発見できません。URL・SQL・HTML など、文字列に構造を持たせる領域に共通する問題です。
+- 手順: 要件は「1つのクエリ値として載せる」。
+- 手順: 補間は文字を並べるだけで、予約文字の変換をしない。
+- 手順: `?q=a&b` は q=a と b の2項目として解釈される。
+- 手順: URLComponents 経由なら %26 にエンコードされ、1項目として保たれる。
+- 動く理由: 単純な語では成功し、予約文字を含む語だけが失敗しています。この分かれ方は、エンコードの欠如という原因を正確に指しています。スキームや Optional の問題であれば、単純な語のテストも失敗するはずです。
+- よくある間違い: 手元の検索語で動いたことをもって完成とみなす間違いです。ユーザー入力には記号や日本語が普通に含まれます。
+- よくある間違い: & だけを replacingOccurrences で置換する対応です。他の予約文字（= # + %）が残り、同じ問題が別の入力で再発します。
+- 関連例:
+```swift
+import Foundation
+func buildURL(query: String) -> URL? {
+    var c = URLComponents(string: "https://example.com/search")
+    c?.queryItems = [URLQueryItem(name: "q", value: query)]
+    return c?.url
+}
+let url = buildURL(query: "a&b")!
+print(URLComponents(url: url, resolvingAgainstBaseURL: false)!.queryItems!)
+```
+- 関連例の出力: [q=a&b]
+- 関連例の説明: クエリ項目が1つだけで、値が a&b のまま保たれていることが確認できます。
+- 覚えておくこと: URLに外部入力を載せるときは必ず構造として組み立てる。補間は意味を保証しない。
+
+### practice-foundation-029 ファイルを書き出すのに必要な行だけ選ぶ [ブロック選択 / Lv3 実装]
+対象レッスン: foundation-filemanager
+シリーズ: foundation-file-io (1段階目)
+スキル: foundation
+問題: 一時ディレクトリに note.txt を書き出し、存在を確認します。必要な行だけを選び、正しい順に並べてください。
+使うブロック:
+- import Foundation
+- let dir = FileManager.default.temporaryDirectory
+- let url = dir.appendingPathComponent("note.txt")
+- try? Data("hello".utf8).write(to: url)
+- print(FileManager.default.fileExists(atPath: url.path))
+ヒント1: ディレクトリの場所は自分で文字列として書かず、FileManager から取得します。
+ヒント2: パスの結合は文字列連結ではなく、URL のメソッドで行います。
+ヒント3: `/Documents` のような絶対パスは、アプリのサンドボックス内には存在しません。
+解説: 書き出し先のディレクトリは FileManager から取得します（アプリのサンドボックス内の実際の場所は実行環境によって変わるため、固定文字列で書けません）。パスの結合は `appendingPathComponent` を使い、区切り文字の重複や欠落を自分で管理しないようにします。`URL(string:)` にファイルパス文字列を渡すと file スキームが付かない不完全な URL になり、書き込みに失敗します。書き込みは失敗しうるので try? か do-catch が必要です。
+- 使っている考え方: ファイルの場所は環境ごとに異なります。FileManager が返す URL を起点にして相対的に組み立てることで、実行環境に依存しないコードになります。
+- 手順: `FileManager.default.temporaryDirectory` … 一時ファイル用のディレクトリURL。
+- 手順: `appendingPathComponent("note.txt")` … 区切り文字を意識せずにファイルURLを作る。
+- 手順: `Data(...).write(to:)` … 失敗しうるので try が必要。
+- 手順: `fileExists(atPath:)` … URL ではなくパス文字列を取るAPIなので `.path` を渡す。
+- 動く理由: 起点のディレクトリを実行時に取得し、結合を URL のメソッドに任せているため、環境やファイル名に依存せず正しいURLが得られます。
+- よくある間違い: パスを文字列連結で組み立てる間違いです。スラッシュの重複や、名前に含まれる特殊文字で壊れます。
+- よくある間違い: `/Documents` のような絶対パスを書く間違いです。アプリはサンドボックス内でしかファイルを扱えません。
+- よくある間違い: write の失敗を無視すると、保存できていないのに成功したように見えます。実際のアプリでは do-catch でエラーを扱います。
+- 関連例:
+```swift
+import Foundation
+let dir = FileManager.default.temporaryDirectory
+let url = dir.appendingPathComponent("practice-note.txt")
+try? Data("hello".utf8).write(to: url)
+print(FileManager.default.fileExists(atPath: url.path))
+try? FileManager.default.removeItem(at: url)
+print(FileManager.default.fileExists(atPath: url.path))
+```
+- 関連例の出力: true
+false
+- 関連例の説明: 書き出し・存在確認・削除まで通すと、ファイル操作の一巡が確認できます。
+- 覚えておくこと: 場所は FileManager から取得し、結合は appendingPathComponent。文字列連結は使わない。
+
+### practice-foundation-030 ファイルパスからURLを作る書き方に直す [修正 / Lv3 実装]
+対象レッスン: foundation-filemanager
+シリーズ: foundation-file-io (2段階目)
+スキル: foundation, debugging
+問題: file スキームを持つ URL を作りたいのに「なし」と表示されます。3行目の修正として正しいものを選んでください。
+正解: let url = URL(fileURLWithPath: path)
+ヒント1: URL(string:) は「URL文字列」を解釈します。渡しているのは何でしょうか。
+ヒント2: ファイルパスは file:// で始まる形ではないため、スキームのない相対URLとして解釈されます。
+ヒント3: ファイルパスからURLを作る専用の初期化子があります。エンコードやスキーム付与を自動で行います。
+解説: バグは3行目です。`URL(string:)` はURL文字列を解釈する初期化子なので、`/var/folders/...` のようなファイルパスを渡すとスキームのない相対URLになり、scheme は nil になります。この URL をファイル操作に使うと、パスが解決できず失敗します。クラッシュしないぶん、「なぜかファイルが読めない」という形で現れます。修正は `URL(fileURLWithPath:)` を使うことで、file スキームが付与され、パス中の特殊文字も適切に扱われます。絶対URL化や部分的な置換では、スキームがない問題そのものは解決しません。
+- 使っている考え方: URL には「ネットワークのURL」と「ファイルURL」の2種類があり、作り方が異なります。ファイルパスは URL 文字列ではないため、専用の初期化子が必要です。
+- 手順: `temporaryDirectory.path` は /var/folders/... のようなパス文字列。
+- 手順: `URL(string:)` はこれをスキームなしの相対URLとして解釈する。
+- 手順: そのため scheme は nil になり、ファイルURLとして機能しない。
+- 手順: `URL(fileURLWithPath:)` なら file:///var/folders/... という完全なファイルURLになる。
+- 動く理由: fileURLWithPath はファイルシステムのパスを前提とした初期化子で、スキームの付与とエンコードを引き受けます。目的（ファイルURLを作る）と手段が一致しています。
+- よくある間違い: `URL(string: "file://" + path)` と自分で組み立てる間違いです。パスに空白や日本語が含まれるとエンコードが必要になり、壊れます。
+- よくある間違い: URL と パス文字列を混ぜて扱う間違いです。API によって URL を取るものと String のパスを取るものがあるため、変換の向きを意識します。
+- 関連例:
+```swift
+import Foundation
+let path = FileManager.default.temporaryDirectory.path
+print(URL(string: path)?.scheme ?? "なし")
+print(URL(fileURLWithPath: path).scheme ?? "なし")
+```
+- 関連例の出力: なし
+file
+- 関連例の説明: 同じパス文字列でも、初期化子を変えるだけでスキームの有無が変わります。
+- 覚えておくこと: ファイルパス → URL は fileURLWithPath。URL(string:) はネットワークURL用。
+
+### practice-foundation-031 UserDefaultsのAPIを対応づける [対応づけ / Lv1 ガイド]
+対象レッスン: foundation-userdefaults
+シリーズ: foundation-defaults (1段階目)
+スキル: foundation
+問題: UserDefaults の要素と、その役割を対応させてください。
+対応:
+- UserDefaults.standard → アプリの設定を保存する共有のストア
+- set(_:forKey:) → キーを指定して値を保存する
+- object(forKey:) → キーを指定して値を取り出す。未登録なら nil が返る
+- register(defaults:) → 起動時に既定値を用意する。ディスクには保存されない
+ヒント1: standard はインスタンスであってメソッドではありません。
+ヒント2: object(forKey:) は型を決めずに取り出すため、戻り値が Optional です。
+ヒント3: register は「保存」ではなく「未設定のときの既定値」を用意する仕組みです。
+解説: `UserDefaults.standard` はアプリ全体で共有される設定ストアです。`set(_:forKey:)` で保存し、`object(forKey:)` で取り出します（未登録なら nil）。`register(defaults:)` は「まだ保存されていないときに使う既定値」を登録するもので、ディスクには書き込まれず、アプリの起動ごとに設定し直します。r5 は該当するAPIがなく、実際には removePersistentDomain などを使います。
+- 使っている考え方: UserDefaults は「小さな設定値のための辞書」です。保存された値と、コード上で用意した既定値は別のレイヤーにあり、読み出し時に重ね合わされます。
+- 手順: `register(defaults:)` で既定値を登録する（保存はされない）。
+- 手順: `set(_:forKey:)` で実際の値を保存する。
+- 手順: 読み出し時は、保存値があればそれ、なければ既定値が返る。
+- 手順: `object(forKey:)` は型を問わず取り出すため Optional を返す。
+- 動く理由: 4つはストア本体・書き込み・読み出し・既定値という異なる役割を持ち、説明と1対1で対応します。register だけが「保存しない」点が区別のポイントです。
+- よくある間違い: UserDefaults を大量のデータや機密情報の保存に使う間違いです。plist として平文で保存されるため、トークンなどは Keychain を使います。
+- よくある間違い: register を毎回呼ぶことを忘れる間違いです。保存されないため、起動のたびに登録が必要です。
+- 関連例:
+```swift
+import Foundation
+let d = UserDefaults.standard
+d.register(defaults: ["fontSize": 14])
+print(d.integer(forKey: "fontSize"))
+print(d.object(forKey: "notSaved") == nil)
+```
+- 関連例の出力: 14
+true
+- 関連例の説明: register した既定値は読み出せますが、object(forKey:) では未保存のキーは nil になります。
+- 覚えておくこと: UserDefaultsは小さな設定用。register は既定値であって保存ではない。
+
+### practice-foundation-032 未設定と false を区別できない行を見つける [バグ発見 / Lv2 基本]
+対象レッスン: foundation-userdefaults
+シリーズ: foundation-defaults (2段階目)
+スキル: foundation, debugging, optional
+問題: 「まだ一度も設定していないときだけ表示したい」のに、明示的に false を保存したあとも表示されてしまいます。原因になっている行を選んでください。
+問題のある行: if d.bool(forKey: "didOnboard") == false {
+ヒント1: bool(forKey:) は、キーが存在しないときに何を返すでしょうか。
+ヒント2: 戻り値が Bool である以上、「未設定」を表す値がありません。
+ヒント3: 未設定かどうかを知るには、Optional を返すAPIで判定する必要があります。
+解説: バグは3行目です。`bool(forKey:)` は戻り値が非Optionalの Bool なので、キーが未登録のときも false を返します。つまり「まだ設定していない」と「false を保存した」を区別できません。挙動としては、意図した初回だけでなく、明示的に false を保存した場合にも条件が成立してしまいます。修正は `object(forKey:)` を使い、nil かどうかで未設定を判定することです。値としての true/false が必要な場面と、設定済みかどうかを知りたい場面では、使うAPIが変わります。
+- 使っている考え方: 「値がない」と「既定値と同じ値である」は別の状態です。非Optionalを返すAPIはこの2つを潰してしまうため、区別が必要なときは Optional を返すAPIを選びます。
+- 手順: `bool(forKey:)` の戻り値は Bool。未登録でも false。
+- 手順: したがって条件 `== false` は未登録でも保存済みfalseでも真になる。
+- 手順: `object(forKey:)` は Any? を返すため、未登録なら nil。
+- 手順: nil 判定にすれば「一度も設定されていない」だけを検出できる。
+- 動く理由: 問題は判定に使っているAPIの戻り値の型です。4行目の処理自体は正しく、条件の作り方だけが要件と食い違っています。
+- よくある間違い: integer(forKey:) も未登録で 0 を返すため、同じ取り違えが起きます。0 が正当な値である場合は特に危険です。
+- よくある間違い: register(defaults:) で既定値を登録した場合、object(forKey:) は既定値を返すため nil になりません。判定方法と既定値の設計はセットで考えます。
+- 関連例:
+```swift
+import Foundation
+let d = UserDefaults.standard
+let key = "practice-unset-key-xyz"
+print(d.bool(forKey: key))
+print(d.object(forKey: key) == nil)
+```
+- 関連例の出力: false
+true
+- 関連例の説明: 同じ未登録キーに対して、bool は false を、object は nil を返します。この差が判定の分かれ目です。
+- 覚えておくこと: 未設定を知りたいなら object(forKey:) の nil 判定。bool/integer は既定値に潰す。
+
+### practice-foundation-033 設定を保存して読み出す [穴埋め / Lv1 ガイド]
+対象レッスン: foundation-userdefaults
+シリーズ: foundation-defaults (3段階目)
+スキル: foundation
+問題: 名前を保存して、そのまま読み出して表示します。空欄を埋めてください。
+埋めたあと:
+```swift
+import Foundation
+let d = UserDefaults.standard
+d.set("Yuki", forKey: "practice-name")
+print(d.string(forKey: "practice-name") ?? "未設定")
+```
+ヒント1: 保存のメソッド名は、辞書に値を入れるときと同じ動詞です。
+ヒント2: 読み出しは型ごとに専用のメソッドがあります。保存したのは文字列です。
+ヒント3: 1つめは値を設定する動詞、2つめは型名をそのまま小文字にしたメソッド名です。
+解説: `set(_:forKey:)` で値を保存し、`string(forKey:)` で文字列として読み出します。型ごとの読み出しメソッド（string / integer / bool / data など）があり、string は保存されていない場合や型が違う場合に nil を返すため `?? "未設定"` で既定値を与えています。実行すると「Yuki」が表示されます。
+- 使っている考え方: UserDefaults は内部的には Any を保存する辞書なので、読み出し側で期待する型を指定します。型ごとのメソッドは、その変換を安全に行うための入口です。
+- 手順: `set("Yuki", forKey: "practice-name")` … 値とキーを渡して保存する。
+- 手順: 保存はアプリの設定ファイルに書き込まれ、次回起動時にも残る。
+- 手順: `string(forKey:)` … String? を返す。型が違えば nil。
+- 手順: `?? "未設定"` で nil の場合の表示を決めている。
+- 動く理由: 保存した型（String）と読み出しメソッド（string）が一致しているため、値がそのまま取得できます。型が食い違うと nil になり、既定値が表示されます。
+- よくある間違い: 保存した型と違うメソッドで読み出す間違いです。integer(forKey:) で文字列を読むと 0 が返り、原因が分かりにくくなります。
+- よくある間違い: 独自の struct をそのまま set しようとする間違いです。保存できるのはプロパティリスト対応の型だけなので、Codable で Data に変換してから保存します。
+- 関連例:
+```swift
+import Foundation
+let d = UserDefaults.standard
+d.set("Yuki", forKey: "practice-name")
+print(d.string(forKey: "practice-name") ?? "未設定")
+print(d.integer(forKey: "practice-name"))
+```
+- 関連例の出力: Yuki
+0
+- 関連例の説明: 同じキーでも型の違うメソッドで読むと、エラーにならず 0 が返ってしまいます。
+- 覚えておくこと: 保存は set、読み出しは型ごとのメソッド。型がずれると静かに失敗する。
+
+### practice-foundation-034 通知の登録と送信の順に並べる [並べ替え / Lv3 実装]
+対象レッスン: foundation-notificationcenter
+シリーズ: foundation-notification (1段階目)
+スキル: foundation, architecture
+問題: 通知を受け取れるようにしてから送信し、最後に登録を解除します。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+import Foundation
+extension Notification.Name { static let didUpdate = Notification.Name("didUpdate") }
+let token = NotificationCenter.default.addObserver(forName: .didUpdate, object: nil, queue: nil) { _ in print("更新を受け取った") }
+NotificationCenter.default.post(name: .didUpdate, object: nil)
+NotificationCenter.default.removeObserver(token)
+```
+ヒント1: 通知名の定義は、使う行より前に必要です。
+ヒント2: 送信より先に受け取る準備ができていなければ、通知は誰にも届きません。
+ヒント3: import → 通知名の定義 → 登録 → 送信 → 解除、の順です。
+解説: NotificationCenter は通知を保存しないため、post の時点で登録されている購読者にしか届きません。したがって addObserver は post より前に実行する必要があります。通知名は Notification.Name の extension として定義しておくと、文字列の打ち間違いをコンパイル時に防げます。最後に removeObserver で登録を解除し、不要になった購読を残さないようにします。
+- 使っている考え方: NotificationCenter は「今聞いている人にだけ届く放送」です。あとから登録しても過去の通知は受け取れないため、登録と送信の順序がそのまま動作を決めます。
+- 手順: `extension Notification.Name` … 通知名を定数として定義する。
+- 手順: `addObserver(forName:object:queue:)` … 購読を開始し、解除用のトークンを受け取る。
+- 手順: `post(name:object:)` … 登録済みの購読者にクロージャが実行される。
+- 手順: `removeObserver(token)` … 購読を解除する。
+- 動く理由: 登録が送信より前にあるため、post の時点で購読者が存在します。この順序が逆だと、エラーにはならず単に何も起きません。
+- よくある間違い: 登録より前に post してしまい「通知が届かない」と悩む間違いです。エラーが出ないため原因に気づきにくい典型です。
+- よくある間違い: ブロック形式の addObserver は登録解除を忘れるとクロージャが保持され続けます。トークンを保持して deinit で解除します。
+- よくある間違い: 通知名を文字列リテラルで直接書くと、送信側と受信側で1文字違っても気づけません。
+- 関連例:
+```swift
+import Foundation
+extension Notification.Name { static let didUpdate = Notification.Name("didUpdate") }
+NotificationCenter.default.post(name: .didUpdate, object: nil)
+let token = NotificationCenter.default.addObserver(forName: .didUpdate, object: nil, queue: nil) { _ in print("受け取った") }
+print("登録完了")
+NotificationCenter.default.removeObserver(token)
+```
+- 関連例の出力: 登録完了
+- 関連例の説明: 登録より前に post したため、通知は誰にも届かず「受け取った」は出力されません。
+- 覚えておくこと: NotificationCenter は登録が先。過去の通知は受け取れない。
+
+### practice-foundation-035 購読を安全に管理するクラスを組み立てる [関数組み立て / Lv4 応用]
+対象レッスン: foundation-notificationcenter
+シリーズ: foundation-notification (2段階目)
+スキル: foundation, memory, architecture
+問題: 通知を購読し、破棄時に必ず解除するクラスを作ります。必要なブロックだけを選んで正しい順に並べてください。
+正解の並び:
+```swift
+import Foundation
+extension Notification.Name { static let didUpdate = Notification.Name("didUpdate") }
+final class Watcher {
+    private var token: NSObjectProtocol?
+    func start() {
+        token = NotificationCenter.default.addObserver(forName: .didUpdate, object: nil, queue: nil) { [weak self] _ in self?.handle() }
+    }
+    func handle() { print("更新") }
+    deinit { if let token { NotificationCenter.default.removeObserver(token) } }
+}
+```
+ヒント1: クロージャがそのまま self を強く捕捉すると、解除するまでインスタンスが解放されません。
+ヒント2: 解除に必要なトークンは、あとで使えるようにプロパティとして保持します。
+ヒント3: import → 通知名 → クラス宣言 → トークン → start → 登録 → start を閉じる → handle → deinit → クラスを閉じる、の10行です。
+解説: ブロック形式の addObserver は、渡したクロージャを NotificationCenter が保持し続けます。そのクロージャが self を強参照すると、removeObserver するまでインスタンスが解放されず、deinit も呼ばれないため解除の機会が永久に来ません。`[weak self]` にすることでこの循環が切れ、インスタンスが解放されるときに deinit が実行されて登録も解除されます。トークンをプロパティに保持しているのは、解除時に必要だからです。
+- 使っている考え方: 購読の登録は「解除まで含めて1組」です。解除のタイミングを deinit に置くなら、deinit が確実に呼ばれるように参照の強さを設計する必要があります。
+- 手順: `private var token: NSObjectProtocol?` … 解除に使うトークンを保持する。
+- 手順: `addObserver(...) { [weak self] _ in self?.handle() }` … 弱参照で self を捕捉する。
+- 手順: NotificationCenter はクロージャを保持するが、self は弱参照なので解放を妨げない。
+- 手順: インスタンスが解放されると deinit が呼ばれ、removeObserver が実行される。
+- 動く理由: weak によって NotificationCenter → self の強参照が切れ、参照カウントが正しく0になります。その結果 deinit が呼ばれ、登録解除まで自動的に完了します。
+- よくある間違い: `{ _ in self.handle() }` と強参照で書く間違いです。deinit が呼ばれなくなり、解除もされず、通知のたびに古いインスタンスが動き続けます。
+- よくある間違い: トークンを保持せずに登録する間違いです。解除のしようがなくなります。
+- よくある間違い: セレクタ形式の addObserver は解除を忘れても比較的安全ですが、こちらのブロック形式では明示的な解除が必要です。
+- 関連例:
+```swift
+import Foundation
+extension Notification.Name { static let didUpdate = Notification.Name("didUpdate") }
+final class Watcher {
+    private var token: NSObjectProtocol?
+    func start() { token = NotificationCenter.default.addObserver(forName: .didUpdate, object: nil, queue: nil) { [weak self] _ in self?.handle() } }
+    func handle() { print("更新") }
+    deinit { print("deinit"); if let token { NotificationCenter.default.removeObserver(token) } }
+}
+var w: Watcher? = Watcher()
+w?.start()
+NotificationCenter.default.post(name: .didUpdate, object: nil)
+w = nil
+```
+- 関連例の出力: 更新
+deinit
+- 関連例の説明: 通知を受け取ったあと、参照を切ると deinit が呼ばれて解除まで完了しています。
+- 覚えておくこと: ブロック形式の購読は [weak self] + トークン保持 + deinit で解除、の3点セット。
+
+### practice-foundation-036 数字が含まれるか判定する1行を書く [記述 / Lv3 実装]
+対象レッスン: foundation-regex
+シリーズ: foundation-regex-basics (1段階目)
+スキル: foundation, syntax
+問題: text に数字が1文字でも含まれるかを true / false で表示する1行を書いてください。正規表現リテラル `#/\d/#` を使います。
+想定する書き方: print(text.contains(#/\d/#))
+ヒント1: 「含まれるか」を判定するメソッドは、文字列でも正規表現でも同じ名前です。
+ヒント2: 正規表現を渡すと、パターンに一致する部分があるかを調べてくれます。
+ヒント3: print のかっこの中に、text に対する contains 呼び出しを書きます。パターンは問題文のリテラルをそのまま使います。
+解説: `print(text.contains(#/\d/#))` と書きます。String の contains は正規表現も受け取れるため、`\d`（数字1文字）に一致する部分があるかを判定できます。ここでは "abc123" に数字があるので true が表示されます。`#/.../#` は拡張区切りの正規表現リテラルで、Swift 5 言語モードのままでも使えます（区切りなしの `/.../` は言語モードの設定によっては割り算と解釈されてしまいます）。
+- 使っている考え方: Swift の正規表現リテラルは、パターンがコンパイル時に検証されます。文字列としてパターンを書く場合と違い、書き間違いを実行前に見つけられます。
+- 手順: `#/\d/#` は「数字1文字」を表す正規表現。
+- 手順: `text.contains(_:)` に正規表現を渡すと、一致する部分の有無を Bool で返す。
+- 手順: "abc123" には 1 があるので true。
+- 手順: 一致する場所や内容が必要なら firstMatch(of:) や matches(of:) を使う。
+- 動く理由: contains は一致の有無だけを返すため、判定用途にはこれで十分です。正規表現リテラルなのでエスケープを二重にする必要もありません。
+- よくある間違い: 文字列で `"\\d"` と書いてから NSRegularExpression を組み立てる古い書き方は、エスケープが二重になり読みにくくなります。
+- よくある間違い: 区切りなしの `/\d/` は、言語モードによっては演算子として解釈されコンパイルエラーになります。迷ったら `#/.../#` を使います。
+- 関連例:
+```swift
+import Foundation
+print("abc123".contains(#/\d/#))
+print("abcdef".contains(#/\d/#))
+print("abc123".firstMatch(of: #/\d+/#).map { String($0.output) } ?? "なし")
+```
+- 関連例の出力: true
+false
+123
+- 関連例の説明: 有無の判定と、一致した部分の取り出しを比べると、使うAPIの違いが分かります。
+- 覚えておくこと: 有無の判定は contains(正規表現)。リテラルは `#/.../#` が安全。
+
+### practice-foundation-037 正規表現の一致結果を追う [実行追跡 / Lv3 実装]
+対象レッスン: foundation-regex
+シリーズ: foundation-regex-basics (2段階目)
+スキル: foundation, debugging
+問題: 次のコードを実行したとき、表示される2行を選んでください。
+正解: 2 と ["1", "22"]
+ヒント1: `+` は「直前のパターンの1回以上の繰り返し」を意味します。
+ヒント2: 連続した数字はまとめて1つの一致になります。
+ヒント3: "a1b22c" の中で連続した数字の並びは 1 と 22 の2か所です。
+解説: `\d+` は「数字が1文字以上続く部分」に一致し、可能な限り長く一致します（貪欲マッチ）。"a1b22c" では "1" と "22" の2か所が該当するため count は2、取り出した文字列は ["1", "22"] です。`\d` だけなら1文字ずつ3か所に一致して ["1", "2", "2"] になります。matches(of:) は一致した箇所すべてを返し、$0.output で一致部分を取り出せます。
+- 使っている考え方: 正規表現の繰り返し指定は、既定で「できるだけ長く一致する」貪欲な動作をします。この性質を知らないと、区切りをまたいで一致してしまうバグの原因になります。
+- 手順: `\d+` は数字1文字以上の連続。
+- 手順: 文字列を左から走査し、"1" で1つ目の一致。
+- 手順: 続いて "22" が連続した数字なので、まとめて2つ目の一致になる。
+- 手順: 一致は2件、内容は "1" と "22"。
+- 動く理由: 隣り合う数字は1つの一致にまとめられるため、22 が2件に分かれることはありません。また文字 a・b・c は数字ではないので一致に含まれません。
+- よくある間違い: `+` を忘れて `\d` と書くと、1文字ずつ別々の一致になり件数が変わります。
+- よくある間違い: 貪欲マッチを知らずに `<.+>` のようなパターンを書くと、最初のタグから最後のタグまでを1つとして一致させてしまいます。最短一致には `+?` を使います。
+- 関連例:
+```swift
+import Foundation
+let text = "a1b22c"
+print(text.matches(of: #/\d/#).map { String($0.output) })
+print(text.matches(of: #/\d+/#).map { String($0.output) })
+```
+- 関連例の出力: ["1", "2", "2"]
+["1", "22"]
+- 関連例の説明: `+` の有無だけで、一致の単位がまったく変わることが確認できます。
+- 覚えておくこと: `+` は1回以上の繰り返しで、既定は最長一致。
+
+### practice-foundation-038 全件変換せずに最初の1件を得る [ブロック選択 / Lv3 実装]
+対象レッスン: foundation-sequence-collection
+シリーズ: foundation-sequence (1段階目)
+スキル: collections, foundation
+問題: 100万件を変換した結果のうち、6より大きい最初の値がほしいです。全件を変換せずに済む行だけを選び、正しい順に並べてください。
+使うブロック:
+- func doubled(_ n: Int) -> Int { n * 2 }
+- let numbers = Array(1...1_000_000)
+- let firstBig = numbers.lazy.map { doubled($0) }.first { $0 > 6 }
+- print(firstBig ?? -1)
+ヒント1: 通常の map は、その場で全要素を変換して新しい配列を作ります。
+ヒント2: 変換を「必要になった要素だけ」に遅らせる仕組みがあります。
+ヒント3: 求めているのは変換後の値です。変換前の要素を返す書き方では答えが変わってしまいます。
+解説: `numbers.map { ... }.first { ... }` は100万件すべてを変換してから先頭を探します。`numbers.lazy.map { ... }.first { ... }` は遅延評価なので、条件を満たす値が見つかった時点で変換が止まり、この例では4件目までしか評価されません。`numbers.first { doubled($0) > 6 }` も全件は評価しませんが、返るのは変換前の要素（4）なので、求めている変換後の値（8）になりません。結果として正しいのは lazy を挟んだ書き方です。
+- 使っている考え方: lazy は「変換の手順だけを覚えておき、値が要求されたときに1件ずつ流す」仕組みです。途中で打ち切る操作（first、contains など）と組み合わせたときに効果があります。
+- 手順: `numbers.lazy` … 以降の変換を遅延評価にする。
+- 手順: `.map { doubled($0) }` … この時点では1件も変換されない。
+- 手順: `.first { $0 > 6 }` … 先頭から1件ずつ変換し、条件を満たした時点で停止する。
+- 手順: 1→2、2→4、3→6、4→8 と評価し、4件目で 8 が見つかって終了する。
+- 動く理由: first は条件を満たす最初の要素で走査を打ち切ります。lazy によって map の適用がその走査に同期するため、必要な件数しか変換されません。
+- よくある間違い: lazy を付ければ常に速くなると考える間違いです。遅延評価には間接呼び出しのコストがあり、全件必要な処理では通常の map より遅くなります。
+- よくある間違い: 配列（Collection）に対する `lazy.filter { }.prefix(3)` は、実測すると評価回数がむしろ増えることがあります（1〜10の配列で16回、通常の filter なら10回）。lazy が効くのは first のように途中で打ち切る操作と組み合わせたときです。
+- よくある間違い: 変換後の値がほしいのに `first(where:)` だけで済ませると、返るのは変換前の要素になります。
+- 関連例:
+```swift
+let numbers = Array(1...10)
+var lazyCount = 0
+let a = numbers.lazy.map { lazyCount += 1; return $0 * 2 }.first { $0 > 6 }
+var eagerCount = 0
+let b = numbers.map { eagerCount += 1; return $0 * 2 }.first { $0 > 6 }
+print(a ?? -1, lazyCount)
+print(b ?? -1, eagerCount)
+```
+- 関連例の出力: 8 4
+8 10
+- 関連例の説明: 結果は同じ8ですが、変換の実行回数は4回と10回で大きく違います。
+- 覚えておくこと: lazy が効くのは「途中で打ち切る操作」との組み合わせ。付ければ速くなる魔法ではない。
+
+### practice-foundation-039 配列を一定サイズに分割する拡張を組み立てる [関数組み立て / Lv4 応用]
+対象レッスン: foundation-sequence-collection
+シリーズ: foundation-sequence (2段階目)
+スキル: collections, functions
+問題: 配列を指定サイズごとに区切る chunked(into:) を作ります。最後の塊は端数でも構いません。必要なブロックだけを選んで正しい順に並べてください。
+正解の並び:
+```swift
+extension Array {
+    func chunked(into size: Int) -> [[Element]] {
+        guard size > 0 else { return [] }
+        return stride(from: 0, to: count, by: size).map {
+            Array(self[$0..<Swift.min($0 + size, count)])
+        }
+    }
+}
+```
+ヒント1: size が 0 以下だと無限ループや不正な範囲になります。先に弾く必要があります。
+ヒント2: 最後の塊は size に満たないことがあります。上限をそのまま足すと範囲外になります。
+ヒント3: 終端を含まない stride と、上限を count で抑えた範囲を使います。
+解説: `stride(from: 0, to: count, by: size)` は 0, size, 2*size... を count 未満まで生成するので、各塊の開始位置になります。終端は `Swift.min($0 + size, count)` で抑えることで、最後の端数の塊でも範囲外にならずに済みます。`through: count` を使うと開始位置が count と等しくなる場合があり、空の塊が混ざります。上限を抑えない `$0..<($0 + size)` は、最後の塊で 'Range requires lowerBound <= upperBound' や範囲外アクセスになります。size が 0 以下のときの guard も、範囲の不正を防ぐために必要です。
+- 使っている考え方: 分割処理は「開始位置の列」と「各区間の終端の抑え込み」の2つで決まります。端数の扱いを最初から式に組み込むと、条件分岐なしで安全に書けます。
+- 手順: `guard size > 0` … 0 や負の size を弾く。stride の by に 0 を渡すとクラッシュする。
+- 手順: `stride(from: 0, to: count, by: size)` … 各塊の開始位置。count 自身は含まない。
+- 手順: `$0..<Swift.min($0 + size, count)` … 終端を配列の長さで抑える。
+- 手順: `Array(self[...])` … ArraySlice を独立した配列に変換する。
+- 動く理由: min による抑え込みが端数の塊を正しく扱い、to による排他的な上限が空の塊の発生を防ぎます。extension 内で `Swift.min` と書いているのは、Array のスコープでの名前解決の曖昧さを避けるためです。
+- よくある間違い: 端数を考えずに `$0..<($0 + size)` と書く間違いです。要素数が size の倍数のときだけ動き、そうでないと落ちます。
+- よくある間違い: ArraySlice をそのまま返す設計は、元の配列を保持し続けます。長く持つなら Array に変換します。
+- 関連例:
+```swift
+extension Array {
+    func chunked(into size: Int) -> [[Element]] {
+        guard size > 0 else { return [] }
+        return stride(from: 0, to: count, by: size).map { Array(self[$0..<Swift.min($0 + size, count)]) }
+    }
+}
+print([1, 2, 3, 4, 5].chunked(into: 2))
+print([Int]().chunked(into: 2))
+```
+- 関連例の出力: [[1, 2], [3, 4], [5]]
+[]
+- 関連例の説明: 端数のある配列と空配列の両方で、例外なく動作することが確認できます。
+- 覚えておくこと: 分割は「開始位置の列 + 終端の min 抑え」。端数は式で吸収する。
+
+### practice-foundation-040 IDを表す型の宣言行を書く [記述 / Lv2 基本]
+対象レッスン: foundation-data-modeling
+スキル: types, protocols, foundation
+問題: ユーザーIDを表す UserID 型を作ります。JSONとの変換と、辞書のキーとしての利用の両方ができるようにする宣言行（struct から始まる1行）を書いてください。
+想定する書き方: struct UserID: Codable, Hashable {
+ヒント1: 必要な能力は2つあります。JSONとの相互変換と、ハッシュ値を持つことです。
+ヒント2: 準拠はカンマで並べて書けます。順序はどちらでも構いません。
+ヒント3: 型名のあとにコロンを書き、2つのプロトコル名を並べ、中かっこを開きます。
+解説: `struct UserID: Codable, Hashable {` と書きます。Codable によって JSON との相互変換が自動生成され、Hashable によって Set の要素や辞書のキーとして使えるようになります。Hashable は Equatable を含むため == も使えます。Int をそのまま ID として持ち回るのではなく専用の型にすると、ユーザーIDと投稿IDを取り違えるようなバグをコンパイル時に防げます。準拠の順序は任意なので `Hashable, Codable` も正解です。
+- 使っている考え方: 「意味のある値」を素の Int や String のまま扱うと、型が同じであるがゆえに取り違えても気づけません。専用の型で包むと、コンパイラが取り違えを検出してくれます。
+- 手順: `struct UserID` … Int を包む専用の型を作る。
+- 手順: `Codable` … サーバとのやり取りでそのまま使えるようにする。
+- 手順: `Hashable` … 辞書のキーや Set の要素にできるようにする。
+- 手順: `let value: Int` … 実際の値を保持する。
+- 動く理由: 要求されている2つの能力がちょうど2つのプロトコルに対応し、どちらも自動生成が効くため実装を書く必要がありません。
+- よくある間違い: Equatable だけを書いて辞書のキーにしようとする間違いです。ハッシュ値が必要なので Hashable が要ります。
+- よくある間違い: IDを素の Int のまま扱う設計です。userID と postID を取り違えても型が同じなのでコンパイルが通ってしまいます。
+- 関連例:
+```swift
+struct UserID: Codable, Hashable { let value: Int }
+var names: [UserID: String] = [:]
+names[UserID(value: 1)] = "Yuki"
+print(names[UserID(value: 1)] ?? "なし")
+```
+- 関連例の出力: Yuki
+- 関連例の説明: Hashable に準拠しているため、そのまま辞書のキーとして使えます。
+- 覚えておくこと: 意味のあるIDは専用の型にする。Codable + Hashable が定番の組み合わせ。
+
+### practice-foundation-041 値型の中に参照型がある場合を追う [実行追跡 / Lv4 応用]
+対象レッスン: foundation-copy-value
+シリーズ: foundation-value-copy (1段階目)
+スキル: types, memory, debugging
+問題: struct の中に class のプロパティがあります。最後の print の結果を選んでください。
+正解: 0 9
+ヒント1: Holder は struct なので、代入時にコピーされます。何がコピーされるのでしょうか。
+ヒント2: count は Int（値型）ですが、box は class への参照です。
+ヒント3: コピーされるのは「参照そのもの」であって、参照先のインスタンスは複製されません。
+解説: Holder は値型なので `var h2 = h1` でコピーが作られますが、コピーされるのは各プロパティの値です。count は Int なので独立した値としてコピーされ、h2.count の変更は h1 に影響しません（h1.count は0のまま）。一方 box は Box への参照であり、コピーされるのは参照だけなので h1.box と h2.box は同じインスタンスを指します。そのため h2.box.n = 9 は h1 からも見え、出力は「0 9」になります。これは値型に見えて一部だけ共有されるという、発見しにくいバグの典型です。
+- 使っている考え方: 値型のコピーは「浅いコピー」です。プロパティが参照型なら、参照がコピーされるだけで参照先は共有されます。値型だから安全、とは限りません。
+- 手順: `var h2 = h1` … Holder の全プロパティがコピーされる。
+- 手順: count（Int）は値そのものがコピーされ、以降は独立。
+- 手順: box（Box への参照）は参照がコピーされ、指す先は同一。
+- 手順: `h2.box.n = 9` は共有されたインスタンスを書き換えるため、h1 からも 9 に見える。
+- 動く理由: コピーの深さがプロパティの種類で変わるためです。値型のプロパティは独立し、参照型のプロパティは共有される、という規則だけで結果が決まります。
+- よくある間違い: struct にしておけば値の独立が保証されると考える間違いです。参照型のプロパティを持つ時点で保証は崩れます。
+- よくある間違い: 独立させたい場合は、コピー時に新しいインスタンスを作る仕組み（明示的なコピーや、参照型を使わない設計）が必要です。
+- 関連例:
+```swift
+final class Box { var n = 0 }
+struct Holder { var box = Box() }
+var a = Holder()
+var b = a
+b.box = Box()
+b.box.n = 9
+print(a.box.n, b.box.n)
+```
+- 関連例の出力: 0 9
+- 関連例の説明: box に新しいインスタンスを代入し直せば共有は切れます。書き換える前に差し替えるかどうかが分かれ目です。
+- 覚えておくこと: 値型のコピーは浅い。参照型のプロパティは共有されたまま。
+
+### practice-foundation-042 共有を避ける初期化の順に並べる [並べ替え / Lv3 実装]
+対象レッスン: foundation-copy-value
+シリーズ: foundation-value-copy (2段階目)
+スキル: types, memory
+問題: 2つの Holder がそれぞれ別の Box を持つようにして、片方だけを書き換えます。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+final class Box { var n = 0 }
+struct Holder { var box: Box }
+var h1 = Holder(box: Box())
+var h2 = Holder(box: Box())
+h2.box.n = 9
+print(h1.box.n, h2.box.n)
+```
+ヒント1: 型の定義がなければインスタンスは作れません。Box が先です。
+ヒント2: それぞれが別のインスタンスを持つには、Box() を2回呼ぶ必要があります。
+ヒント3: Box → Holder → h1 → h2 → 書き換え → 表示、の順です。
+解説: Box() を2回呼ぶことで、h1 と h2 はそれぞれ別のインスタンスを持ちます。そのため h2.box.n の書き換えは h1 に影響せず、出力は「0 9」になります。`var h2 = h1` のようにコピーで作ると参照が共有され、両方とも9になってしまいます。プロパティに既定値を持たせて `Holder()` を2回呼んでも、初期化のたびに Box() が評価されるため同じく独立します。
+- 使っている考え方: 参照型のプロパティを独立させたいなら、インスタンスを別々に生成するしかありません。値型のコピーでは参照が複製されるだけです。
+- 手順: `final class Box` と `struct Holder` を定義する。
+- 手順: `Holder(box: Box())` を2回呼ぶと、Box のインスタンスが2つ作られる。
+- 手順: h1.box と h2.box は別の実体を指す。
+- 手順: `h2.box.n = 9` は h2 側だけを書き換え、出力は「0 9」。
+- 動く理由: Box() の呼び出しが2回あるため実体が2つ存在し、参照の共有が起きません。書き換えの影響範囲が片方に限定されます。
+- よくある間違い: `var h2 = h1` で作ってしまう間違いです。box の参照が共有され、両方が9になります。
+- よくある間違い: Box のインスタンスを定数にまとめて両方に渡す間違いも同じ結果になります。共有したいのか独立させたいのかを設計時に決めます。
+- 関連例:
+```swift
+final class Box { var n = 0 }
+struct Holder { var box: Box }
+var h1 = Holder(box: Box())
+var h2 = Holder(box: Box())
+h2.box.n = 9
+print(h1.box.n, h2.box.n)
+var h3 = h1
+h3.box.n = 7
+print(h1.box.n, h3.box.n)
+```
+- 関連例の出力: 0 9
+7 7
+- 関連例の説明: 別々に作った場合は独立し、コピーで作った場合は共有されることが同時に確認できます。
+- 覚えておくこと: 参照型を独立させたいなら、インスタンスを別々に作る。コピーでは足りない。
 
 ---
