@@ -1,6 +1,6 @@
 # 実装練習 (practice)
 
-実装練習 168問。編集元は source/practice.json です。このTXTは生成物です.
+実装練習 204問。編集元は source/practice.json です。このTXTは生成物です.
 
 ## Swift Starter（42問）
 
@@ -5832,5 +5832,1382 @@ print(h1.box.n, h3.box.n)
 7 7
 - 関連例の説明: 別々に作った場合は独立し、コピーで作った場合は共有されることが同時に確認できます。
 - 覚えておくこと: 参照型を独立させたいなら、インスタンスを別々に作る。コピーでは足りない。
+
+---
+
+## Concurrency & Memory（36問）
+
+### practice-concurrency-001 エラー処理の記法を対応づける [対応づけ / Lv1 ガイド]
+対象レッスン: concurrency-errors
+シリーズ: concurrency-error-basics (1段階目)
+スキル: errors
+問題: エラー処理に使う記法と、その意味を対応させてください。
+対応:
+- throws → その関数がエラーを投げる可能性があることを宣言する
+- try → エラーを投げうる呼び出しであることを示す印
+- do-catch → 投げられたエラーを捕まえて処理する構文
+- Result → 成功と失敗のどちらかを1つの値として表す型
+ヒント1: 宣言側に書くものと、呼び出し側に書くものを分けて考えてください。
+ヒント2: Result は構文ではなく型です。値として持ち回れます。
+ヒント3: r5 は try! の説明なので、この4つとは対応しません。
+解説: throws は関数の宣言に書き、エラーを投げうることを型の一部として表明します。try は呼び出し側に書く印で、「この行でエラーが発生しうる」ことを読み手に示します。do-catch は投げられたエラーを受け止める構文です。Result は成功値と失敗を1つの値として扱う型で、非同期のコールバックなど throws が使えない場面で活躍します。r5 は try! の説明です。
+- 使っている考え方: Swift のエラー処理は「宣言（throws）」「呼び出しの印（try）」「捕捉（do-catch）」の3点で構成されます。どこでエラーが起きうるかがコードを読むだけで分かるのが特徴です。
+- 手順: throws … 関数の型の一部。呼び出し側に対処を強制する。
+- 手順: try … 呼び出し行に付ける。付け忘れるとコンパイルエラーになる。
+- 手順: do-catch … エラーを捕まえる。catch は網羅的でなければならない。
+- 手順: Result … エラーを値として持ち回りたいときに使う。
+- 動く理由: 4つは宣言・印・構文・型という別のカテゴリに属し、役割が重なりません。try! だけは「対処しない」という別の選択肢です。
+- よくある間違い: try を「試す」という意味だと解釈する間違いです。実際には「ここでエラーが出るかもしれない」という目印にすぎず、実行を保護する働きはありません。
+- よくある間違い: throws を付けたのに呼び出し側で try を書き忘れる間違いです。コンパイルエラーになるので気づけます。
+- 関連例:
+```swift
+enum LoadError: Error { case notFound }
+func load(_ id: Int) throws -> String {
+    guard id >= 0 else { throw LoadError.notFound }
+    return "item\(id)"
+}
+do { print(try load(1)); print(try load(-1)) } catch { print("失敗: \(error)") }
+```
+- 関連例の出力: item1
+失敗: notFound
+- 関連例の説明: 成功する呼び出しと失敗する呼び出しを並べると、3つの記法の役割が一度に確認できます。
+- 覚えておくこと: throws は宣言、try は目印、do-catch は捕捉、Result は値。
+
+### practice-concurrency-002 エラーを投げる関数を宣言する [穴埋め / Lv2 基本]
+対象レッスン: concurrency-errors
+シリーズ: concurrency-error-basics (2段階目)
+スキル: errors, types
+問題: 独自のエラー型を定義し、投げる関数を作ります。空欄を埋めてください。
+埋めたあと:
+```swift
+enum LoadError: Error {
+    case notFound
+}
+func load(_ id: Int) throws -> String {
+    if id < 0 { throw LoadError.notFound }
+    return "item\(id)"
+}
+do {
+    print(try load(1))
+    print(try load(-1))
+} catch {
+    print("失敗: \(error)")
+}
+```
+ヒント1: 投げられる型は、あるプロトコルに準拠している必要があります。Swiftでの名前は1語です。
+ヒント2: 宣言に書くキーワードと、実際に投げるときのキーワードは形が違います。
+ヒント3: 1つめはプロトコル名、2つめは戻り値の矢印の前に置く宣言用のキーワードです（複数形の形をしています）。
+解説: Swift で投げられるのは `Error` プロトコルに準拠した型だけです。enum は関連値を持てるため、エラーの種類と付随情報を表現するのに適しています。関数の宣言には `throws` を書き、実際に投げるときは `throw` を使います（宣言は複数形、実行は単数形）。load(-1) が投げたエラーは catch で受け止められ、「失敗: notFound」と表示されます。
+- 使っている考え方: エラーを型として定義すると、呼び出し側が switch で網羅的に扱えます。文字列やコード番号で表すより、追加や変更に強くなります。
+- 手順: `enum LoadError: Error` … 投げられる型として宣言する。
+- 手順: `func load(_ id: Int) throws -> String` … エラーを投げうることを型に含める。
+- 手順: `throw LoadError.notFound` … 実際に投げる。以降の行は実行されない。
+- 手順: 呼び出し側は try を付け、do-catch で受け止める。
+- 動く理由: Error 準拠によって throw の対象になり、throws 宣言によって呼び出し側に対処が強制されます。この2つがそろって初めてコンパイルが通ります。
+- よくある間違い: `throws` と `throw` を取り違える間違いです。宣言に throw を書くと構文エラーになります。
+- よくある間違い: Error に準拠していない型を投げようとすると 'Thrown expression type does not conform to Error' になります。
+- よくある間違い: rethrows は「引数のクロージャが投げたときだけ投げる」宣言で、自分でエラーを投げる関数には使えません。
+- 関連例:
+```swift
+enum LoadError: Error { case notFound(id: Int) }
+func load(_ id: Int) throws -> String {
+    guard id >= 0 else { throw LoadError.notFound(id: id) }
+    return "item\(id)"
+}
+do { _ = try load(-5) } catch LoadError.notFound(let id) { print("見つかりません id=\(id)") } catch { print("その他") }
+```
+- 関連例の出力: 見つかりません id=-5
+- 関連例の説明: enum に関連値を持たせると、catch でパターンマッチして詳細を取り出せます。
+- 覚えておくこと: 投げられるのは Error 準拠の型だけ。宣言は throws、実行は throw。
+
+### practice-concurrency-003 throws宣言が抜けている行を見つける [バグ発見 / Lv2 基本]
+対象レッスン: concurrency-errors
+シリーズ: concurrency-error-basics (3段階目)
+スキル: errors, debugging
+問題: このコードはビルドできません。原因になっている行を選んでください。
+問題のある行: func load(_ id: Int) -> String {
+ヒント1: エラーを投げている関数の宣言を確認してください。
+ヒント2: Swift ではエラーを投げうることを、関数の型として宣言する必要があります。
+ヒント3: 投げる行そのものは正しく書かれています。それを許可する宣言が欠けています。
+解説: バグは2行目の関数宣言です。関数の中で throw を使うには、宣言に `throws` を含めて「この関数はエラーを投げうる」ことを型として表明しなければなりません。宣言がないため、コンパイラは 'Error is not handled because the enclosing function is not declared throws' と指摘してビルドを止めます。実行時ではなくコンパイル時のエラーです。修正は `func load(_ id: Int) throws -> String` とすることで、呼び出し側にも try と do-catch が必要になります。この連鎖こそが、エラーの扱い忘れを防ぐ仕組みです。
+- 使っている考え方: throws は関数の型の一部です。宣言に含まれることで、呼び出し側に対処が強制され、エラーが黙って握りつぶされる経路がなくなります。
+- 手順: 3行目の throw は、エラーを投げる正しい構文。
+- 手順: しかし2行目の宣言に throws がないため、投げる先がない。
+- 手順: コンパイラは関数宣言と本体の矛盾として報告する。
+- 手順: throws を足すと、呼び出し側にも try が必要になる。
+- 動く理由: エラーは「投げる場所」と「投げうると宣言する場所」の両方が必要です。宣言だけが欠けているため、原因は2行目にあります。
+- よくある間違い: try! や try? を呼び出し側に足して回避しようとする間違いです。宣言がない以上、そもそもコンパイルできません。
+- よくある間違い: throws を足したあと呼び出し側の修正を忘れ、別のエラーが出て混乱する例です。エラーの伝播は連鎖するのが正常な動作です。
+- 関連例:
+```swift
+enum LoadError: Error { case notFound }
+func load(_ id: Int) throws -> String {
+    if id < 0 { throw LoadError.notFound }
+    return "item"
+}
+print((try? load(-1)) ?? "エラーだった")
+```
+- 関連例の出力: エラーだった
+- 関連例の説明: throws を宣言すると、呼び出し側で try? や do-catch を選べるようになります。
+- 覚えておくこと: throw する関数には throws。宣言と本体は型として一致していなければならない。
+
+### practice-concurrency-004 どのエラーか分かるcatchに直す [修正 / Lv3 実装]
+対象レッスン: concurrency-errors
+シリーズ: concurrency-error-basics (4段階目)
+スキル: errors, debugging
+問題: どんな失敗でも「エラー」としか出ません。catch 節を書き換えて、失敗の種類が分かるようにします。適切なものを選んでください。
+正解: } catch let error as LoadError {
+    print("読み込み失敗: \(error)")
+} catch {
+    print("その他: \(error)")
+}
+ヒント1: catch は型やパターンで絞り込めます。絞り込んだうえで、値そのものを表示する必要があります。
+ヒント2: 型の名前だけを出しても、notFound と network の区別はつきません。
+ヒント3: 特定のケースだけを catch すると、それ以外のエラーが捕まえられず網羅性を満たせません。
+解説: 問題は catch 節が固定文字列しか出力していないことです。`catch let error as LoadError` とすると、エラーを LoadError として受け取れ、`\(error)` で network や notFound といったケース名まで表示できます。最後に型を限定しない catch を置くことで、想定外のエラーも取りこぼしません。`type(of: error)` は型名（LoadError）しか分からずケースを区別できず、`catch LoadError.notFound` だけでは network が捕まえられないため 'Errors thrown from here are not handled' になります。o4 は再送出するだけで情報が増えません。
+- 使っている考え方: catch はパターンマッチができます。型で絞る、ケースで絞る、条件を付ける、といった段階を組み合わせて、必要な粒度で処理を分けられます。
+- 手順: `catch let error as LoadError` … LoadError に該当する場合だけこの節に入る。
+- 手順: `\(error)` は enum のケース名を含む文字列を返す。
+- 手順: 最後の `catch` は型を限定しないため、それ以外のすべてを受け止める。
+- 手順: 結果として network が投げられた場合「読み込み失敗: network」と表示される。
+- 動く理由: 型で絞ったうえで値を表示しているため、同じ型の中のどのケースかまで分かります。網羅性も最後の catch で担保されています。
+- よくある間違い: catch 節でエラーを表示せずに固定文字列を出す実装は、調査に必要な情報を捨てています。ログには必ず error を含めます。
+- よくある間違い: 特定のケースだけを catch して他を書き忘れると、do-catch が網羅的でないためコンパイルエラーになります（トップレベルや非throws関数の場合）。
+- 関連例:
+```swift
+enum LoadError: Error { case notFound, network }
+func load(_ fail: LoadError) throws -> String { throw fail }
+for e in [LoadError.notFound, .network] {
+    do { _ = try load(e) }
+    catch LoadError.notFound { print("見つかりません") }
+    catch { print("その他: \(error)") }
+}
+```
+- 関連例の出力: 見つかりません
+その他: network
+- 関連例の説明: ケースごとに catch を分けると、種類に応じた処理を書き分けられます。
+- 覚えておくこと: catch は型やケースで絞れる。表示には必ず error 自体を含める。
+
+### practice-concurrency-005 エラーを投げて捕まえる流れを並べる [並べ替え / Lv3 実装]
+対象レッスン: concurrency-errors
+シリーズ: concurrency-error-basics (5段階目)
+スキル: errors, controlFlow
+問題: エラーを投げる関数を定義し、失敗する呼び出しを捕まえて表示します。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+enum LoadError: Error { case notFound }
+func load(_ id: Int) throws -> String {
+    guard id >= 0 else { throw LoadError.notFound }
+    return "item\(id)"
+}
+do {
+    print(try load(-1))
+} catch {
+    print("失敗: \(error)")
+}
+```
+ヒント1: エラー型の定義が最初です。関数の中で使われています。
+ヒント2: 関数を定義してから、それを呼ぶ do ブロックを書きます。
+ヒント3: エラー型 → 関数（guard・return・閉じかっこ）→ do → 呼び出し → catch → 表示 → 閉じかっこ、の順です。
+解説: 定義（エラー型・関数）を先に置き、そのあとで do-catch による呼び出しを書きます。guard で早期に throw することで、以降の行は正常系だけを扱えます。load(-1) は必ず throw するため、print には到達せず catch 節が実行されて「失敗: notFound」が表示されます。throw が実行された時点で、その関数の残りの処理も do ブロックの残りの行も飛ばされる点が重要です。
+- 使っている考え方: エラーは戻り値とは別の経路で呼び出し元へ伝わります。throw された瞬間に通常の実行フローは中断し、最も近い catch まで一気に巻き戻ります。
+- 手順: `enum LoadError: Error` … 投げる型を定義する。
+- 手順: `func load(_:) throws` … guard で不正な入力を弾き、throw する。
+- 手順: `do { print(try load(-1)) }` … throw されるので print は実行されない。
+- 手順: `catch` … エラーを受け取り、内容を表示する。
+- 動く理由: 定義が使用より前にあり、do-catch が構文として正しく閉じているためです。throw による中断で print が飛ばされることも、この並びから読み取れます。
+- よくある間違い: do ブロックの中に関数定義を入れてしまう並びです。動作はしますが、スコープが do の中に閉じて再利用できません。
+- よくある間違い: throw のあとに書いた処理が実行されると考える間違いです。throw は return と同じく、その場で関数を抜けます。
+- 関連例:
+```swift
+enum LoadError: Error { case notFound }
+func load(_ id: Int) throws -> String {
+    guard id >= 0 else { throw LoadError.notFound }
+    return "item\(id)"
+}
+do {
+    print(try load(-1))
+    print("ここは実行されない")
+} catch {
+    print("失敗: \(error)")
+}
+```
+- 関連例の出力: 失敗: notFound
+- 関連例の説明: throw によって do ブロックの残りが飛ばされ、2つ目の print が実行されていないことが分かります。
+- 覚えておくこと: throw は実行を中断して最も近い catch へ飛ぶ。以降の行は実行されない。
+
+### practice-concurrency-006 成功と失敗を1つの値で表す [穴埋め / Lv3 実装]
+対象レッスン: concurrency-result
+シリーズ: concurrency-result (1段階目)
+スキル: errors, types
+問題: エラーを投げる代わりに、成功か失敗かを値として返します。空欄を埋めてください。
+埋めたあと:
+```swift
+enum LoadError: Error { case notFound }
+func load(_ id: Int) -> Result<String, LoadError> {
+    id >= 0 ? .success("item\(id)") : .failure(.notFound)
+}
+switch load(-1) {
+case .success(let v): print(v)
+case .failure(let e): print("失敗: \(e)")
+}
+```
+ヒント1: 成功値の型とエラーの型の2つを型引数に取る標準の型があります。
+ヒント2: switch の case を見ると、2つのケース名が分かります。
+ヒント3: 1つめは標準ライブラリの列挙型、2つめは switch の2つめの case と同じ名前です。
+解説: `Result<Success, Failure>` は成功値と失敗を1つの値として表す標準の列挙型で、ケースは `.success` と `.failure` です。throws と違って値なので、配列に入れたり、あとから処理したり、コールバックで渡したりできます。switch のケース名と一致させる必要があるため、`.failure(.notFound)` と書きます。実行すると「失敗: notFound」が表示されます。
+- 使っている考え方: throws は「その場で対処させる」仕組み、Result は「結果を値として持ち回る」仕組みです。非同期のコールバックや、複数の結果をまとめて集計する場面では Result が適します。
+- 手順: `Result<String, LoadError>` … 成功なら String、失敗なら LoadError。
+- 手順: `.success("item\(id)")` … 成功のケースに値を包む。
+- 手順: `.failure(.notFound)` … 失敗のケースにエラーを包む。
+- 手順: switch で両方のケースを網羅して処理する。
+- 動く理由: Result のケース名は success と failure に決まっており、switch 側の記述と一致します。型引数の順序（成功、失敗）も宣言と一致しています。
+- よくある間違い: `.error(...)` と書く間違いです。ケース名は failure です。
+- よくある間違い: Result を返す関数の中でさらに throws を使うと、2つのエラー経路が混在して呼び出し側が混乱します。どちらかに統一します。
+- よくある間違い: Result から値を取り出すには switch か `get()` が必要です。`get()` は throws なので try が要ります。
+- 関連例:
+```swift
+enum LoadError: Error { case notFound }
+func load(_ id: Int) -> Result<String, LoadError> {
+    id >= 0 ? .success("item\(id)") : .failure(.notFound)
+}
+let results = [load(1), load(-1)]
+print(results.compactMap { try? $0.get() })
+```
+- 関連例の出力: ["item1"]
+- 関連例の説明: Result は値なので配列に入れられ、成功したものだけを取り出すといった後処理ができます。
+- 覚えておくこと: Result は成功と失敗を値にする。ケース名は success / failure。
+
+### practice-concurrency-007 Resultを返す関数を組み立てる [関数組み立て / Lv3 実装]
+対象レッスン: concurrency-result
+シリーズ: concurrency-result (2段階目)
+スキル: errors, functions
+問題: エラーを投げずに、成功か失敗かを Result で返す関数を作ります。必要なブロックだけを選んで正しい順に並べてください。
+正解の並び:
+```swift
+enum LoadError: Error { case notFound }
+func loadResult(_ id: Int) -> Result<String, LoadError> {
+    guard id >= 0 else { return .failure(.notFound) }
+    return .success("item\(id)")
+}
+```
+ヒント1: 戻り値は Result なので、失敗のときも throw ではなく return です。
+ヒント2: 成功値も .success で包んでから返す必要があります。
+ヒント3: エラー型 → 関数宣言 → 失敗時の early return → 成功時の return → 関数を閉じる、の5行です。
+解説: Result を返す関数では、失敗も return で返します。`throw` を使うと Result という戻り値の設計と矛盾し、そもそも throws 宣言がないためコンパイルできません。成功値も `.success(...)` で包む必要があり、素の String をそのまま返すことはできません。この形にすると、呼び出し側は必ず成功と失敗の両方を意識することになります。
+- 使っている考え方: エラーの伝え方を throws にするか Result にするかは設計判断です。Result を選んだなら、その関数の中では throw を混ぜず、すべて return で表現します。
+- 手順: `-> Result<String, LoadError>` … 戻り値の型で成功・失敗の両方を表す。
+- 手順: `guard ... else { return .failure(.notFound) }` … 失敗も return。
+- 手順: `return .success("item\(id)")` … 成功値を包んで返す。
+- 手順: 呼び出し側は switch か get() で中身を取り出す。
+- 動く理由: 戻り値の型と、すべての return 文の型が一致しているためコンパイルが通ります。失敗の経路も戻り値として表現されるので、呼び出し側が見落とせません。
+- よくある間違い: `throw` と `return .failure` を混在させる間違いです。呼び出し側が2種類の失敗経路を扱わされます。
+- よくある間違い: 成功値を包み忘れて `return "item"` と書く間違いです。型が Result ではないためコンパイルエラーになります。
+- 関連例:
+```swift
+enum LoadError: Error { case notFound }
+func loadResult(_ id: Int) -> Result<String, LoadError> {
+    guard id >= 0 else { return .failure(.notFound) }
+    return .success("item\(id)")
+}
+switch loadResult(-1) {
+case .success(let v): print(v)
+case .failure(let e): print("失敗: \(e)")
+}
+```
+- 関連例の出力: 失敗: notFound
+- 関連例の説明: 呼び出し側は switch で両方のケースを扱うことになり、失敗の見落としが起きません。
+- 覚えておくこと: Result を返すなら失敗も return。throw と混ぜない。
+
+### practice-concurrency-008 参照カウントと解放のタイミングを追う [実行追跡 / Lv3 実装]
+対象レッスン: concurrency-arc
+シリーズ: concurrency-arc (1段階目)
+スキル: memory, debugging
+問題: 次のコードを実行したとき、出力される順番を選んでください。
+正解: init A → after a = nil → deinit A → end
+ヒント1: `var b = a` のあと、そのインスタンスを指している名前はいくつあるでしょうか。
+ヒント2: 参照カウントが0になった瞬間に deinit が呼ばれます。
+ヒント3: a を nil にしても b がまだ指しているため、解放されるのは b を nil にしたときです。
+解説: `Node("A")` の生成で「init A」が出力され、a と b の2つが同じインスタンスを指すため参照カウントは2になります。`a = nil` では1に減るだけなので解放されず、「after a = nil」が先に表示されます。続く `b = nil` で0になり、その時点で deinit が呼ばれて「deinit A」が出力され、最後に「end」が表示されます。参照が1つでも残っていれば解放されない、というのが ARC の基本規則です。
+- 使っている考え方: ARC は参照の数を数え、0になった瞬間にインスタンスを解放します。解放のタイミングは「最後の参照が消えた行」であり、スコープの終わりとは限りません。
+- 手順: `Node("A")` … 生成時に init が実行され、参照カウントは1。
+- 手順: `var b = a` … 参照カウントが2になる。
+- 手順: `a = nil` … 1に減るだけ。deinit は呼ばれない。
+- 手順: `b = nil` … 0になり、その場で deinit が実行される。
+- 手順: その後 `print("end")` が実行される。
+- 動く理由: deinit の出力位置が「b = nil」と「end」の間にあることが、参照カウントが0になった瞬間に解放されたことを示しています。
+- よくある間違い: 変数に nil を入れたら必ず解放されると考える間違いです。他に参照が残っていれば解放されません。
+- よくある間違い: 解放がプログラム終了時にまとめて行われると考える間違いです。ARC は決定的で、最後の参照が消えた時点で実行されます。
+- 関連例:
+```swift
+final class Node {
+    let name: String
+    init(_ name: String) { self.name = name }
+    deinit { print("deinit \(name)") }
+}
+do {
+    let n = Node("A")
+    print("スコープ内", n.name)
+}
+print("スコープ外")
+```
+- 関連例の出力: スコープ内 A
+deinit A
+スコープ外
+- 関連例の説明: ローカル変数の場合、スコープを抜けた時点で参照が消え、その場で deinit が呼ばれます。
+- 覚えておくこと: deinit は参照カウントが0になった瞬間に呼ばれる。1つでも残れば解放されない。
+
+### practice-concurrency-009 参照の輪を切るべき宣言を見つける [バグ発見 / Lv3 実装]
+対象レッスン: concurrency-arc
+シリーズ: concurrency-arc (2段階目)
+スキル: memory, debugging
+問題: 親子で互いに参照し合っているため、どちらも解放されません。weak にすべき宣言を選んでください。
+問題のある行: final class Child { var parent: Parent? }
+ヒント1: 親が子を持ち、子が親を持つと、参照が輪になります。
+ヒント2: 輪を切るには、どちらか一方を弱い参照にします。どちらを弱くすべきかは所有関係で決めます。
+ヒント3: 一般に、所有しているのは親のほうです。子から親への参照を弱くします。
+解説: バグは2行目の `var parent: Parent?` が強参照であることです。親が子を、子が親を強参照すると参照カウントが互いに1以上のまま残り、外部からの参照が消えても両方とも解放されません（deinit が呼ばれず、メモリが増え続けます）。クラッシュしないため、Instruments などで測るまで気づけないのが特徴です。修正は所有関係の弱いほう、つまり子から親への参照を `weak var parent: Parent?` にすることです。親が解放されれば parent は自動的に nil になり、輪が切れます。
+- 使っている考え方: 参照の強弱は所有関係の表現です。「どちらがどちらの寿命を支配するか」を決め、支配される側から支配する側への参照を弱くします。
+- 手順: Parent → Child は強参照（親が子を所有する）。
+- 手順: Child → Parent も強参照だと、輪が閉じて双方が解放されない。
+- 手順: Child → Parent を weak にすると、輪が切れる。
+- 手順: weak は Optional でなければならず、親の解放時に自動で nil になる。
+- 動く理由: 所有しているのは親なので、親から子への強参照は残す必要があります。弱くしてよいのは子から親への逆方向の参照だけです。
+- よくある間違い: 親から子への参照を weak にしてしまうと、親だけが生きている状態で子が解放され、意図せず nil になります。
+- よくある間違い: weak を非Optionalに付けようとするとコンパイルエラーです。解放時に nil になる必要があるためです。
+- よくある間違い: unowned を使うと Optional にせずに済みますが、親が先に解放された場合にアクセスするとクラッシュします。
+- 関連例:
+```swift
+final class Parent { var child: Child?
+    deinit { print("parent deinit") } }
+final class Child { weak var parent: Parent?
+    deinit { print("child deinit") } }
+do {
+    let p = Parent(); let c = Child()
+    p.child = c; c.parent = p
+}
+print("スコープ外")
+```
+- 関連例の出力: parent deinit
+child deinit
+スコープ外
+- 関連例の説明: weak にしたことで両方が正しく解放されています。強参照のままだと deinit は一切出力されません。
+- 覚えておくこと: 輪を切るのは所有されている側から。子→親を weak にする。
+
+### practice-concurrency-010 参照の強さを対応づける [対応づけ / Lv1 ガイド]
+対象レッスン: concurrency-weak-unowned
+シリーズ: concurrency-reference-strength (1段階目)
+スキル: memory
+問題: 参照の種類と、その性質を対応させてください。
+対応:
+- strong（既定） → 参照している間、対象は解放されない
+- weak → 対象が解放されると自動で nil になる。Optional でなければならない
+- unowned → 対象のほうが長生きすると分かっている場合に使う。解放後に触るとクラッシュする
+- [weak self] → クロージャの捕捉リストで self を弱参照にする指定
+ヒント1: 既定の参照は、対象の寿命を延ばします。
+ヒント2: 自動で nil になるほうと、解放後に触るとクラッシュするほうを区別してください。
+ヒント3: r5 のような仕組みは存在しません。参照カウントは自動で管理されます。
+解説: 既定の strong 参照は対象の寿命を延ばします。weak は寿命を延ばさず、対象が解放されると自動的に nil になるため Optional でなければなりません。unowned も寿命を延ばしませんが nil にはならず、解放後にアクセスするとクラッシュします。`[weak self]` はクロージャの捕捉リストで self を弱参照にする書き方です。r5 のような仕組みは存在しません。
+- 使っている考え方: 参照の種類は「寿命を延ばすか」「解放後どうなるか」の2軸で整理できます。weak は安全側、unowned は速度と簡潔さを取る代わりに前提が崩れると落ちます。
+- 手順: strong … 参照カウントを増やす。既定。
+- 手順: weak … 増やさない。解放時に nil になるので Optional。
+- 手順: unowned … 増やさない。nil にならないので、解放後のアクセスは未定義動作（実質クラッシュ）。
+- 手順: [weak self] … クロージャ内での self の捕捉を弱くする指定。
+- 動く理由: 4つはそれぞれ異なる寿命の扱いを表しており、説明と1対1で対応します。weak と unowned の差は「解放後に nil になるか、落ちるか」です。
+- よくある間違い: unowned を「weak の短い書き方」と考える間違いです。前提が崩れたときの挙動がまったく違います。
+- よくある間違い: 迷ったときに unowned を選ぶ間違いです。寿命の前提を証明できないなら weak が安全です。
+- 関連例:
+```swift
+final class Owner { var name = "O"
+    deinit { print("owner deinit") } }
+var owner: Owner? = Owner()
+weak var weakRef = owner
+print(weakRef?.name ?? "nil")
+owner = nil
+print(weakRef?.name ?? "nil")
+```
+- 関連例の出力: O
+owner deinit
+nil
+- 関連例の説明: 対象が解放された瞬間に weak 参照が自動的に nil になっていることが確認できます。
+- 覚えておくこと: 迷ったら weak。unowned は寿命の前提を証明できるときだけ。
+
+### practice-concurrency-011 長生きするクロージャの捕捉を直す [修正 / Lv4 応用]
+対象レッスン: concurrency-weak-unowned
+シリーズ: concurrency-reference-strength (2段階目)
+スキル: memory, debugging, functions
+問題: Registry に登録したクロージャは Owner より長く残ります。Owner が解放されたあとに呼ばれても落ちないようにします。5行目の修正として正しいものを選んでください。
+正解: Registry.handlers.append { [weak self] in self?.finish() }
+ヒント1: Registry は static なので、アプリが動いている間ずっとクロージャを保持し続けます。
+ヒント2: Owner が解放されたあとに呼ばれる可能性があるなら、解放後も安全な参照が必要です。
+ヒント3: 解放後に nil になる参照を使い、nil のときは何もしない形にします。
+解説: 問題は、static な配列に保持されるクロージャが self を強参照していることです。この状態では Owner の参照カウントが0にならず、画面を閉じても解放されません（メモリリーク）。挙動としてはクラッシュせず、メモリ使用量が増え続けます。修正は `[weak self]` で弱参照にし、`self?.finish()` として Owner が既に解放されていれば何もしない形にすることです。`[unowned self]` は寿命を延ばさない点は同じですが、Owner が解放されたあとに呼ばれると 'Attempted to read an unowned reference but object was already deallocated' でクラッシュします。今回はクロージャのほうが長生きすると分かっているため使えません。`[self]` は明示的な強参照でリークが残り、o4 は要件と無関係です。
+- 使っている考え方: weak と unowned の選択は「どちらが先に解放されうるか」で決まります。クロージャの保持先が self より長生きするなら、unowned の前提は成立しません。
+- 手順: `Registry.handlers` は static なので、プロセスが終わるまで生き続ける。
+- 手順: そこに追加されたクロージャも同じだけ生き続ける。
+- 手順: クロージャが self を強参照すると、Owner も同じだけ生き続ける（リーク）。
+- 手順: [weak self] にすると Owner は正しく解放され、その後の呼び出しは何もしない。
+- 動く理由: weak は解放後に nil になるため、クロージャがいつ呼ばれても安全です。Optional chaining により、解放後の呼び出しは静かに無視されます。
+- よくある間違い: unowned のほうが速いという理由で選ぶ間違いです。差はごくわずかで、クラッシュのリスクに見合いません。
+- よくある間違い: weak にしたあと `self!.finish()` と書く間違いです。解放後にクラッシュし、weak にした意味がなくなります。
+- よくある間違い: 解放後に処理を実行したい場合、weak では何も起きません。その場合は self に依存しない形に設計し直します。
+- 関連例:
+```swift
+final class Registry { static var handlers: [() -> Void] = [] }
+final class Owner {
+    func setup() { Registry.handlers.append { [weak self] in self?.finish() } }
+    func finish() { print("done") }
+    deinit { print("owner deinit") }
+}
+var o: Owner? = Owner()
+o?.setup()
+Registry.handlers[0]()
+o = nil
+Registry.handlers[0]()
+print("end")
+```
+- 関連例の出力: done
+owner deinit
+end
+- 関連例の説明: 解放後の呼び出しでは self が nil のため何も起きず、クラッシュもしていません。
+- 覚えておくこと: クロージャの保持先が self より長生きするなら unowned は使えない。weak 一択。
+
+### practice-concurrency-012 解放されるクラスに必要な行だけ選ぶ [ブロック選択 / Lv3 実装]
+対象レッスン: concurrency-weak-unowned
+シリーズ: concurrency-reference-strength (3段階目)
+スキル: memory, functions
+問題: クロージャをプロパティに保持しても、正しく解放される（deinit が呼ばれる）クラスを作ります。必要な行だけを選び、正しい順に並べてください。
+使うブロック:
+- final class Owner {
+-     var onDone: (() -> Void)?
+-     func setup() { onDone = { [weak self] in self?.finish() } }
+-     func finish() { print("done") }
+-     deinit { print("deinit") }
+- }
+ヒント1: プロパティに保持したクロージャは、self が保持しています。
+ヒント2: そのクロージャが self を強参照すると、輪ができて解放されません。
+ヒント3: 捕捉リストで self を弱参照にした setup を選びます。
+解説: self が onDone を保持し、onDone が self を強参照すると輪が閉じて deinit が呼ばれなくなります。`[weak self]` を付けた setup を使うことで輪が切れ、参照がなくなった時点で deinit が実行されます。b7 の強参照版はビルドは通りますが、Owner が永久に解放されなくなるため要件を満たしません。deinit を書いておくと、解放されているかどうかを出力で確認できます。
+- 使っている考え方: 「プロパティに保持したクロージャが self を捕捉する」形は、循環参照の最も一般的なパターンです。この形を見たら反射的に捕捉リストを確認します。
+- 手順: `var onDone: (() -> Void)?` … self → クロージャ の強参照。
+- 手順: クロージャが self を強参照すると、クロージャ → self の強参照ができる。
+- 手順: この2本で輪が閉じ、参照カウントが0にならない。
+- 手順: `[weak self]` により後者が弱参照になり、輪が切れる。
+- 動く理由: 循環の片側を弱くすれば輪は成立しません。onDone の保持自体は必要なので、切るのはクロージャ側の捕捉です。
+- よくある間違い: map や forEach に渡すだけのクロージャにまで [weak self] を付ける間違いです。保持されないクロージャでは輪ができません。
+- よくある間違い: deinit が呼ばれているかを確認せずに「たぶん大丈夫」と判断する間違いです。print を1行入れれば確実に検証できます。
+- 関連例:
+```swift
+final class Owner {
+    var onDone: (() -> Void)?
+    func setup() { onDone = { [weak self] in self?.finish() } }
+    func finish() { print("done") }
+    deinit { print("deinit") }
+}
+var o: Owner? = Owner()
+o?.setup()
+o?.onDone?()
+o = nil
+print("end")
+```
+- 関連例の出力: done
+deinit
+end
+- 関連例の説明: deinit が出力されているため、循環参照が起きていないことを実際に確認できます。
+- 覚えておくこと: プロパティに保持するクロージャで self を使うなら [weak self]。deinit で検証する。
+
+### practice-concurrency-013 非同期関数を宣言して呼び出す [穴埋め / Lv2 基本]
+対象レッスン: concurrency-async-await
+シリーズ: concurrency-async-basics (1段階目)
+スキル: concurrency, syntax
+問題: 非同期関数を定義し、結果を受け取って表示します。空欄を埋めてください。
+埋めたあと:
+```swift
+func fetch(_ id: Int) async -> String {
+    "item\(id)"
+}
+let a = await fetch(1)
+print(a)
+```
+ヒント1: 宣言側に書くキーワードと、呼び出し側に書くキーワードは別々です。
+ヒント2: throws / try の関係と同じ構造になっています。
+ヒント3: 1つめは「この関数は途中で中断しうる」という宣言、2つめは「ここで中断しうる」という呼び出し側の印です。
+解説: `async` は関数の宣言に書き、「この関数は実行の途中で中断（suspend）しうる」ことを型として表明します。呼び出し側では `await` を書き、その行で中断が起こりうることを示します。throws と try がペアであるのとまったく同じ構造で、宣言と呼び出しの両方に印が必要です。この例では中断が実際には起きませんが、宣言が async である以上 await は必須です。
+- 使っている考え方: async/await は「中断しうる場所」をコード上で見えるようにする仕組みです。await の付いた行では他の処理に実行が移りうるため、その前後で状態が変わっている可能性を意識できます。
+- 手順: `func fetch(_ id: Int) async -> String` … 中断しうる関数として宣言する。
+- 手順: 呼び出しは `await fetch(1)` と書く。await がないとコンパイルエラー。
+- 手順: await の時点でスレッドは解放され、結果が用意できたら続きが再開される。
+- 手順: 結果の String が a に入り、print される。
+- 動く理由: async が宣言、await が呼び出しの印という役割分担があり、両方そろって初めてコンパイルが通ります。片方だけでは 'Expression is async but is not marked with await' などになります。
+- よくある間違い: await を「待つ」だけの意味と捉える間違いです。実際にはスレッドをブロックせず解放するため、その間に他の処理が進みます。
+- よくある間違い: async 関数を同期関数から呼ぼうとする間違いです。Task で包むか、呼び出し側も async にする必要があります。
+- 関連例:
+```swift
+func fetch(_ id: Int) async -> String { "item\(id)" }
+let a = await fetch(1)
+let b = await fetch(2)
+print(a, b)
+```
+- 関連例の出力: item1 item2
+- 関連例の説明: await を並べると、上から順に1つずつ実行されます（直列）。
+- 覚えておくこと: async は宣言、await は呼び出しの印。throws / try と同じ構造。
+
+### practice-concurrency-014 非同期処理を順に呼び出す [並べ替え / Lv3 実装]
+対象レッスン: concurrency-async-await
+シリーズ: concurrency-async-basics (2段階目)
+スキル: concurrency
+問題: 2件を順番に取得して表示します。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+func fetch(_ id: Int) async -> String { "item\(id)" }
+let first = await fetch(1)
+let second = await fetch(2)
+print(first, second)
+```
+ヒント1: 関数の定義は、呼び出しより前に必要です。
+ヒント2: await を並べると、上の行が終わってから次の行が始まります。
+ヒント3: 定義 → 1件目 → 2件目 → 表示、の順です。
+解説: await を続けて書くと処理は直列になります。1件目が完了してから2件目が始まるため、それぞれが1秒かかるなら合計2秒かかります。両方を同時に走らせたい場合は async let や TaskGroup を使います。ここでは順序どおりに first と second が得られ、「item1 item2」が表示されます。
+- 使っている考え方: await は中断点であって並行実行の指示ではありません。並行にしたいときは明示的に別の構文（async let、TaskGroup、Task）を使う必要があります。
+- 手順: `func fetch(_:) async` … 定義を先に置く。
+- 手順: `await fetch(1)` … ここで中断し、結果が返ってから次へ進む。
+- 手順: `await fetch(2)` … 1件目の完了後に開始される。
+- 手順: 両方そろってから print される。
+- 動く理由: 各行が必要とする値が前の行で用意されており、await の直列性によって順序も保証されます。
+- よくある間違い: await を書けば自動的に並行実行されると考える間違いです。直列のまま遅くなっているコードは非常によく見かけます。
+- よくある間違い: 並行にすべきかどうかは依存関係で決まります。2件目が1件目の結果を使うなら、直列が正しい選択です。
+- 関連例:
+```swift
+func fetch(_ id: Int) async -> String { "item\(id)" }
+let first = await fetch(1)
+let second = await fetch(2)
+print(first, second)
+```
+- 関連例の出力: item1 item2
+- 関連例の説明: 結果は並行実行と同じですが、実行のされ方（直列）が異なります。
+- 覚えておくこと: await を並べると直列。並行にしたいなら async let か TaskGroup。
+
+### practice-concurrency-015 awaitが抜けている行を見つける [バグ発見 / Lv3 実装]
+対象レッスン: concurrency-async-await
+シリーズ: concurrency-async-basics (3段階目)
+スキル: concurrency, debugging
+問題: このコードはビルドできません。原因になっている行を選んでください。
+問題のある行:     let a = fetch(1)
+ヒント1: fetch は async 宣言された関数です。呼び出し側に必要な印は書かれているでしょうか。
+ヒント2: show 自体は async なので、await を書ける場所ではあります。
+ヒント3: 非同期関数を呼んでいる行に、中断しうることを示す印がありません。
+解説: バグは3行目です。fetch は async なので、呼び出しには await が必要ですが書かれていません。コンパイラは 'Expression is async but is not marked with await' と指摘してビルドを止めます。実行時ではなくコンパイル時のエラーです。囲んでいる show 自体は async 宣言されているため、await を書ける場所であり、修正は3行目に await を足すだけです。もし show が async でなければ、show の宣言も変えるか Task で包む必要が出てきます。
+- 使っている考え方: await は「ここで中断しうる」という印であり、書けるのは async な文脈の中だけです。コンパイラが強制するため、非同期処理を同期処理と誤読することがありません。
+- 手順: `fetch` の型は `(Int) async -> String`。
+- 手順: 非同期関数の呼び出しには await が必要。
+- 手順: 3行目には await がないためコンパイルエラー。
+- 手順: `let a = await fetch(1)` に直すと通る。
+- 動く理由: エラーは呼び出し側の印の欠落なので、原因は呼び出しを書いている3行目です。宣言（1行目）も囲む関数（2行目）も正しく書かれています。
+- よくある間違い: エラーを見て fetch の宣言から async を外そうとする間違いです。非同期であること自体は仕様なので、直すのは呼び出し側です。
+- よくある間違い: 同期関数の中から呼びたい場合、await を足すだけでは解決しません。Task { } で包むか、呼び出し側も async にします。
+- 関連例:
+```swift
+func fetch(_ id: Int) async -> String { "item\(id)" }
+func show() async { print(await fetch(1)) }
+await show()
+```
+- 関連例の出力: item1
+- 関連例の説明: await を足すことで、非同期関数の結果を受け取って表示できます。
+- 覚えておくこと: async 関数の呼び出しには必ず await。書けるのは async な文脈の中だけ。
+
+### practice-concurrency-016 async letで同時に走らせた結果を追う [実行追跡 / Lv3 実装]
+対象レッスン: concurrency-async-let
+シリーズ: concurrency-parallel (1段階目)
+スキル: concurrency, debugging
+問題: 処理時間の違う2つを async let で走らせます。出力される順番を選んでください。
+正解: done 1 → done 2 → sum 3
+ヒント1: async let は、その行に到達した時点で処理を開始します。await を待ちません。
+ヒント2: fetch(2) は約60ミリ秒、fetch(1) は約30ミリ秒かかります。
+ヒント3: 2つは同時に走っているので、先に終わるのは待ち時間の短いほうです。
+解説: `async let` は宣言した時点で子タスクを開始し、`await` で値を使うときに完了を待ちます。したがって fetch(2)（約60ms）と fetch(1)（約30ms）は同時に走り始め、先に終わるのは待ち時間の短い fetch(1) です。そのため「done 1」が先、「done 2」が後になります。両方の値がそろってから合計が計算され、最後に「sum 3」が表示されます。書いた順ではなく、完了した順に出力される点が直列実行との違いです。
+- 使っている考え方: async let は「先に走らせておいて、必要になったときに受け取る」構文です。開始は宣言時、待機は await 時と、2つのタイミングが分かれているのが特徴です。
+- 手順: `async let a = fetch(2)` … この行で fetch(2) が開始される。
+- 手順: `async let b = fetch(1)` … 続けて fetch(1) も開始される。2つは同時に進む。
+- 手順: 約30ms後に fetch(1) が完了し「done 1」。
+- 手順: 約60ms後に fetch(2) が完了し「done 2」。
+- 手順: `await a + b` で両方の値がそろい、「sum 3」が出力される。
+- 動く理由: 同時に開始されている以上、完了順は処理時間の短い順になります。宣言の順序は開始の順序であって、完了の順序ではありません。
+- よくある間違い: 宣言した順に完了すると考えて「done 2 → done 1」を選ぶ間違いです。並行実行では完了順は所要時間で決まります。
+- よくある間違い: async let を宣言だけして await しないと、スコープを抜けるときに暗黙的にキャンセルされます。値を使わないなら宣言する意味がありません。
+- 関連例:
+```swift
+func fetch(_ id: Int) async -> Int {
+    try? await Task.sleep(nanoseconds: UInt64(id) * 30_000_000)
+    print("done \(id)")
+    return id
+}
+async let a = fetch(2)
+async let b = fetch(1)
+print("sum \(await a + b)")
+```
+- 関連例の出力: done 1
+done 2
+sum 3
+- 関連例の説明: 後から宣言した fetch(1) のほうが先に完了していることが、出力順から確認できます。
+- 覚えておくこと: async let は宣言時に開始、await 時に待機。完了順は所要時間で決まる。
+
+### practice-concurrency-017 2件を同時に取得する関数を組み立てる [関数組み立て / Lv3 実装]
+対象レッスン: concurrency-async-let
+シリーズ: concurrency-parallel (2段階目)
+スキル: concurrency, functions
+問題: 2件の取得を同時に走らせて、両方そろってから配列で返す関数を作ります。必要なブロックだけを選んで正しい順に並べてください。
+正解の並び:
+```swift
+func fetch(_ id: Int) async -> String { "item\(id)" }
+func fetchAll() async -> [String] {
+    async let a = fetch(1)
+    async let b = fetch(2)
+    return await [a, b]
+}
+```
+ヒント1: await を並べると直列になります。同時に走らせる構文が必要です。
+ヒント2: async let は宣言した時点で開始され、値を使うときに待ちます。
+ヒント3: 定義 → 関数宣言 → async let を2つ → まとめて await して返す → 関数を閉じる、の6行です。
+解説: `async let` は宣言した時点で子タスクを開始するため、2つ並べると同時に走ります。値を使う `return await [a, b]` の時点で両方の完了を待つので、所要時間は「2件の合計」ではなく「遅いほう」になります。`let a = await fetch(1)` の形では1件目の完了を待ってから2件目が始まるため直列になり、要件を満たしません。await は配列リテラル全体の前に1つ書けば、両方の待機をまとめられます。
+- 使っている考え方: 並行化の判断基準は依存関係です。2件が互いに独立しているなら同時に走らせられます。依存があるなら直列にせざるを得ません。
+- 手順: `async let a = fetch(1)` … この時点で1件目が開始。
+- 手順: `async let b = fetch(2)` … 続けて2件目も開始。2つが同時に進む。
+- 手順: `await [a, b]` … 両方の完了を待って配列にする。
+- 手順: 合計時間は2件の合計ではなく、遅いほうの時間になる。
+- 動く理由: async let によって開始と待機が分離され、待機が最後にまとめられているためです。この形が並行化の最小の書き方になります。
+- よくある間違い: `async let` の値を1つずつ await すると、結果的に直列に近い待ち方になることがあります。まとめて待つほうが意図が明確です。
+- よくある間違い: 件数が可変の場合、async let は使えません（変数の数を動的に決められないため）。その場合は TaskGroup を使います。
+- 関連例:
+```swift
+func fetch(_ id: Int) async -> String { "item\(id)" }
+func fetchAll() async -> [String] {
+    async let a = fetch(1)
+    async let b = fetch(2)
+    return await [a, b]
+}
+print(await fetchAll())
+```
+- 関連例の出力: ["item1", "item2"]
+- 関連例の説明: 同時に走らせても、配列に入れる順序は書いた順のままです。
+- 覚えておくこと: 独立した2〜3件の並行化は async let。件数が可変なら TaskGroup。
+
+### practice-concurrency-018 直列になっている取得を並行にする [修正 / Lv4 応用]
+対象レッスン: concurrency-async-let
+シリーズ: concurrency-parallel (3段階目)
+スキル: concurrency, debugging
+問題: 2件の取得は互いに独立していますが、直列に実行されるため2倍の時間がかかります。関数の中身（3〜5行目）の修正として正しいものを選んでください。
+正解:     async let a = fetch(1)
+    async let b = fetch(2)
+    return await [a, b]
+ヒント1: await を並べると、上の行が終わるまで下の行は始まりません。
+ヒント2: 開始と待機を分ける構文を使うと、2つを同時に走らせられます。
+ヒント3: 別タスクに投げっぱなしにすると結果を受け取れません。結果は必ず返す必要があります。
+解説: 問題は3〜4行目で、`await` を続けて書いているため1件目の完了を待ってから2件目が始まります（直列）。修正は `async let` に変えることで、宣言した時点で両方が走り始め、`return await [a, b]` でまとめて待てるようになります。所要時間は合計から「遅いほう」に短縮されます。o2 は async let なしで await を省いているためコンパイルできず、o3 は Task に投げて結果を捨てているので空配列しか返らず要件を満たしません。o4 は await の位置を変えただけで直列のままです。
+- 使っている考え方: パフォーマンスの問題は、正しさの問題と違ってテストでは見つかりません。「独立した処理を直列に待っていないか」は、コードの形から判断する必要があります。
+- 手順: `let a = await fetch(1)` … ここで完全に待つ。
+- 手順: 待ち終わってから `fetch(2)` が開始される。合計時間は2件分。
+- 手順: `async let` に変えると、2行目に到達した時点で1件目はすでに走っている。
+- 手順: `await [a, b]` で両方を待つ。合計時間は遅いほうの1件分。
+- 動く理由: async let は開始と待機を分離するため、独立した処理を重ねられます。結果は配列として正しく返るので、呼び出し側の変更も不要です。
+- よくある間違い: Task { } で投げて結果を捨てる修正です。並行にはなりますが、結果を受け取れず、エラーも握りつぶされます。
+- よくある間違い: 依存関係がある処理まで並行化しようとする間違いです。2件目が1件目の結果を使うなら、直列が正しい実装です。
+- 関連例:
+```swift
+func fetch(_ id: Int) async -> Int {
+    try? await Task.sleep(nanoseconds: 30_000_000)
+    return id
+}
+let start = ContinuousClock().now
+async let a = fetch(1)
+async let b = fetch(2)
+_ = await [a, b]
+print(ContinuousClock().now - start < .milliseconds(50))
+```
+- 関連例の出力: true
+- 関連例の説明: 30ms の処理を2件並行に走らせても、合計は50ms未満に収まっていることが確認できます。直列なら60ms以上かかります。
+- 覚えておくこと: 独立した await が並んでいたら並行化の余地。async let で開始と待機を分ける。
+
+### practice-concurrency-019 キャンセルを確認しながら進める [穴埋め / Lv3 実装]
+対象レッスン: concurrency-task-cancel
+シリーズ: concurrency-cancel (1段階目)
+スキル: concurrency, errors
+問題: 各ステップの前にキャンセルを確認し、結果を受け取ります。空欄を埋めてください。
+埋めたあと:
+```swift
+func work() async throws -> Int {
+    for i in 1...3 {
+        try Task.checkCancellation()
+        print("step \(i)")
+    }
+    return 3
+}
+let t = Task { try await work() }
+print((try? await t.value) ?? -1)
+```
+ヒント1: キャンセル状態を問い合わせる先は、いま実行中の単位そのものです。
+ヒント2: Task から結果を取り出すプロパティは1語です。throws な処理なら try が必要になります。
+ヒント3: 1つめは型名、2つめは「完了した値」を表すプロパティ名です。result という別のプロパティもありますが、こちらは Result を返します。
+解説: `Task.checkCancellation()` は現在のタスクがキャンセルされていれば CancellationError を投げる静的メソッドです。ループの各回で呼ぶことで、キャンセル要求に速やかに反応できます。`Task.value` は完了した結果を受け取るプロパティで、内部が throws ならこちらも throws になるため `try` が必要です（ここでは try? で受けて既定値 -1 を用意しています）。キャンセルされなければ step 1〜3 が表示され、3が返ります。
+- 使っている考え方: Swift のキャンセルは協調的です。cancel() はフラグを立てるだけで処理を強制停止しないため、実行側が自分で確認しなければ止まりません。
+- 手順: `Task.checkCancellation()` … キャンセル済みなら CancellationError を throw する。
+- 手順: ループの各回で呼ぶことで、長い処理でも途中で抜けられる。
+- 手順: `Task { ... }` で非同期処理を開始する。
+- 手順: `await t.value` で完了を待ち、結果またはエラーを受け取る。
+- 動く理由: checkCancellation はエラーとして中断を伝えるため、呼び出し側が正常終了と区別できます。value は結果を受け取る標準的な手段で、エラーもそのまま伝播します。
+- よくある間違い: cancel() を呼べば処理が止まると考える間違いです。確認しない処理は最後まで走り切ります。
+- よくある間違い: `Task.isCancelled` と `checkCancellation()` の使い分けを誤る間違いです。前者は Bool を返すだけ、後者はエラーを投げます。呼び出し元に中断を伝えたいなら後者です。
+- 関連例:
+```swift
+func work() async throws -> Int {
+    for i in 1...3 { try Task.checkCancellation(); print("step \(i)") }
+    return 3
+}
+let t = Task { try await work() }
+t.cancel()
+print((try? await t.value) ?? -1)
+```
+- 関連例の出力: -1
+- 関連例の説明: 開始直後にキャンセルしたため、最初の checkCancellation で中断され、既定値の -1 が表示されます。
+- 覚えておくこと: キャンセルは協調的。自分で checkCancellation か isCancelled を確認する。
+
+### practice-concurrency-020 キャンセルに反応しない箇所を見つける [バグ発見 / Lv4 応用]
+対象レッスン: concurrency-task-cancel
+シリーズ: concurrency-cancel (2段階目)
+スキル: concurrency, debugging
+問題: cancel() を呼んでいるのに最後まで走り切って「完了」が表示されます。キャンセルの確認を入れるべき箇所を選んでください。
+問題のある行:     for i in 1...1_000_000 {
+ヒント1: cancel() は処理を強制的に止めるのでしょうか。
+ヒント2: キャンセルはフラグが立つだけで、実行中の処理はそれを見に行かない限り気づけません。
+ヒント3: 長時間まわり続ける箇所に、確認を入れる必要があります。
+解説: 問題はループ（2行目）がキャンセル状態をまったく確認していないことです。Swift のキャンセルは協調的で、`cancel()` はタスクにフラグを立てるだけです。await のような中断点も含まれない純粋な計算ループでは、フラグが立ったことに気づく機会がないため、最後まで走り切って「完了」が表示されます。挙動としてはクラッシュもエラーも起きず、単にキャンセルが効かないという形で現れます。修正はループの各回で `Task.isCancelled` を確認し、立っていれば早期に return することです。中断を呼び出し元にエラーとして伝えたい場合は `try Task.checkCancellation()` を使います。
+- 使っている考え方: 協調的キャンセルは、実行中の処理を安全な位置で止めるための設計です。強制停止は途中状態を壊す危険があるため、言語としては提供されていません。
+- 手順: `task.cancel()` … タスクの isCancelled フラグを true にする。
+- 手順: ループは計算だけで中断点を持たないため、フラグを確認する機会がない。
+- 手順: 結果として100万回まわり切り、「完了」が出力される。
+- 手順: ループ内で `Task.isCancelled` を見れば、次の周回で抜けられる。
+- 動く理由: 止まらない原因は、長時間まわる処理に確認がないことです。cancel() の呼び出し（7行目）自体は正しく、確認を追加すべきなのはループ側です。
+- よくある間違い: await を含む処理ならキャンセルが自動的に効くと考える間違いです。標準ライブラリの一部（Task.sleep など）はキャンセルを検知しますが、自分の計算ループは対象外です。
+- よくある間違い: 毎周回の確認がコストになると心配する間違いです。isCancelled の読み取りは十分に軽く、1000回に1回に間引く必要は通常ありません。
+- 関連例:
+```swift
+let task = Task { () -> String in
+    for _ in 1...1_000_000 {
+        if Task.isCancelled { return "中断" }
+    }
+    return "完了"
+}
+task.cancel()
+print(await task.value)
+```
+- 関連例の出力: 中断
+- 関連例の説明: ループ内で確認を入れると、キャンセルに反応して途中で抜けられます。
+- 覚えておくこと: cancel() はフラグを立てるだけ。長い処理は自分で isCancelled を見る。
+
+### practice-concurrency-021 中断を呼び出し元に伝える行を選ぶ [ブロック選択 / Lv3 実装]
+対象レッスン: concurrency-task-cancel
+シリーズ: concurrency-cancel (3段階目)
+スキル: concurrency, errors
+問題: キャンセルされたら、そのことをエラーとして呼び出し元に伝えたいです。必要な行だけを選び、正しい順に並べてください。
+使うブロック:
+- let task = Task {
+-     for i in 1...5 {
+-         try Task.checkCancellation()
+-         print(i)
+-     }
+- }
+ヒント1: 「エラーとして伝える」ので、Bool を見て break する形では要件を満たしません。
+ヒント2: キャンセル済みならエラーを投げるメソッドがあります。
+ヒント3: 回数の決まったループなので、無限ループにする必要はありません。
+解説: `try Task.checkCancellation()` はキャンセル済みなら CancellationError を投げるため、呼び出し元は `task.value` を await したときにエラーとして受け取れます。`if Task.isCancelled { break }` はループを抜けるだけで、呼び出し元からは正常終了と区別がつきません。中断されたことを上位に伝えて処理を分岐させたいなら、エラーとして投げるほうが適切です。`while true` は回数が決まっているこの場面では不要です。
+- 使っている考え方: 中断の伝え方には「静かに終わる」と「エラーとして伝える」の2通りがあります。呼び出し元が中断を区別して扱う必要があるなら、後者を選びます。
+- 手順: `Task { ... }` の中は throws なクロージャとして扱える。
+- 手順: `try Task.checkCancellation()` … キャンセル済みなら CancellationError を投げる。
+- 手順: 投げられたエラーはタスクの結果として保持される。
+- 手順: 呼び出し元は `try await task.value` で受け取り、catch で中断を判別できる。
+- 動く理由: checkCancellation はエラーを通じて中断を伝えるため、正常完了との区別が呼び出し元で可能になります。要件が「伝える」である以上、break では不足です。
+- よくある間違い: break で抜けたあと、正常終了として結果を返してしまう実装です。呼び出し元は中断に気づけません。
+- よくある間違い: CancellationError を catch して握りつぶす実装も同じ問題を招きます。中断は失敗ではないため、上位で明示的に扱います。
+- 関連例:
+```swift
+let task = Task {
+    for i in 1...5 { try Task.checkCancellation(); print(i) }
+}
+task.cancel()
+do { try await task.value; print("完了") }
+catch is CancellationError { print("中断された") }
+catch { print("その他") }
+```
+- 関連例の出力: 中断された
+- 関連例の説明: 呼び出し元が CancellationError として中断を判別できています。
+- 覚えておくこと: 中断を伝えるなら checkCancellation。静かに終えるだけなら isCancelled。
+
+### practice-concurrency-022 件数が可変の並行処理を並べる [並べ替え / Lv4 応用]
+対象レッスン: concurrency-taskgroup
+シリーズ: concurrency-taskgroup (1段階目)
+スキル: concurrency, collections
+問題: 任意の件数を同時に取得して集める関数を作ります。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+func fetch(_ id: Int) async -> String { "item\(id)" }
+func fetchAll(_ ids: [Int]) async -> [String] {
+    return await withTaskGroup(of: String.self) { group in
+        var results: [String] = []
+        for id in ids { group.addTask { await fetch(id) } }
+        for await value in group { results.append(value) }
+        return results
+    }
+}
+```
+ヒント1: fetch の定義が最初に必要です。
+ヒント2: 結果を入れる配列は、集め始める前に用意します。
+ヒント3: タスクを登録してから、for await で完了したものを受け取ります。
+解説: `withTaskGroup(of:)` は子タスクをまとめて管理する仕組みで、件数が実行時に決まる場合に使います。`addTask` で登録した子タスクは登録した時点で走り始め、`for await value in group` で完了したものから順に受け取れます。結果を入れる配列は受け取り始める前に用意します。グループを抜けるときに全子タスクの完了が保証されるため、途中で処理が残ることはありません。
+- 使っている考え方: TaskGroup は「動的な数の子タスク」を安全に扱う構造化並行性の仕組みです。グループのスコープを抜ける時点で全子タスクの完了（またはキャンセル）が保証されます。
+- 手順: `withTaskGroup(of: String.self)` … 子タスクの戻り値の型を指定する。
+- 手順: `var results: [String] = []` … 集める先を用意する。
+- 手順: `group.addTask { ... }` … 子タスクを登録。登録時点で実行が始まる。
+- 手順: `for await value in group` … 完了した順に結果を受け取る。
+- 手順: `return results` … グループの結果として返す。
+- 動く理由: 定義・関数宣言・グループ生成・受け皿・登録・収集・返却という依存順序が守られています。addTask より前に受け皿を用意しておくことで、収集ループがそのまま書けます。
+- よくある間違い: for await の結果順が addTask の順と一致すると考える間違いです。完了順なので順序は保証されません。
+- よくある間違い: グループの外に子タスクの結果を持ち出そうとする間違いです。構造化並行性ではスコープ内で完結させます。
+- 関連例:
+```swift
+func fetch(_ id: Int) async -> String { "item\(id)" }
+func fetchAll(_ ids: [Int]) async -> [String] {
+    return await withTaskGroup(of: String.self) { group in
+        var results: [String] = []
+        for id in ids { group.addTask { await fetch(id) } }
+        for await value in group { results.append(value) }
+        return results
+    }
+}
+print(await fetchAll([1, 2, 3]).count)
+```
+- 関連例の出力: 3
+- 関連例の説明: 件数は必ず一致しますが、並び順は完了順になるため count で確認しています。
+- 覚えておくこと: 件数が可変なら TaskGroup。addTask で開始、for await で完了順に収集。
+
+### practice-concurrency-023 順序を保つ並行取得を組み立てる [関数組み立て / Lv4 応用]
+対象レッスン: concurrency-taskgroup
+シリーズ: concurrency-taskgroup (2段階目)
+スキル: concurrency, collections
+問題: 並行に取得しつつ、結果を入力の順序どおりに返す関数を作ります。必要なブロックだけを選んで正しい順に並べてください。
+正解の並び:
+```swift
+func fetch(_ id: Int) async -> String { "item\(id)" }
+func fetchAll(_ ids: [Int]) async -> [String] {
+    await withTaskGroup(of: (Int, String).self) { group in
+        var pairs: [(Int, String)] = []
+        for id in ids { group.addTask { (id, await fetch(id)) } }
+        for await pair in group { pairs.append(pair) }
+        return pairs.sorted { $0.0 < $1.0 }.map(\.1)
+    }
+}
+```
+ヒント1: 完了順に届くので、あとから並べ直すための情報が必要です。
+ヒント2: 子タスクの戻り値に、元の位置が分かるものを含めます。
+ヒント3: 集めたあとに並べ替えてから、必要な値だけを取り出します。
+解説: TaskGroup は完了した順に結果を返すため、入力の順序を保ちたい場合は子タスクの戻り値に元のID（や添字）を含めます。`(Int, String)` のタプルで返し、集めたあとに `sorted { $0.0 < $1.0 }` で並べ直してから `map(\.1)` で値だけを取り出します。`pairs.map(\.1)` だけでは完了順のままなので、実行のたびに順序が変わります。IDを含めない `group.addTask { await fetch(id) }` では、そもそも並べ直す手がかりがありません。
+- 使っている考え方: 並行処理では順序が保証されません。順序が必要なら「順序の情報を結果に持たせて、あとで復元する」のが定石です。
+- 手順: `withTaskGroup(of: (Int, String).self)` … 戻り値の型にIDを含める。
+- 手順: `group.addTask { (id, await fetch(id)) }` … 各子タスクが自分のIDを返す。
+- 手順: `for await pair in group` … 完了順に受け取る（順序は不定）。
+- 手順: `sorted { $0.0 < $1.0 }` … IDで並べ直す。
+- 手順: `map(\.1)` … 値だけを取り出して返す。
+- 動く理由: 順序の情報を結果に埋め込んだため、完了順がどうであっても復元できます。並べ替えは全件そろったあとに行うので、確定した順序が得られます。
+- よくある間違い: テストで偶然順序が合っていたために「順序は保たれる」と判断する間違いです。負荷や件数が変わると崩れます。
+- よくある間違い: 共有配列に直接添字で書き込む実装は、データ競合の危険があります。結果を集めてから並べ替えるほうが安全です。
+- 関連例:
+```swift
+func fetch(_ id: Int) async -> String { "item\(id)" }
+func fetchAll(_ ids: [Int]) async -> [String] {
+    await withTaskGroup(of: (Int, String).self) { group in
+        var pairs: [(Int, String)] = []
+        for id in ids { group.addTask { (id, await fetch(id)) } }
+        for await pair in group { pairs.append(pair) }
+        return pairs.sorted { $0.0 < $1.0 }.map(\.1)
+    }
+}
+print(await fetchAll([1, 2, 3]))
+```
+- 関連例の出力: ["item1", "item2", "item3"]
+- 関連例の説明: 並行に取得しても、並べ直しによって入力どおりの順序で返っています。
+- 覚えておくこと: 並行処理は完了順。順序が要るなら情報を持たせて後で並べ直す。
+
+### practice-concurrency-024 順序のテストが不安定になる理由を読む [テスト読解 / Lv4 応用]
+対象レッスン: concurrency-taskgroup
+シリーズ: concurrency-taskgroup (3段階目)
+スキル: testing, concurrency, debugging
+問題: 件数のテストは通るのに、順序のテストだけが実行のたびに結果が変わります。実装のどの点が要件に反していますか。
+正解: TaskGroup は完了した順に結果を返すため、入力の順序は保証されない
+ヒント1: 件数のテストは通っているので、子タスクの登録も収集も正しく行われています。
+ヒント2: 失敗しているのは順序だけで、しかも毎回結果が違います。
+ヒント3: for await が値を受け取る順番は、何で決まるのかを考えてください。
+解説: 失敗したテストが表しているのは「入力と同じ順序で返す」という要件です。入力は普通の3件で、境界的な値ではなく、順序という性質だけを検証しています。実装では `for await value in group` が完了した子タスクから順に値を受け取るため、各 fetch の所要時間の違いによって並びが変わります。件数のテストが通っているのは、すべての子タスクが登録され、すべての結果が収集されているためで、欠落や重複は起きていません。結果が実行のたびに変わるのは並行処理の本質であり、実装のたまたまの不安定さではありません。修正は、子タスクの戻り値にIDや添字を含めて、収集後に並べ替えることです。
+- 使っている考え方: 並行処理のテストでは「毎回同じ結果になるか」が重要な観点になります。たまたま通ることがあるため、1回の成功は保証になりません。
+- 手順: 要件は「入力の ids と同じ順序で返すこと」。
+- 手順: TaskGroup は完了順に値を返す仕様。
+- 手順: 所要時間はネットワークやスケジューリングで変動するため、完了順も変動する。
+- 手順: 結果として順序のテストだけが不安定になる。
+- 動く理由: 件数のテストが安定して通っていることが、登録漏れや取りこぼしがないことを示しています。差が出ているのは順序だけであり、それは TaskGroup の仕様どおりの挙動です。
+- よくある間違い: テストを何度か実行して通ったことをもって修正済みと判断する間違いです。並行処理では再現しないだけで、原因は残っています。
+- よくある間違い: テストの期待値を「順序不問」に変えて通す対応です。要件が順序を求めているなら、仕様のほうを壊しています。
+- よくある間違い: sleep を入れて順序を安定させる対応も同様です。タイミングに依存した見せかけの安定であり、本番環境では崩れます。
+- 関連例:
+```swift
+func fetch(_ id: Int) async -> String { "item\(id)" }
+func fetchAllOrdered(_ ids: [Int]) async -> [String] {
+    await withTaskGroup(of: (Int, String).self) { group in
+        var pairs: [(Int, String)] = []
+        for id in ids { group.addTask { (id, await fetch(id)) } }
+        for await p in group { pairs.append(p) }
+        return pairs.sorted { $0.0 < $1.0 }.map(\.1)
+    }
+}
+print(await fetchAllOrdered([3, 1, 2]))
+```
+- 関連例の出力: ["item1", "item2", "item3"]
+- 関連例の説明: IDで並べ替える実装では、何度実行しても同じ順序になります（ここではID順に整列されます）。
+- 覚えておくこと: 並行処理の順序は保証されない。順序が要件なら実装で復元する。
+
+### practice-concurrency-025 actorまわりの記法を対応づける [対応づけ / Lv2 基本]
+対象レッスン: concurrency-actor
+シリーズ: concurrency-actor-basics (1段階目)
+スキル: concurrency, types
+問題: 並行処理の安全性に関する記法と、その意味を対応させてください。
+対応:
+- actor → 内部状態へのアクセスを1つずつに直列化する参照型
+- await someActor.value → 外から状態を読むには中断点が必要になることを表す
+- nonisolated → 隔離を必要としないメンバーであることを示す指定
+- @MainActor → その処理をメインアクター上で実行することを保証する指定
+ヒント1: actor は class と同じ参照型ですが、状態へのアクセスに制約が加わります。
+ヒント2: 外から actor の状態に触るときに await が必要なのは、順番待ちが発生しうるからです。
+ヒント3: r5 は Sendable の説明なので、この4つとは対応しません。
+解説: actor は内部状態へのアクセスを直列化する参照型で、データ競合を型レベルで防ぎます。外部から状態を読むときは順番待ちが起こりうるため await が必要になります。nonisolated は隔離を必要としないメンバー（不変の値を返すだけのメソッドなど）に付ける指定で、await なしで呼べるようになります。@MainActor はメインアクター上での実行を保証する指定です。r5 は Sendable の説明で、この中には対応するものがありません。
+- 使っている考え方: Swift の並行性は「どのアクターに隔離されているか」で安全性を保証します。actor は隔離の単位、await はその境界を越える印、nonisolated は境界の外に出す指定です。
+- 手順: actor … 内部状態へのアクセスが自動的に直列化される。
+- 手順: 外からのアクセス … 順番待ちが起きうるため await が必要。
+- 手順: nonisolated … 状態に触らないメンバーは隔離から外せる。
+- 手順: @MainActor … UI 更新など、メインスレッドで行うべき処理に付ける。
+- 動く理由: 4つはそれぞれ隔離の単位・境界の越え方・隔離の除外・特定アクターへの固定という別の役割を持ち、説明と1対1で対応します。Sendable だけは「型が安全に渡せるか」という別の軸の話です。
+- よくある間違い: actor にすればすべてのデータ競合が消えると考える間違いです。actor の外に可変の参照型を渡してしまえば競合は起きます。
+- よくある間違い: nonisolated を「速くするための指定」と考える間違いです。状態に触るメンバーに付けるとコンパイルエラーになります。
+- 関連例:
+```swift
+actor Counter {
+    private(set) var value = 0
+    func increment() { value += 1 }
+    nonisolated let id = "counter-1"
+}
+let c = Counter()
+await c.increment()
+print(c.id, await c.value)
+```
+- 関連例の出力: counter-1 1
+- 関連例の説明: nonisolated なメンバーは await なしで読め、隔離された状態には await が必要です。
+- 覚えておくこと: actor は隔離の単位、await は境界を越える印。Sendable は別の軸。
+
+### practice-concurrency-026 状態を安全に持つ型を宣言する [穴埋め / Lv3 実装]
+対象レッスン: concurrency-actor
+シリーズ: concurrency-actor-basics (2段階目)
+スキル: concurrency, types
+問題: 複数のタスクから同時に更新されても壊れないカウンタを作ります。空欄を埋めてください。
+埋めたあと:
+```swift
+actor Counter {
+    private(set) var value = 0
+    func increment() { value += 1 }
+}
+let c = Counter()
+await c.increment()
+print(await c.value)
+```
+ヒント1: class では複数タスクからの同時更新を防げません。状態を直列化する種類の型が必要です。
+ヒント2: その型の状態を外から読むときには、順番待ちが起こりえます。
+ヒント3: 1つめは並行安全な参照型のキーワード、2つめは中断しうる箇所に付ける印です。
+解説: `actor` は内部状態へのアクセスを自動的に直列化するため、複数のタスクから同時に increment を呼んでも値が壊れません。class では同じコードがデータ競合を起こします。actor の状態を外部から読むときは順番待ちが発生しうるため `await c.value` と書きます。struct は値型なのでコピーされ、そもそも共有された状態になりません。実行すると 1 が表示されます。
+- 使っている考え方: データ競合は「複数のスレッドが同時に同じメモリを読み書きする」ことで起きます。actor はアクセスを1つずつに直列化することで、この状況を構造的に排除します。
+- 手順: `actor Counter` … 内部状態が隔離される。
+- 手順: `func increment()` … actor 内部のメソッドなので、状態に直接触れる。
+- 手順: `await c.increment()` … 外部からの呼び出しは順番待ちが起きうる。
+- 手順: `await c.value` … 状態の読み取りも同様に await が必要。
+- 動く理由: actor による直列化が同時更新を防ぎ、await によって境界を越えるアクセスが明示されます。両方そろってコンパイルが通り、かつ安全になります。
+- よくある間違い: class に対してロックを自前で書く方法もありますが、書き忘れや順序ミスが起きやすく、actor のほうが安全です。
+- よくある間違い: actor の状態を外から `c.value` と await なしで読もうとするとコンパイルエラーになります。読み取りも境界を越える操作です。
+- 関連例:
+```swift
+actor Counter {
+    private(set) var value = 0
+    func increment() { value += 1 }
+}
+let c = Counter()
+await withTaskGroup(of: Void.self) { group in
+    for _ in 1...100 { group.addTask { await c.increment() } }
+}
+print(await c.value)
+```
+- 関連例の出力: 100
+- 関連例の説明: 100件を並行に実行しても、actor によって値が正確に100になります。
+- 覚えておくこと: 共有される可変状態は actor に入れる。外からのアクセスには await。
+
+### practice-concurrency-027 確認と実行が分かれている行を見つける [バグ発見 / Lv4 応用]
+対象レッスン: concurrency-actor
+シリーズ: concurrency-actor-basics (3段階目)
+スキル: concurrency, debugging
+問題: 残高を確認してから引き出していますが、同時に呼ばれると残高がマイナスになることがあります。原因になっている行を選んでください。
+問題のある行: if await bank.balance >= 100 { await bank.withdraw(100) }
+ヒント1: await はそこで中断しうる箇所です。中断中に他のタスクが動けます。
+ヒント2: この行には await が2つあります。その間に何が起こりうるでしょうか。
+ヒント3: 残高の確認と引き出しが別々のアクセスになっているため、間に他の引き出しが割り込めます。
+解説: バグは6行目です。`await bank.balance` で残高を読んだあと、`await bank.withdraw(100)` を呼ぶまでの間に中断点があり、その隙に別のタスクが同じ判定を通って引き出しを実行できます。結果として2つのタスクが両方とも「残高は100ある」と判断し、合計200を引き出して残高がマイナスになります。actor は1回のアクセスを直列化しますが、複数のアクセスにまたがる不変条件までは守れません。挙動としてはクラッシュせず、同時実行が重なったときだけ値が壊れるため再現が難しいバグです。修正は判定と更新を actor 内の1つのメソッドにまとめ、その中で guard することです。
+- 使っている考え方: actor が保証するのは「1つのメソッド呼び出しの中は他から割り込まれない」ことです。複数の呼び出しをまたぐ処理は、外から見れば分割されており、その隙間に他のタスクが入り得ます。
+- 手順: `await bank.balance` … ここで1回目の隔離境界を越える。読み取り後に中断しうる。
+- 手順: if の判定が真になる。
+- 手順: `await bank.withdraw(100)` … ここで2回目の境界を越える。この間に他タスクが同じ経路を通れる。
+- 手順: 判定と更新を1メソッドにまとめると、その内部は割り込まれない。
+- 動く理由: 問題は actor の定義側ではなく、確認と実行を2回のアクセスに分けている呼び出し側です。1〜3行目は単体では正しく、複数アクセスの組み合わせ方だけが誤っています。
+- よくある間違い: actor にしたのだから安全だと考える間違いです。この「確認してから実行する」パターン（check-then-act）は actor でも壊れます。
+- よくある間違い: withdraw の中でさらに balance を await しようとする間違いです。actor 内部からは await 不要で、そのまま触れます。
+- 関連例:
+```swift
+actor Bank {
+    private(set) var balance = 100
+    func withdraw(_ n: Int) -> Bool {
+        guard balance >= n else { return false }
+        balance -= n
+        return true
+    }
+}
+let bank = Bank()
+async let a = bank.withdraw(100)
+async let b = bank.withdraw(100)
+print(await a, await b, await bank.balance)
+```
+- 関連例の出力: true false 0
+- 関連例の説明: 判定と更新をまとめたことで、同時に2件を試しても片方だけが成功し、残高がマイナスになりません。
+- 覚えておくこと: actor が守るのは1呼び出し内だけ。不変条件はメソッド内に閉じ込める。
+
+### practice-concurrency-028 actorの状態を外から書き換えるコードを直す [修正 / Lv4 応用]
+対象レッスン: concurrency-actor
+シリーズ: concurrency-actor-basics (4段階目)
+スキル: concurrency, debugging
+問題: 最終行がビルドできません。修正として正しいものを選んでください。
+正解: await cache.set("1", for: "a")
+ヒント1: actor の状態は、外から直接書き換えることができません。
+ヒント2: await を付けても、書き換えができるようになるわけではありません。
+ヒント3: 状態を変更する手段は、actor が公開しているメソッドを通すことです。
+解説: バグは最終行です。actor の隔離された状態は外部から直接変更できず、'Actor-isolated property items can not be mutated from a nonisolated context' というコンパイルエラーになります（この例ではさらに private(set) による制限もあります）。await を付けても書き換えが許可されるわけではありません。修正は actor が用意したメソッド `set(_:for:)` を await 付きで呼ぶことです。メソッドの内部は隔離されているため、そこでの更新は安全に直列化されます。Task で包んでも隔離の制約は変わらず、updateValue も外部からの変更である点は同じです。
+- 使っている考え方: actor は「状態を変更できるのは自分自身のメソッドだけ」という制約を課します。この一方通行の設計により、変更経路が actor の内部に限定され、レビューすべき箇所も限られます。
+- 手順: `items` は actor に隔離された可変状態。
+- 手順: 外部（nonisolated な文脈）からの直接変更はコンパイルエラー。
+- 手順: `set(_:for:)` は actor のメソッドなので、内部で自由に変更できる。
+- 手順: 外からは `await cache.set(...)` として呼ぶ。
+- 動く理由: 変更を actor のメソッドに集約することで、隔離の保証がそのまま働きます。呼び出し側は await で境界を越えるだけで済みます。
+- よくある間違い: await を付ければ何でもできると考える間違いです。await は中断点の印であって、権限を与えるものではありません。
+- よくある間違い: Task で包めば隔離を回避できると考える間違いです。Task の中も nonisolated な文脈なので、制約は同じです。
+- 関連例:
+```swift
+actor Cache {
+    private(set) var items: [String: String] = [:]
+    func set(_ v: String, for k: String) { items[k] = v }
+}
+let cache = Cache()
+await cache.set("1", for: "a")
+print(await cache.items["a"] ?? "なし")
+```
+- 関連例の出力: 1
+- 関連例の説明: メソッド経由なら、外部からでも安全に状態を更新できます。
+- 覚えておくこと: actor の状態変更はメソッド経由。await は権限ではなく中断点の印。
+
+### practice-concurrency-029 @MainActorの関数がどこで動くか追う [実行追跡 / Lv3 実装]
+対象レッスン: concurrency-mainactor
+シリーズ: concurrency-mainactor (1段階目)
+スキル: concurrency, debugging
+問題: 次のコードを実行したとき、表示される内容を選んでください。
+正解: main: true
+ヒント1: @MainActor が付いた関数は、どこで実行されることが保証されているでしょうか。
+ヒント2: work は @MainActor が付いていないため、別の場所で動いている可能性があります。
+ヒント3: await によってメインアクターへ移動してから label が実行されます。
+解説: `@MainActor` が付いた関数は、必ずメインアクター（メインスレッド）上で実行されることが保証されます。呼び出し側の work にはその指定がないため、label を呼ぶには境界を越える必要があり、そこで await が要求されます。await の時点でメインアクターへ移動してから実行されるため、Thread.isMainThread は必ず true になり「main: true」が表示されます。実行のたびに変わることはありません。
+- 使っている考え方: @MainActor は「この処理はメインで動く」という保証をコンパイラに検査させる仕組みです。UI 更新をメインスレッド以外から行うバグを、実行前に防げます。
+- 手順: `@MainActor func label()` … メインアクターに隔離された関数。
+- 手順: `func work() async` … 隔離指定がないので、メインアクター以外で動きうる。
+- 手順: `await label()` … 境界を越えるため、メインアクターへ移動する。
+- 手順: 移動後に実行されるので Thread.isMainThread は true。
+- 動く理由: 隔離の保証は言語仕様レベルのもので、スケジューリングの運任せではありません。そのため結果は決定的に true になります。
+- よくある間違い: await を書いたら別スレッドで動くと考える間違いです。await は中断点であって、実行場所は隔離指定で決まります。
+- よくある間違い: DispatchQueue.main.async で包む昔ながらの書き方と混同する間違いです。@MainActor なら、書き忘れをコンパイラが検出します。
+- 関連例:
+```swift
+import Foundation
+@MainActor func label() -> String { "main: \(Thread.isMainThread)" }
+func work() async -> String { await label() }
+print(await work())
+```
+- 関連例の出力: main: true
+- 関連例の説明: 呼び出し元がどこであっても、@MainActor の関数はメインで実行されます。
+- 覚えておくこと: @MainActor は実行場所の保証。await は境界を越える印。
+
+### practice-concurrency-030 MainActorに隔離した型を扱う順に並べる [並べ替え / Lv2 基本]
+対象レッスン: concurrency-mainactor
+シリーズ: concurrency-mainactor (2段階目)
+スキル: concurrency, types
+問題: @MainActor の ViewModel を更新して表示します。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+@MainActor final class ViewModel {
+    var title = ""
+    func update(_ t: String) { title = t }
+}
+func run(_ vm: ViewModel) async {
+    await vm.update("新しい題名")
+    print(await vm.title)
+}
+```
+ヒント1: クラスの宣言を開いてから、プロパティ、メソッドの順に書きます。
+ヒント2: run は @MainActor が付いていないため、ViewModel に触るたびに境界を越えます。
+ヒント3: クラス定義（宣言・プロパティ・メソッド・閉じかっこ）→ run（宣言・更新・表示・閉じかっこ）の順です。
+解説: `@MainActor` をクラスに付けると、そのすべてのメンバーがメインアクターに隔離されます。run には隔離指定がないため、update の呼び出しにも title の読み取りにも await が必要です。await が付くことで「ここでメインアクターへ移動する」ことがコード上に現れ、UI 更新の場所が読み取れるようになります。クラス定義を先に書き、そのあとで利用する関数を書くのが正しい順序です。
+- 使っている考え方: 型全体に @MainActor を付けると、その型を触るすべての箇所で隔離が検査されます。ViewModel のように UI と結びつく型では、この指定が事故を防ぎます。
+- 手順: `@MainActor final class ViewModel` … 型全体をメインアクターに隔離する。
+- 手順: `var title` と `func update` … どちらもメインアクター隔離になる。
+- 手順: `func run(_ vm: ViewModel) async` … 隔離指定がない関数。
+- 手順: `await vm.update(...)` と `await vm.title` … 境界を越えるので await が必要。
+- 動く理由: 定義が利用より前にあり、隔離境界を越える箇所すべてに await が付いています。この形なら、どこでメインへ移動するかがコードから読み取れます。
+- よくある間違い: await を付け忘れて 'Main actor-isolated property can not be referenced from a nonisolated context' になる間違いです。境界を越える箇所すべてに必要です。
+- よくある間違い: run にも @MainActor を付ければ await は不要になりますが、その関数全体がメイン上で動くことになります。重い処理を含むなら分けるべきです。
+- 関連例:
+```swift
+@MainActor final class ViewModel {
+    var title = ""
+    func update(_ t: String) { title = t }
+}
+func run(_ vm: ViewModel) async {
+    await vm.update("新しい題名")
+    print(await vm.title)
+}
+await run(ViewModel())
+```
+- 関連例の出力: 新しい題名
+- 関連例の説明: 隔離された型でも、await を通せば別の文脈から安全に扱えます。
+- 覚えておくこと: 型に @MainActor を付けると全メンバーが隔離される。境界を越える箇所には await。
+
+### practice-concurrency-031 非同期取得の結果をUI用の型へ反映する [ブロック選択 / Lv3 実装]
+対象レッスン: concurrency-mainactor
+シリーズ: concurrency-mainactor (3段階目)
+スキル: concurrency, architecture
+問題: 非同期に取得した結果を @MainActor の ViewModel に反映します。必要な行だけを選び、正しい順に並べてください。
+使うブロック:
+- func fetchItems() async -> [String] { ["a"] }
+- @MainActor final class ViewModel {
+-     var items: [String] = []
+-     func load() async { items = await fetchItems() }
+- }
+ヒント1: fetchItems の定義は、使う行より前に必要です。
+ヒント2: items は @MainActor に隔離されたプロパティです。どこからなら書き換えられるでしょうか。
+ヒント3: nonisolated を付けると隔離の外に出てしまい、隔離されたプロパティへ代入できなくなります。
+解説: `load()` は @MainActor のクラスのメソッドなので、それ自体がメインアクターに隔離されています。そのため `items = ...` の代入は隔離の内側で行われ、安全です。`await fetchItems()` の間はメインアクターを手放すため、UI をブロックしません。b6 のように `nonisolated` を付けると隔離の外に出てしまい、隔離されたプロパティ items への代入が 'Main actor-isolated property can not be mutated from a nonisolated context' になります。
+- 使っている考え方: 「重い処理は隔離の外、状態の更新は隔離の内」という分担が基本形です。async メソッドを隔離された型に置くと、この分担が自然に実現します。
+- 手順: `func load() async` はメインアクターに隔離されたメソッド。
+- 手順: `await fetchItems()` の間は中断し、メインアクターを他の処理に譲る。
+- 手順: 結果が返ると再びメインアクター上で再開する。
+- 手順: `items = ...` の代入は隔離の内側なので安全。
+- 動く理由: 隔離されたメソッドの中では、そのアクターの状態に自由に触れます。await による中断があっても、再開時には同じアクターへ戻るため、代入は常にメイン上で行われます。
+- よくある間違い: nonisolated を「非同期にするための指定」と誤解する間違いです。隔離を外す指定であり、状態に触れなくなります。
+- よくある間違い: 取得処理まで @MainActor で行うと、重い処理がメインを占有します。await を挟むことで手放せる点が重要です。
+- 関連例:
+```swift
+func fetchItems() async -> [String] { ["a"] }
+@MainActor final class ViewModel {
+    var items: [String] = []
+    func load() async { items = await fetchItems() }
+}
+let vm = ViewModel()
+await vm.load()
+print(await vm.items)
+```
+- 関連例の出力: ["a"]
+- 関連例の説明: 取得は隔離の外で行われ、代入はメインアクター上で行われています。
+- 覚えておくこと: 隔離された async メソッドなら、待っている間だけアクターを手放せる。
+
+### practice-concurrency-032 安全に受け渡せる型の宣言行を書く [記述 / Lv3 実装]
+対象レッスン: concurrency-sendable
+シリーズ: concurrency-sendable (1段階目)
+スキル: concurrency, types
+問題: 複数のタスク間で受け渡しても安全な設定値の型を作ります。型名は Config、値型で、安全に渡せることを表すプロトコルに準拠させる宣言行（struct から始まる1行）を書いてください。
+想定する書き方: struct Config: Sendable {
+ヒント1: 「並行に受け渡しても安全」であることを表す標準のプロトコルがあります。
+ヒント2: そのプロトコルは要求メンバーを持たず、準拠を宣言するだけで検査が働きます。
+ヒント3: struct のあとに型名、コロン、プロトコル名、中かっこを続けます。
+解説: `struct Config: Sendable {` と書きます。Sendable は「この型の値は並行実行の境界を越えて安全に渡せる」ことを表すマーカープロトコルで、実装すべきメンバーはありません。準拠を宣言すると、コンパイラがその型の中身（全プロパティが Sendable か、可変な参照を持っていないか）を検査します。let のみを持つ値型は条件を満たすため、宣言するだけで準拠できます。実際には、すべてのプロパティが Sendable な struct は暗黙的に Sendable になりますが、公開する型では明示しておくと意図が伝わります。
+- 使っている考え方: Sendable は「型が並行境界を越えられるか」を表す軸です。actor が「状態をどう守るか」であるのに対し、Sendable は「値を渡してよいか」を扱います。
+- 手順: `struct Config: Sendable` … 値型として宣言し、Sendable に準拠する。
+- 手順: `let retries: Int` … Int は Sendable なので条件を満たす。
+- 手順: コンパイラが全プロパティを検査し、問題なければ準拠が認められる。
+- 手順: 以降、この型はタスク間で自由に渡せる。
+- 動く理由: 値型はコピーされて渡るため、共有された可変状態が生まれません。プロパティも不変かつ Sendable なので、検査を通ります。
+- よくある間違い: 可変プロパティを持つ class に Sendable を付ける間違いです。同時に書き換えられる可能性が残るため、コンパイルエラーになります。
+- よくある間違い: @unchecked Sendable で検査を黙らせる間違いです。安全性の保証を自分で負うことになるため、根拠がないなら使いません。
+- 関連例:
+```swift
+struct Config: Sendable { let retries: Int }
+let config = Config(retries: 3)
+let t = Task { config.retries }
+print(await t.value)
+```
+- 関連例の出力: 3
+- 関連例の説明: Sendable な値は、別のタスクへそのまま捕捉させても安全です。
+- 覚えておくこと: Sendable は「渡してよい型」の宣言。値型 + 不変なら自然に満たせる。
+
+### practice-concurrency-033 タスク間で渡せない型を直す [修正 / Lv4 応用]
+対象レッスン: concurrency-sendable
+シリーズ: concurrency-sendable (2段階目)
+スキル: concurrency, types, debugging
+問題: この Settings は、メインスレッドに限定せず任意のタスクへ値として渡したいものです。厳格な並行性チェックでは 'Non-sendable type' として拒否されます。1〜3行目の修正として最も適切なものを選んでください。
+正解: struct Settings: Sendable {
+    var theme = "light"
+}
+ヒント1: 参照型は複数の場所から同じ実体を触れるため、可変なままでは安全に渡せません。
+ヒント2: 値型ならコピーされて渡るので、共有された可変状態が生まれません。
+ヒント3: 検査を黙らせる指定や、特定のアクターに固定する指定は、要件（任意のタスクへ値として渡す）とは合いません。
+解説: 問題は、可変プロパティを持つ class を並行境界を越えて渡そうとしていることです。参照型は渡した先と元が同じ実体を共有するため、両方から theme を書き換えるとデータ競合になります。修正は struct にして Sendable に準拠させることです。値型はコピーされて渡るので、渡した先での変更が元に影響せず、競合が原理的に起きません。可変プロパティを持つ class に Sendable を付ける o2 はコンパイラに拒否され、`nonisolated(unsafe)` を使う o3 は検査を黙らせるだけで危険性は残ります。@MainActor を付ける o4 は Sendable にはなりますが、触るたびにメインアクターへの移動が必要になり「任意のタスクへ値として渡す」という要件に合いません。
+- 使っている考え方: 「並行境界を越えて渡せるか」は、その型が可変状態を共有しうるかで決まります。共有をなくす最も簡単な方法が、値型にすることです。
+- 手順: class は参照型なので、渡した先と元が同じ実体を指す。
+- 手順: `var theme` が可変なため、両側から同時に書き換えられる可能性がある。
+- 手順: struct にすると渡すたびにコピーされ、共有が消える。
+- 手順: 全プロパティが Sendable なので、Sendable 準拠が認められる。
+- 動く理由: 値型にすることで共有そのものをなくしており、検査を回避するのではなく前提を満たしています。要件である「任意のタスクへ渡す」もそのまま実現できます。
+- よくある間違い: `@unchecked Sendable` や `nonisolated(unsafe)` で警告を消す対応です。コンパイラの検査を無効化するだけで、競合の可能性は残ります。
+- よくある間違い: 共有された可変状態が本当に必要な場合は、struct 化ではなく actor に持たせるのが正しい設計です。要件によって答えが変わります。
+- 関連例:
+```swift
+struct Settings: Sendable { var theme = "light" }
+func apply(_ s: Settings) async { print(s.theme) }
+var s = Settings()
+let t = Task { [s] in await apply(s) }
+s.theme = "dark"
+await t.value
+print(s.theme)
+```
+- 関連例の出力: light
+dark
+- 関連例の説明: 捕捉リスト [s] を書くと、その時点の値がコピーされてタスクへ渡ります。捕捉リストを書かずに var をそのまま捕捉すると変数を共有してしまい、あとの変更（dark）が見えてしまいます。
+- 覚えておくこと: 渡したいだけなら値型にする。共有が必要なら actor。検査を黙らせる指定は最後の手段。
+
+### practice-concurrency-034 コールバックAPIをasyncに橋渡しする [関数組み立て / Lv4 応用]
+対象レッスン: concurrency-continuation
+シリーズ: concurrency-continuation (1段階目)
+スキル: concurrency, functions
+問題: 完了ハンドラ形式の古いAPIを、async/await から使える関数に変換します。必要なブロックだけを選んで正しい順に並べてください。
+正解の並び:
+```swift
+func legacyLoad(completion: @escaping (String) -> Void) { completion("done") }
+func load() async -> String {
+    await withCheckedContinuation { continuation in
+        legacyLoad { value in
+            continuation.resume(returning: value)
+        }
+    }
+}
+```
+ヒント1: コールバックの中で return しても、外側の関数の戻り値にはなりません。
+ヒント2: 非同期の完了を async の世界へ伝えるための橋渡し役が必要です。
+ヒント3: その橋渡し役に対して「この値で再開してください」と伝えるメソッドを呼びます。
+解説: `withCheckedContinuation` は、コールバック形式のAPIを async/await に橋渡しする仕組みです。渡されたクロージャの中でコールバックを呼び出し、結果が届いたら `continuation.resume(returning:)` を呼ぶことで、中断していた async 関数が再開されます。コールバックの中で `return value` と書いても、それはコールバック自身の戻り値であって外側の関数の結果にはなりません。`await legacyLoad()` は legacyLoad が async ではないため呼べません。
+- 使っている考え方: continuation は「中断した処理の続き」を表す値です。これを保持しておき、結果が届いたタイミングで resume することで、コールバックの世界と await の世界がつながります。
+- 手順: `withCheckedContinuation { continuation in ... }` … ここで async 関数が中断する。
+- 手順: クロージャの中で従来のAPIを呼ぶ。
+- 手順: コールバックが呼ばれたら `continuation.resume(returning: value)` を実行する。
+- 手順: 中断していた load() が再開し、その値を返す。
+- 動く理由: resume が呼ばれるまで await 側は中断したままで、resume の引数がそのまま async 関数の戻り値になります。コールバックと戻り値の橋渡しがこの1行で成立します。
+- よくある間違い: resume を1度も呼ばないと、その処理は永久に再開されません。checked 版なら実行時に警告が出ますが、処理は止まったままです。
+- よくある間違い: resume を2回以上呼ぶとクラッシュします。エラー経路と成功経路の両方で呼んでいないか確認が必要です。
+- よくある間違い: エラーも扱いたい場合は withCheckedThrowingContinuation を使い、`resume(throwing:)` を呼びます。
+- 関連例:
+```swift
+func legacyLoad(completion: @escaping (String) -> Void) { completion("done") }
+func load() async -> String {
+    await withCheckedContinuation { continuation in
+        legacyLoad { value in continuation.resume(returning: value) }
+    }
+}
+print(await load())
+```
+- 関連例の出力: done
+- 関連例の説明: コールバックで受け取った値が、そのまま async 関数の戻り値になっています。
+- 覚えておくこと: continuation は必ず1回だけ resume する。0回は停止、2回はクラッシュ。
+
+### practice-concurrency-035 continuationの再開順を追う [実行追跡 / Lv3 実装]
+対象レッスン: concurrency-continuation
+シリーズ: concurrency-continuation (2段階目)
+スキル: concurrency, debugging
+問題: 次のコードを実行したとき、出力される順番を選んでください。
+正解: 開始 → コールバック → done → 終了
+ヒント1: legacyLoad は呼ばれた時点で「開始」を表示し、その場でコールバックを呼びます。
+ヒント2: resume が呼ばれるまで、load() は中断したままです。
+ヒント3: print(await load()) は、値が返ってきてから実行されます。
+解説: load() を呼ぶと withCheckedContinuation の中で legacyLoad が実行され、まず「開始」が表示されます。legacyLoad はその場でコールバックを呼ぶため「コールバック」が続き、そこで resume が呼ばれて load() が再開します。再開後に返った値が print されて「done」が表示され、最後に「終了」が出ます。resume が呼ばれるまで await 側は止まっているため、「done」が「コールバック」より先に出ることはありません。
+- 使っている考え方: continuation を使うと、コールバックが呼ばれるまで async 関数は中断したままになります。出力順を追うと、中断と再開の関係がはっきり見えます。
+- 手順: `await load()` … withCheckedContinuation に入り、legacyLoad が呼ばれる。
+- 手順: 「開始」が出力される。
+- 手順: コールバックが即座に呼ばれ「コールバック」が出力される。
+- 手順: `resume(returning:)` で load() が再開し、戻り値が print されて「done」。
+- 手順: 最後に「終了」が出力される。
+- 動く理由: resume より前に await 側の処理は進めないため、「done」は必ず「コールバック」より後になります。legacyLoad が同期的にコールバックを呼ぶので、「開始」と「コールバック」も連続します。
+- よくある間違い: コールバックが必ず非同期に呼ばれると考える間違いです。同期的に呼ぶ実装もあり、その場合は出力が連続します。
+- よくある間違い: await の行で先に「終了」まで進むと考える間違いです。await は中断であり、その行より下は再開後に実行されます。
+- 関連例:
+```swift
+func legacyLoad(completion: @escaping (String) -> Void) { print("開始"); completion("done") }
+func load() async -> String {
+    await withCheckedContinuation { c in
+        legacyLoad { v in print("コールバック"); c.resume(returning: v) }
+    }
+}
+print(await load())
+print("終了")
+```
+- 関連例の出力: 開始
+コールバック
+done
+終了
+- 関連例の説明: 中断と再開の順序が、そのまま出力の順序として観察できます。
+- 覚えておくこと: resume されるまで await 側は進まない。出力順が中断と再開を可視化する。
+
+### practice-concurrency-036 同時実行のテストだけが不安定な理由を読む [テスト読解 / Lv4 応用]
+対象レッスン: concurrency-sendable
+シリーズ: concurrency-sendable (3段階目)
+スキル: testing, concurrency, memory
+問題: 単一タスクのテストは通るのに、同時実行のテストだけ結果が毎回変わります。実装のどの点が要件に反していますか。
+正解: 可変状態がクラスに置かれ同期されていないため、同時更新でデータ競合が起きて更新が失われている
+ヒント1: 単一タスクのテストが通っていることから、加算のロジック自体は正しいと分かります。
+ヒント2: 失敗するのは同時に呼んだときだけで、しかも毎回値が違います。
+ヒント3: `value += 1` は読み取り・加算・書き込みの3段階です。途中で他のスレッドが割り込むとどうなるでしょうか。
+解説: 失敗したテストが表しているのは「同時更新でも合計が正確である」という要件です。検証している入力は並行に合計1000回という条件で、単一タスクでは現れない競合状態を狙っています。実装は class の可変プロパティを何の同期もなく更新しており、`value += 1` は「現在値を読む → 1を足す → 書き戻す」の3段階に分かれます。2つのスレッドが同じ値を読んでから書き戻すと、片方の加算が失われるため、合計は1000より小さくなります。失われる回数はタイミング次第なので、結果は毎回変わります。単一タスクのテストが通るのは、割り込みが起こらず3段階が常に完結するためで、ロジックの正しさとは別の話です。修正は Counter を actor にして更新を直列化することです。
+- 使っている考え方: データ競合は「同時に同じメモリを読み書きする」ことで起きます。1行に見える演算でも複数の機械語命令に分かれるため、途中で割り込まれる余地があります。
+- 手順: 要件は「同時に呼ばれても合計が一致すること」。
+- 手順: `value += 1` は読み取り・加算・書き込みの3段階。
+- 手順: 2つのタスクが同じ値を読むと、片方の加算が上書きで失われる。
+- 手順: 失われる回数はタイミング依存なので、結果が毎回変わる。
+- 動く理由: 単一タスクのテストが安定して通ることが、加算そのものやオーバーフローが原因でないことを示しています。差が出ているのは同時実行の有無だけで、それはまさにデータ競合の条件です。
+- よくある間違い: 何度か実行して1000になったことをもって直ったと判断する間違いです。競合は再現しないことがあるだけで、消えてはいません。
+- よくある間違い: テストの期待値を緩める対応です。要件が正確な合計を求めている以上、仕様のほうを壊しています。
+- よくある間違い: increment に async を付けるだけでは競合は解決しません。直列化するのは actor の隔離であって、async という指定ではありません。
+- 関連例:
+```swift
+actor Counter {
+    private(set) var value = 0
+    func increment() { value += 1 }
+}
+let c = Counter()
+await withTaskGroup(of: Void.self) { group in
+    for _ in 1...1000 { group.addTask { await c.increment() } }
+}
+print(await c.value)
+```
+- 関連例の出力: 1000
+- 関連例の説明: actor にすると、1000件を並行に実行しても合計が常に正確になります。
+- 覚えておくこと: 同時実行のときだけ壊れるならデータ競合。共有される可変状態は actor に移す。
 
 ---
