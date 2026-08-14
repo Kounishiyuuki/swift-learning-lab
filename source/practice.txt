@@ -1,6 +1,6 @@
 # 実装練習 (practice)
 
-実装練習 273問。編集元は source/practice.json です。このTXTは生成物です.
+実装練習 300問。編集元は source/practice.json です。このTXTは生成物です.
 
 ## Swift Starter（42問）
 
@@ -9746,5 +9746,1036 @@ print(describe(.failed("通信エラー")))
 失敗: 通信エラー
 - 関連例の説明: 値は case の中にあるため、成功時にだけ items が取り出せます。Optional の判定が不要になります。
 - 覚えておくこと: 排他な状態は enum で表す。値は case に持たせる。
+
+---
+
+## UIKit（27問）
+
+### practice-uikit-001 いちばん小さい画面クラスを並べ替える [並べ替え / Lv1 ガイド]
+対象レッスン: uikit-view-controller
+シリーズ: uikit-vc (1段階目)
+スキル: uikit, syntax
+問題: 背景色を設定するだけの UIViewController です。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+final class HomeViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+    }
+}
+```
+ヒント1: いちばん外側は、UIViewController を継承したクラスの宣言です。
+ヒント2: override したメソッドでは、親クラスの実装を最初に呼ぶのが基本です。
+ヒント3: 自分の処理は、親の処理が終わったあとに書きます。
+解説: 正しい順は「クラス宣言 → viewDidLoad の override → super.viewDidLoad() → 自分の処理 → メソッドを閉じる → クラスを閉じる」です。要点は `super.viewDidLoad()` を最初に呼ぶことです。UIViewController の viewDidLoad には、UIKit が画面を成立させるために行う準備が含まれています。これを呼ばずに自分の処理だけ書くと、親クラスの初期化が行われないまま画面が動くことになり、状況によっては表示やレイアウトが崩れます。自分の処理（`view.backgroundColor` の設定）は、親の処理が終わってからにします。`view` プロパティは viewDidLoad が呼ばれた時点で既に生成されているため、ここで安全にアクセスできます。UIKit の画面は SwiftUI と違い、クラスを継承して作り、決められたタイミングのメソッドを override して処理を書き込む形になります。
+- 使っている考え方: UIKit の ViewController は「UIKit が決めたタイミングで呼び出されるメソッド」に処理を書き込む形式です。継承と override が基本の道具になります。
+- 手順: `final class HomeViewController: UIViewController {` … UIViewController を継承する。
+- 手順: `override func viewDidLoad() {` … view が読み込まれた直後に呼ばれるメソッドを上書きする。
+- 手順: `super.viewDidLoad()` … 親クラスの準備処理を先に実行する。
+- 手順: `view.backgroundColor = .systemBackground` … 自分の初期設定を行う。
+- 手順: 内側から順にかっこを閉じる。
+- 動く理由: 親の処理が自分の処理より前にあるため、UIKit 側の準備が済んだ状態で view を触れます。view は viewDidLoad の時点で存在するので、背景色の設定も安全に行えます。
+- よくある間違い: `super.viewDidLoad()` を書き忘れる間違いです。ビルドは通りますが、親クラスの準備が行われず不安定になります。
+- よくある間違い: super を自分の処理のあとに呼ぶ間違いです。順序が逆になり、親の処理が自分の設定を上書きすることがあります。
+- よくある間違い: init の中で view を触る間違いです。その時点では view がまだ生成されていません。
+- 関連例:
+```swift
+class Base { func setUp() { print("親の準備") } }
+class Child: Base {
+    override func setUp() {
+        super.setUp()
+        print("自分の設定")
+    }
+}
+Child().setUp()
+```
+- 関連例の出力: 親の準備
+自分の設定
+- 関連例の説明: super を先に呼ぶことで、親が整えた状態の上に自分の処理を重ねられます。
+- 覚えておくこと: override したライフサイクルメソッドでは super を先に呼ぶ。
+
+### practice-uikit-002 ラベルを画面に載せるコードを完成させる [穴埋め / Lv1 ガイド]
+対象レッスン: uikit-view-controller
+シリーズ: uikit-vc (2段階目)
+スキル: uikit, syntax
+問題: ラベルを作って画面に表示します。空欄を埋めてください。
+埋めたあと:
+```swift
+override func viewDidLoad() {
+    super.viewDidLoad()
+    let label = UILabel()
+    label.text = "こんにちは"
+    label.frame = CGRect(x: 20, y: 100, width: 200, height: 30)
+    view.addSubview(label)
+}
+```
+ヒント1: 1つ目は親クラスの同名メソッドを呼ぶ行です。自分自身を呼ぶと無限に繰り返します。
+ヒント2: 2つ目は「この view の子として追加する」という意味のメソッドです。
+ヒント3: UIView の階層に部品を足すメソッド名は、配列に要素を足すメソッド名とは違います。
+解説: 1つ目は `super.viewDidLoad()` です。`super.` を付けずに `viewDidLoad()` と書くと自分自身を再帰的に呼び出すことになり、無限ループでクラッシュします。`super.init()` はイニシャライザの呼び出しなので、ここでは使えません。2つ目は `addSubview` です。UIKit の画面は UIView の入れ子（ビュー階層）で構成されており、`view.addSubview(label)` は「ViewController が持つ root view の子として label を追加する」という意味になります。追加して初めて画面に表示され、タッチイベントの対象にもなります。`append` は配列のメソッドで UIView にはありません。`insert` に近いものとしては `insertSubview(_:at:)` がありますが、これは追加位置を指定する別のメソッドで、単純に末尾へ追加する場合は addSubview を使います。
+- 使っている考え方: UIKit の画面は「UIView の木構造」です。部品は作っただけでは表示されず、親の view に追加されて初めてこの木に参加します。
+- 手順: `super.viewDidLoad()` … 親クラスの準備を先に実行する。
+- 手順: `UILabel()` … 部品を生成する。この時点ではどこにも属していない。
+- 手順: `label.text` / `label.frame` … 中身と位置・大きさを設定する。
+- 手順: `view.addSubview(label)` … ビュー階層に追加し、画面に現れるようにする。
+- 動く理由: super を正しく呼び、部品をビュー階層に追加しているため、ラベルが画面に表示されます。frame で位置と大きさが決まっているので、Auto Layout を使わなくても表示されます。
+- よくある間違い: addSubview を忘れる間違いです。コードは正常に動きますが、画面には何も出ません。
+- よくある間違い: `super.` を付け忘れて `viewDidLoad()` と書く間違いです。再帰呼び出しでスタックが溢れて落ちます。
+- よくある間違い: frame も制約も設定しない間違いです。大きさが 0 になり、追加しても見えません。
+- 関連例:
+```swift
+final class Node { var children: [String] = [] }
+let root = Node()
+let label = "UILabel"
+print("追加前:", root.children)
+root.children.append(label)
+print("追加後:", root.children)
+```
+- 関連例の出力: 追加前: []
+追加後: ["UILabel"]
+- 関連例の説明: addSubview がやっているのは、この木への追加です。作っただけでは木に入りません。
+- 覚えておくこと: 部品は addSubview でビュー階層に追加して初めて表示される。
+
+### practice-uikit-003 ボタンを画面に載せる1行を書く [記述 / Lv1 ガイド]
+対象レッスン: uikit-view-controller
+スキル: uikit, syntax
+問題: 既に作った button を、ViewController の画面に表示させる1行を書いてください。
+想定する書き方: view.addSubview(button)
+ヒント1: ViewController が持っている root view のプロパティ名は view です。
+ヒント2: 部品を子として追加するメソッドを、その view に対して呼びます。
+ヒント3: 引数は追加したい部品そのものです。
+解説: `view.addSubview(button)` と書きます。`view` は UIViewController が持つ root view で、画面全体を覆う UIView です。`addSubview(_:)` はその view の子として引数の部品を追加するメソッドで、これを呼んだ時点で button がビュー階層に入り、画面に表示されるようになります。表示だけでなく、タッチイベントの伝達もビュー階層をたどって行われるため、追加していないボタンはタップにも反応しません。frame は既に設定済みなので、位置と大きさは決まっています。もし frame も制約も設定していなければ、大きさが 0×0 になり、addSubview しても見えません。「作る」「設定する」「階層に追加する」の3段階がそろって初めて画面に現れる、という点が UIKit の基本です。
+- 使っている考え方: UIView は親子関係を持つ木構造です。addSubview は子を追加する操作で、表示・レイアウト・タッチ判定のすべてがこの木を基準に行われます。
+- 手順: `UIButton(type: .system)` … 部品を生成する。まだ木に属していない。
+- 手順: `setTitle` / `frame` … 見た目と配置を設定する。
+- 手順: `view.addSubview(button)` … root view の子として木に加える。
+- 手順: 木に加わったことで、描画とタッチ判定の対象になる。
+- 動く理由: ViewController の view を親として addSubview を呼ぶことで、button が画面のビュー階層に入ります。frame が設定済みなので、そのまま指定位置に表示されます。
+- よくある間違い: `self.addSubview(button)` と書く間違いです。UIViewController 自身は UIView ではないため、このメソッドを持ちません。
+- よくある間違い: addSubview を viewDidLoad より前（init 内）で呼ぶ間違いです。view がまだ生成されておらず、意図しないタイミングで生成されます。
+- よくある間違い: 同じ部品を2回 addSubview する間違いです。移動として扱われ、階層内の順序が変わります。
+- 関連例:
+```swift
+final class View2 { var subviews: [String] = []
+    func addSubview(_ v: String) { subviews.append(v) } }
+let root = View2()
+root.addSubview("UIButton")
+print(root.subviews)
+```
+- 関連例の出力: ["UIButton"]
+- 関連例の説明: addSubview は親の子リストへの追加です。これによって描画対象になります。
+- 覚えておくこと: view.addSubview(部品) でビュー階層に追加する。
+
+### practice-uikit-004 viewはいつ作られるかを追う [実行追跡 / Lv1 ガイド]
+対象レッスン: uikit-view-controller
+スキル: uikit, debugging
+問題: ViewController を生成しただけで、まだ画面には出していません。このとき何が起きますか。
+正解: vc.view にアクセスした時点で view が生成され、viewDidLoad が呼ばれてから背景色が設定される
+ヒント1: UIViewController の view は、必要になった時点で作られます。
+ヒント2: 「必要になった時点」とは、そのプロパティが初めて読まれたときです。
+ヒント3: viewDidLoad の名前が示すとおり、view が読み込まれた直後に呼ばれます。
+解説: `vc.view` にアクセスした時点で view が生成され、その直後に viewDidLoad が呼ばれ、そのあとで背景色が設定されます。UIViewController の view は遅延読み込み（lazy loading）で、イニシャライザの時点ではまだ存在しません。プロパティが初めて読まれたとき、UIKit が loadView を実行して view を生成し、続けて viewDidLoad を呼びます。この仕組みがあるおかげで、画面遷移の候補として ViewController を大量に作っても、実際に表示されるまでメモリを消費しません。逆に言えば、意図せず `vc.view` に触れると、まだ表示していない画面の viewDidLoad が走ってしまいます。生成直後に設定を渡したい場合は、view を触るのではなくプロパティに値を入れておき、viewDidLoad の中で反映するのが正しい順序です。view が nil になることはなく、アクセスすれば必ず生成されます。
+- 使っている考え方: UIViewController の view は遅延生成されます。「いつ生成されるか」は「いつ最初にアクセスされるか」で決まり、表示のタイミングとは別です。
+- 手順: `HomeViewController()` … インスタンスは生成されるが view はまだない。
+- 手順: `print("生成した")` … この時点でも view は未生成。
+- 手順: `vc.view` … アクセスにより loadView が実行され、view が生成される。
+- 手順: 続けて viewDidLoad が呼ばれる。
+- 手順: その後、`backgroundColor = .red` が適用される。
+- 動く理由: view は Optional ではなく、アクセス時に必ず生成されます。したがって nil によるクラッシュも、設定が無視されることもありません。生成のきっかけはアクセスそのものです。
+- よくある間違い: 生成直後に `vc.view` を触って初期設定する間違いです。表示前に viewDidLoad が走り、想定と違う順序になります。
+- よくある間違い: 「view が nil かもしれない」と考えて Optional として扱う間違いです。view は非Optionalで、アクセスすれば生成されます。
+- よくある間違い: 遷移先の ViewController を大量に事前生成し、それぞれの view に触る間違いです。全画面ぶんのメモリを先に確保することになります。
+- 関連例:
+```swift
+final class VC {
+    private var _view: String?
+    var view: String {
+        if _view == nil { _view = "UIView"; print("viewDidLoad") }
+        return _view!
+    }
+}
+let vc = VC()
+print("生成した")
+print("背景色を設定:", vc.view)
+```
+- 関連例の出力: 生成した
+viewDidLoad
+背景色を設定: UIView
+- 関連例の説明: アクセス時に初めて生成され、そのタイミングで viewDidLoad にあたる処理が走ります。
+- 覚えておくこと: view はアクセスした瞬間に生成され、viewDidLoad が呼ばれる。
+
+### practice-uikit-005 画面表示までの呼び出し順に並べ替える [並べ替え / Lv2 基本]
+対象レッスン: uikit-lifecycle
+シリーズ: uikit-lifecycle (1段階目)
+スキル: uikit
+問題: ViewController が画面に現れるまでに呼ばれるメソッドを、実際に呼ばれる順に並べ替えてください。
+正解の並び:
+```swift
+loadView()
+viewDidLoad()
+viewWillAppear(_:)
+viewDidLayoutSubviews()
+viewDidAppear(_:)
+```
+ヒント1: まず view そのものが作られ、次にその読み込み完了が通知されます。
+ヒント2: レイアウトの計算は、画面に現れる直前の通知よりあとに行われます。
+ヒント3: 表示が完了したことを伝えるメソッドが最後です。
+解説: 正しい順は loadView → viewDidLoad → viewWillAppear → viewDidLayoutSubviews → viewDidAppear です。まず `loadView()` が view そのものを生成します。次に `viewDidLoad()` が呼ばれ、ここは view が生成された直後で画面ごとに1回しか呼ばれないため、部品の生成や制約の設定などの初期化に使います。`viewWillAppear(_:)` は表示されるたびに呼ばれるので、他画面から戻ってきたときの再読み込みなどに使います。この時点ではまだレイアウトが確定していない点が重要で、view の frame は最終的な値とは限りません。`viewDidLayoutSubviews()` でレイアウト計算が完了し、frame が確定します。角丸の半径を高さから計算するような処理はここで行います。最後に `viewDidAppear(_:)` が呼ばれ、アニメーションの開始や画面表示の計測など、完全に表示されてからでよい処理に使います。
+- 使っている考え方: ライフサイクルメソッドは「何が確定しているか」で使い分けます。viewDidLoad では部品の存在が、viewDidLayoutSubviews ではサイズが、viewDidAppear では表示完了が保証されます。
+- 手順: `loadView()` … view を生成する。通常は override しない。
+- 手順: `viewDidLoad()` … 1回だけ。部品の生成と制約の設定を行う。
+- 手順: `viewWillAppear(_:)` … 表示のたびに。データの再読み込みなど。
+- 手順: `viewDidLayoutSubviews()` … frame が確定。サイズに依存する計算をここで行う。
+- 手順: `viewDidAppear(_:)` … 表示完了。アニメーションや計測を開始する。
+- 動く理由: 生成 → 読み込み完了 → 表示直前 → レイアウト確定 → 表示完了という因果関係がそのまま順序になっています。各段階で確定している情報が増えていきます。
+- よくある間違い: viewDidLoad で frame を使って計算する間違いです。この時点のサイズは仮の値で、実機の画面サイズとは異なります。
+- よくある間違い: viewWillAppear に部品の生成を書く間違いです。表示のたびに呼ばれるため、画面を往復すると部品が重複します。
+- よくある間違い: viewDidLayoutSubviews に重い処理を書く間違いです。回転やキーボード表示など、何度も呼ばれます。
+- 関連例:
+```swift
+let order = ["loadView", "viewDidLoad", "viewWillAppear", "viewDidLayoutSubviews", "viewDidAppear"]
+for (i, name) in order.enumerated() { print(i + 1, name) }
+```
+- 関連例の出力: 1 loadView
+2 viewDidLoad
+3 viewWillAppear
+4 viewDidLayoutSubviews
+5 viewDidAppear
+- 関連例の説明: この順序を覚えておくと、「なぜここでは frame が正しくないのか」がすぐ説明できます。
+- 覚えておくこと: 初期化は viewDidLoad、サイズ依存の計算は viewDidLayoutSubviews。
+
+### practice-uikit-006 ライフサイクルメソッドと処理を対応づける [対応づけ / Lv2 基本]
+対象レッスン: uikit-lifecycle
+シリーズ: uikit-lifecycle (2段階目)
+スキル: uikit, architecture
+問題: 処理内容と、それを書くべきライフサイクルメソッドを対応づけてください。
+対応:
+- ラベルとボタンを生成して addSubview する → viewDidLoad
+- 他画面から戻るたびに一覧を再取得する → viewWillAppear
+- ボタンの高さの半分を角丸半径に設定する → viewDidLayoutSubviews
+- 画面が隠れたら動画の再生を止める → viewDidDisappear
+ヒント1: 1回だけ行いたい処理と、表示のたびに行いたい処理を分けて考えます。
+ヒント2: サイズに依存する計算は、サイズが確定したあとでなければ正しくできません。
+ヒント3: 後始末は、画面が見えなくなったことが確定してから行います。
+解説: 部品の生成と addSubview は画面ごとに1回でよいので `viewDidLoad` に書きます。表示のたびに呼ばれるメソッドに書くと、画面を往復するたびに部品が重複して追加されます。他画面から戻るたびの再取得は `viewWillAppear` です。viewDidLoad は最初の1回しか呼ばれないため、戻ってきたときには実行されません。角丸半径をボタンの高さから計算する処理は `viewDidLayoutSubviews` に書きます。viewDidLoad の時点では frame が確定しておらず、Auto Layout の計算前なので高さが仮の値になり、意図しない角丸になります。動画の停止は `viewDidDisappear` で、画面が完全に見えなくなってから止めます。`init(coder:)` は Storyboard から生成されるときのイニシャライザで、この時点では view も部品も存在しないため、どの処理にも使えません。
+- 使っている考え方: 「何回呼ばれるか」と「何が確定しているか」の2つの軸で使い分けます。1回きりか毎回か、サイズが確定しているかしていないか、という判断です。
+- 手順: 1回だけ・view は存在する → viewDidLoad（部品の生成）。
+- 手順: 毎回・表示直前 → viewWillAppear（データの再取得）。
+- 手順: サイズ確定後 → viewDidLayoutSubviews（サイズ依存の計算）。
+- 手順: 非表示確定後 → viewDidDisappear（再生停止などの後始末）。
+- 動く理由: 4つの処理はそれぞれ必要とする条件が異なり、その条件を最初に満たすメソッドが1つに決まります。init(coder:) はどの条件も満たしません。
+- よくある間違い: viewWillAppear に部品の生成を書く間違いです。画面を往復するたびに部品が積み重なります。
+- よくある間違い: viewDidLoad で角丸を設定する間違いです。frame が仮の値なので、実際の高さと合わない半径になります。
+- よくある間違い: viewWillDisappear で再生を止める間違いです。遷移をキャンセルして戻った場合にも止まってしまいます。
+- 関連例:
+```swift
+var subviewCount = 0
+func viewDidLoad() { subviewCount += 1 }
+func viewWillAppear() { /* 再取得のみ */ }
+viewDidLoad()
+for _ in 1...3 { viewWillAppear() }
+print("部品の数:", subviewCount)
+```
+- 関連例の出力: 部品の数: 1
+- 関連例の説明: 3回表示しても部品は1つのままです。生成を viewWillAppear に書くと4つになります。
+- 覚えておくこと: 1回だけは viewDidLoad、毎回は viewWillAppear、サイズ依存は viewDidLayoutSubviews。
+
+### practice-uikit-007 戻るたびに通知が二重になる原因を見つける [バグ発見 / Lv2 基本]
+対象レッスン: uikit-lifecycle
+スキル: uikit, debugging, memory
+問題: 他画面から戻るたびに、通知を受け取る回数が1回ずつ増えていきます。原因となっている行を1つ選んでください。
+問題のある行:     NotificationCenter.default.addObserver(self, selector: #selector(reload), name: .dataChanged, object: nil)
+ヒント1: viewWillAppear は表示のたびに呼ばれます。何回呼ばれても問題ない処理はどれでしょうか。
+ヒント2: オブザーバの登録は、同じ相手を何度でも重複して登録できてしまいます。
+ヒント3: 再読み込みは何度実行しても結果が同じですが、登録は実行のたびに増えます。
+解説: 問題は3行目で、オブザーバの登録を `viewWillAppear` に書いていることです。viewWillAppear は画面が表示されるたびに呼ばれるため、他画面へ進んで戻ってくるたびに同じオブザーバが追加登録されます。NotificationCenter は同じ組み合わせでも重複登録を弾かないので、登録が2件、3件と増え、通知が来るたびに reload が複数回実行されます。表示上のちらつきだけでなく、reload が通信を伴う場合は同じリクエストが何度も飛ぶことになります。修正は、登録を1回しか呼ばれない `viewDidLoad` に移すことです。4行目の `tableView.reloadData()` も表示のたびに実行されますが、これは何度呼んでも結果が同じ（冪等な）処理なので、viewWillAppear に置いて問題ありません。1〜2行目のメソッド宣言と super の呼び出しも正しい形です。
+- 使っている考え方: ライフサイクルメソッドに処理を書くときは「何度呼ばれても大丈夫か」を判断基準にします。累積する処理は1回だけ呼ばれる場所に置きます。
+- 手順: 画面Aを表示 → viewWillAppear → オブザーバ1件目を登録。
+- 手順: 画面Bへ遷移 → 画面Aは残ったまま、登録も残る。
+- 手順: 画面Aへ戻る → viewWillAppear → オブザーバ2件目を登録。
+- 手順: 通知が1回来ると reload が2回実行される。
+- 手順: 登録を viewDidLoad へ移すと、何度往復しても1件のまま。
+- 動く理由: 登録は累積する処理なので1回だけ呼ばれる場所に置く必要があり、再読み込みは冪等なので毎回呼ばれても問題ありません。この使い分けが症状と正確に対応しています。
+- よくある間違い: viewWillDisappear で removeObserver して対処する間違いです。動きますが、画面が隠れている間に通知を受け取れなくなります。
+- よくある間違い: 登録の前に「既に登録済みか」を自前のフラグで管理する間違いです。状態が増え、遷移の組み合わせで漏れます。
+- よくある間違い: reload を viewDidLoad に移してしまう間違いです。戻ってきたときにデータが更新されなくなります。
+- 関連例:
+```swift
+var observers = 0
+func viewWillAppear() { observers += 1 }
+for _ in 1...3 { viewWillAppear() }
+print("往復3回後の登録数:", observers)
+print("通知1回で reload が走る回数:", observers)
+```
+- 関連例の出力: 往復3回後の登録数: 3
+通知1回で reload が走る回数: 3
+- 関連例の説明: 登録数がそのまま実行回数になります。画面を往復するほど症状が悪化します。
+- 覚えておくこと: 累積する登録処理は viewDidLoad。冪等な更新は viewWillAppear。
+
+### practice-uikit-008 画面を往復したときの呼び出しを追う [実行追跡 / Lv3 実装]
+対象レッスン: uikit-lifecycle
+スキル: uikit, debugging
+問題: 画面A から画面B へ push し、戻るボタンで A に戻りました。A の viewDidLoad と viewWillAppear はそれぞれ何回呼ばれますか（A の初回表示から数えます）。
+正解: viewDidLoad は1回、viewWillAppear は2回
+ヒント1: push しても、元の画面のインスタンスは破棄されません。
+ヒント2: viewDidLoad は view が読み込まれたときに呼ばれます。読み込みは何回起きるでしょうか。
+ヒント3: viewWillAppear は「表示されようとしている」たびに呼ばれます。
+解説: viewDidLoad は1回、viewWillAppear は2回呼ばれます。`pushViewController` は画面A のインスタンスをナビゲーションスタックに残したまま、その上に画面B を積みます。A は破棄されず、view も読み込まれたまま保持されるため、戻ってきても view を再生成する必要がなく、viewDidLoad は呼ばれません。一方 viewWillAppear は「この画面がこれから表示される」というタイミングで毎回呼ばれるので、初回表示で1回、B から戻ったときにもう1回、合計2回です。この違いが、初期化を viewDidLoad に、再取得を viewWillAppear に書き分ける理由です。なお、メモリ不足の警告を受けて view が破棄された場合には、再表示時に viewDidLoad が再び呼ばれ得ますが、通常の push と pop の往復では起きません。
+- 使っている考え方: ナビゲーションスタックは ViewController を積み重ねる構造です。上に積まれた画面が表示されている間も、下の画面はインスタンスごと生き続けます。
+- 手順: A を表示 → view が生成される → viewDidLoad（1回目） → viewWillAppear（1回目）。
+- 手順: B を push → A は破棄されずスタックに残る → A の viewWillDisappear が呼ばれる。
+- 手順: 戻る → B が破棄される → A の viewWillAppear（2回目）。
+- 手順: A の view は保持されたままなので viewDidLoad は呼ばれない。
+- 動く理由: view の読み込みは1回きり、表示は往復のたびに起きるという性質の違いが、そのまま呼び出し回数の違いになります。
+- よくある間違い: 戻るたびに viewDidLoad が呼ばれると考える間違いです。この誤解のまま再取得を viewDidLoad に書くと、戻ってもデータが更新されません。
+- よくある間違い: push で前の画面が破棄されると考える間違いです。実際は残るため、前の画面が保持しているリソースも解放されません。
+- よくある間違い: 戻る操作で B が必ず破棄されると仮定してリソース解放を怠る間違いです。B が他から参照されていると破棄されません。
+- 関連例:
+```swift
+var didLoad = 0, willAppear = 0
+func show(firstTime: Bool) {
+    if firstTime { didLoad += 1 }
+    willAppear += 1
+}
+show(firstTime: true)
+show(firstTime: false)
+print("viewDidLoad:", didLoad, "viewWillAppear:", willAppear)
+```
+- 関連例の出力: viewDidLoad: 1 viewWillAppear: 2
+- 関連例の説明: 初回だけ実行される処理と毎回実行される処理の違いが、この2つの数字になります。
+- 覚えておくこと: push で前の画面は残る。viewDidLoad は1回、viewWillAppear は毎回。
+
+### practice-uikit-009 ラベルを画面中央に置く制約を組み立てる [関数組み立て / Lv2 基本]
+対象レッスン: uikit-autolayout
+シリーズ: uikit-autolayout (1段階目)
+スキル: uikit
+問題: label を親 view の中央に配置します。必要なブロックだけを正しい順に選んでください。
+正解の並び:
+```swift
+view.addSubview(label)
+label.translatesAutoresizingMaskIntoConstraints = false
+NSLayoutConstraint.activate([
+    label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+    label.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+])
+```
+ヒント1: 制約を張る前に、対象を同じビュー階層に入れておく必要があります。
+ヒント2: 自動生成される制約を止めないと、自分で書いた制約と衝突します。
+ヒント3: frame や autoresizingMask による指定は、Auto Layout と併用しません。
+解説: 必要なのは addSubview、`translatesAutoresizingMaskIntoConstraints = false`、activate の開始、2本の制約、閉じかっこの6ブロックです。順序の要点は2つあります。1つ目は addSubview を先に行うことです。制約は2つの view の関係を表すため、両方が同じビュー階層に属していないと実行時に例外が発生します。2つ目は `translatesAutoresizingMaskIntoConstraints = false` です。既定では UIKit が frame と autoresizingMask から制約を自動生成しますが、自分で制約を書く場合はこれが衝突します。false にしておかないと、位置とサイズを二重に指定した状態になり、コンソールに制約競合の警告が出て意図しない配置になります。`frame` の設定と `autoresizingMask` の設定は、まさにその自動生成の元になる指定なので、Auto Layout を使う場合には書きません。
+- 使っている考え方: Auto Layout は「どこに置くか」ではなく「何との関係でどこに置くか」を宣言する仕組みです。関係を記述するには、両方の view が同じ階層にいる必要があります。
+- 手順: `view.addSubview(label)` … 同じビュー階層に入れ、制約を張れる状態にする。
+- 手順: `translatesAutoresizingMaskIntoConstraints = false` … 自動生成される制約を止める。
+- 手順: `NSLayoutConstraint.activate([...])` … 複数の制約をまとめて有効化する。
+- 手順: `centerXAnchor` / `centerYAnchor` … 水平・垂直の中心を親と一致させる。
+- 手順: サイズは UILabel の内容から自動的に決まるため、指定不要。
+- 動く理由: 階層への追加、自動制約の無効化、制約の有効化という3つの前提が順番どおりにそろっています。中央の2本だけで位置が決まり、大きさは内容から決まるため過不足がありません。
+- よくある間違い: `translatesAutoresizingMaskIntoConstraints = false` を忘れる間違いです。制約競合の警告が出て、意図しない位置に表示されます。
+- よくある間違い: addSubview の前に制約を張る間違いです。共通の祖先がないため実行時に例外が発生します。
+- よくある間違い: `isActive = true` を書き忘れる間違いです。制約は作っただけでは効かず、有効化が必要です。
+- 関連例:
+```swift
+struct Anchor { let name: String }
+func constraint(_ a: Anchor, equalTo b: Anchor) -> String { "\(a.name) == \(b.name)" }
+let cs = [constraint(Anchor(name: "label.centerX"), equalTo: Anchor(name: "view.centerX")),
+          constraint(Anchor(name: "label.centerY"), equalTo: Anchor(name: "view.centerY"))]
+cs.forEach { print($0) }
+```
+- 関連例の出力: label.centerX == view.centerX
+label.centerY == view.centerY
+- 関連例の説明: 制約は等式です。2本の等式で中心が一致し、位置が一意に決まります。
+- 覚えておくこと: 追加 → 自動制約を切る → 制約を有効化、の順。frame とは併用しない。
+
+### practice-uikit-010 制約が効かず左上に固まる原因を見つける [バグ発見 / Lv3 実装]
+対象レッスン: uikit-autolayout
+シリーズ: uikit-autolayout (2段階目)
+スキル: uikit, debugging
+問題: 制約を書いたのに、ボタンが画面の左上に小さく表示され、コンソールに制約競合の警告が出ます。原因となっている行を1つ選んでください。
+問題のある行: button.translatesAutoresizingMaskIntoConstraints = true
+ヒント1: 制約自体は正しく書かれ、有効化もされています。
+ヒント2: 「競合」ということは、別の制約がどこかから来ているということです。
+ヒント3: frame から制約を自動生成する仕組みが、まだ有効なままです。
+解説: 問題は3行目で、`translatesAutoresizingMaskIntoConstraints` を `true` のままにしていることです。これが true だと、UIKit はその view の frame と autoresizingMask から制約を自動生成します。button の frame は初期値の `CGRect.zero` なので、「幅0・高さ0で左上（0,0）に固定」という制約が作られます。そこへ自分で書いた中央揃えの制約が加わるため、位置について矛盾する指定が同時に存在することになり、Auto Layout エンジンが競合を検出して警告を出し、片方を無効化します。多くの場合、自動生成された制約のほうが必須（required）の優先度で残るため、ボタンは左上に0サイズで表示されます。修正は false にすることで、自動生成が止まり、自分で書いた制約だけが効くようになります。2行目の addSubview、4〜7行目の制約はいずれも正しく、原因ではありません。
+- 使っている考え方: `translatesAutoresizingMaskIntoConstraints` は「frame ベースのレイアウトと Auto Layout のどちらを使うか」を切り替えるフラグです。両方を同時に有効にすると必ず競合します。
+- 手順: true のとき、UIKit が frame から制約を自動生成する。
+- 手順: button の frame は .zero なので「幅0・高さ0・左上固定」という制約になる。
+- 手順: 自分で書いた centerX / centerY の制約が追加される。
+- 手順: 位置についての指定が2組あり、矛盾するため競合として検出される。
+- 手順: false にすると自動生成が止まり、自分の制約だけが残る。
+- 動く理由: 制約自体は正しいのに位置が反映されていないという症状は、「別の制約に負けている」ことを示します。その別の制約の出どころがこのフラグです。
+- よくある間違い: 制約の優先度を下げて警告を消す対応です。警告は消えますが、自動生成された制約が勝つため位置は直りません。
+- よくある間違い: frame も一緒に設定して両立させようとする間違いです。frame は自動生成の元になるだけで、競合が解消しません。
+- よくある間違い: Storyboard で配置した view にも false を設定する間違いです。Storyboard 側は既に false になっており、不要です。
+- 関連例:
+```swift
+let autoGenerated = ["x == 0", "y == 0", "width == 0", "height == 0"]
+let manual = ["centerX == parent.centerX", "centerY == parent.centerY"]
+print("true のとき有効な制約:", autoGenerated + manual, "→ 競合")
+print("false のとき有効な制約:", manual, "→ 競合なし")
+```
+- 関連例の出力: true のとき有効な制約: ["x == 0", "y == 0", "width == 0", "height == 0", "centerX == parent.centerX", "centerY == parent.centerY"] → 競合
+false のとき有効な制約: ["centerX == parent.centerX", "centerY == parent.centerY"] → 競合なし
+- 関連例の説明: フラグ1つで有効な制約の集合が変わります。競合の原因は見えないところで作られた制約です。
+- 覚えておくこと: コードで制約を書くなら translatesAutoresizingMaskIntoConstraints = false。
+
+### practice-uikit-011 書いたのに効かない制約を直す [修正 / Lv3 実装]
+対象レッスン: uikit-autolayout
+シリーズ: uikit-autolayout (3段階目)
+スキル: uikit, debugging
+問題: 制約を作るコードを書きましたが、レイアウトにまったく反映されません。修正として最も適切なものを選んでください。
+正解: imageView.translatesAutoresizingMaskIntoConstraints = false
+view.addSubview(imageView)
+
+NSLayoutConstraint.activate([
+    imageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+    imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+    imageView.heightAnchor.constraint(equalToConstant: 120)
+])
+ヒント1: constraint(equalTo:) が返しているものは何でしょうか。それは何かに使われていますか。
+ヒント2: 制約は作った時点では無効で、明示的に有効化する必要があります。
+ヒント3: 再レイアウトを促しても、有効な制約が1本もなければ何も変わりません。
+解説: 問題は、`constraint(equalTo:)` が NSLayoutConstraint のインスタンスを返しているだけで、それを有効化していないことです。制約は生成しただけでは無効な状態で、`isActive = true` にするか `NSLayoutConstraint.activate(_:)` に渡すことで初めてレイアウトに参加します。このコードは戻り値を捨てているため、実質的に何もしていません（コンパイラの「戻り値未使用」の警告が唯一の手がかりになります）。修正は3本の制約を `NSLayoutConstraint.activate([...])` にまとめて渡すことです。複数の制約をまとめて有効化すると、レイアウト計算が1回で済むため個別に isActive を立てるより効率的です。o2 のようにフラグを true に戻すと自動生成の制約が加わり、状況が悪化します。o3 の `setNeedsLayout()` は再計算を促すだけで、有効な制約が1本もない状態では結果が変わりません。o4 は Auto Layout をやめて frame に戻す案で、`translatesAutoresizingMaskIntoConstraints = false` のままなので frame の指定も効かず、サイズが0のままになります。
+- 使っている考え方: NSLayoutConstraint は「関係を表す値」です。値として存在することと、レイアウトエンジンに登録されていることは別で、後者には有効化が必要です。
+- 手順: `constraint(equalTo:)` … NSLayoutConstraint を生成して返す。この時点では無効。
+- 手順: 戻り値を使わずに捨てているため、どこにも登録されていない。
+- 手順: `NSLayoutConstraint.activate([...])` … 配列内の制約をまとめて有効化する。
+- 手順: 有効化された制約だけがレイアウト計算に参加する。
+- 動く理由: 不足していたのは有効化だけなので、制約の内容を変えずに activate で包むだけで意図どおりに動きます。まとめて渡すため計算も1回で済みます。
+- よくある間違い: `isActive = true` の書き忘れです。コンパイルは通り、警告も見落としやすいため気づきにくい不具合です。
+- よくある間違い: 制約を変数に代入して満足する間違いです。代入しても有効化しなければレイアウトには影響しません。
+- よくある間違い: 効かないからと frame を併用する間違いです。translatesAutoresizingMaskIntoConstraints が false のため frame も無視されます。
+- 関連例:
+```swift
+struct Constraint { let text: String; var isActive = false }
+var all = [Constraint(text: "top == 16"), Constraint(text: "height == 120")]
+print("有効な制約:", all.filter(\.isActive).count)
+for i in all.indices { all[i].isActive = true }
+print("activate 後:", all.filter(\.isActive).count)
+```
+- 関連例の出力: 有効な制約: 0
+activate 後: 2
+- 関連例の説明: 生成した数と有効な数は別です。0本のままではレイアウトは何も変わりません。
+- 覚えておくこと: 制約は作るだけでは効かない。activate か isActive = true で有効化する。
+
+### practice-uikit-012 上端を安全領域に合わせる制約を書く [記述 / Lv2 基本]
+対象レッスン: uikit-autolayout
+スキル: uikit
+問題: headerView の上端を、親 view の安全領域の上端にぴったり合わせる制約を1つ書いてください（有効化はまだ不要で、制約の式だけを書きます）。
+想定する書き方: headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)
+ヒント1: 上端を表すアンカーの名前を使います。下端や中心ではありません。
+ヒント2: 親 view の上端そのものではなく、安全領域を表すレイアウトガイドの上端に合わせます。
+ヒント3: ぴったり合わせるので、定数（constant）の指定は不要です。
+解説: `headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)` と書きます。`topAnchor` は view の上端を表すアンカーで、`constraint(equalTo:)` で別のアンカーと一致させる制約を作ります。ここで `view.topAnchor` ではなく `view.safeAreaLayoutGuide.topAnchor` を使う点が重要です。`view.topAnchor` は画面の物理的な上端を指すため、ノッチやDynamic Island、ステータスバーの下に部品が潜り込んで隠れてしまいます。`safeAreaLayoutGuide` はそれらを避けた「安全に表示できる領域」を表し、その topAnchor に合わせることで、端末やステータスバーの状態が変わっても常に見える位置に配置されます。安全領域の大きさは端末や向きによって変わりますが、レイアウトガイドを使っていれば自動的に追従するため、端末ごとの分岐を書く必要がありません。
+- 使っている考え方: レイアウトガイドは「実体のない、制約を張るための基準」です。safeAreaLayoutGuide は端末のノッチやホームインジケータを避けた領域を表します。
+- 手順: `headerView.topAnchor` … 自分の上端を表すアンカー。
+- 手順: `constraint(equalTo:)` … 相手のアンカーと一致させる制約を生成する。
+- 手順: `view.safeAreaLayoutGuide.topAnchor` … 安全領域の上端。
+- 手順: 端末や向きが変わると安全領域も変わり、制約が自動で追従する。
+- 動く理由: 上端どうしを等しくする制約なので constant は不要で、基準に安全領域を選んでいるため、どの端末でもコンテンツが隠れません。
+- よくある間違い: `view.topAnchor` に合わせる間違いです。ノッチやステータスバーの下に隠れます。
+- よくある間違い: 端末ごとに constant で 44 や 59 を指定する間違いです。新しい端末が出るたびに値が合わなくなります。
+- よくある間違い: safeAreaInsets を viewDidLoad で読んで計算する間違いです。この時点ではまだ確定していません。
+- 関連例:
+```swift
+let deviceTopInset: [String: Double] = ["SE": 20, "15 Pro": 59]
+for (name, inset) in deviceTopInset.sorted(by: { $0.key < $1.key }) {
+    print("\(name): safeArea.top = \(inset)")
+}
+print("制約は数値を書かないため、どちらにも追従する")
+```
+- 関連例の出力: 15 Pro: safeArea.top = 59.0
+SE: safeArea.top = 20.0
+制約は数値を書かないため、どちらにも追従する
+- 関連例の説明: 数値は端末ごとに違います。ガイドに合わせておけば、その違いを自分で扱う必要がありません。
+- 覚えておくこと: 上下の基準は safeAreaLayoutGuide に合わせる。数値でノッチを避けない。
+
+### practice-uikit-013 横幅いっぱいのカードを配置する制約を選ぶ [ブロック選択 / Lv2 基本]
+対象レッスン: uikit-autolayout
+スキル: uikit
+問題: cardView を、安全領域の上端から16、左右に16の余白をとって配置し、高さを200にします。必要なブロックだけを正しい順に選んでください。不要なブロックが混ざっています。
+使うブロック:
+- NSLayoutConstraint.activate([
+-     cardView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+-     cardView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+-     cardView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+-     cardView.heightAnchor.constraint(equalToConstant: 200)
+- ])
+ヒント1: 左右の余白を制約で表すと、幅を数値で指定する必要はなくなります。
+ヒント2: trailing は右方向が正なので、内側へ寄せるときの符号に注意します。
+ヒント3: 特定の端末幅を前提にした固定値は、他の端末で崩れます。
+解説: 必要なのは activate の開始、上端・左・右・高さの4本の制約、閉じかっこの6ブロックです。要点は右端の符号です。`trailingAnchor` は右方向が正なので、`constant: -16` と書くことで親の右端から16だけ内側に入ります。`constant: 16` と書くと親の右端より16はみ出す制約になり、画面外へ飛び出します。この符号は leading（左）とは逆になるため、UIKit で最も間違えやすい点の1つです。また、左右の制約を張れば幅は自動的に決まるため、`widthAnchor.constraint(equalToConstant: 343)` は不要です。343 は特定の端末の画面幅から余白を引いた値であり、別の端末や画面分割では合いません。固定幅と左右の制約を両方指定すると制約が過剰になり、競合の警告が出ます。高さについては上下どちらか一方しか指定していないので、`heightAnchor` による指定が必要です。
+- 使っている考え方: Auto Layout では、位置とサイズが一意に決まるだけの制約を過不足なく与えます。左右を固定すれば幅は導かれるため、幅の指定は不要になります。
+- 手順: `topAnchor ... constant: 16` … 安全領域の上端から16下。
+- 手順: `leadingAnchor ... constant: 16` … 親の左端から16右。
+- 手順: `trailingAnchor ... constant: -16` … 親の右端から16左（負の値）。
+- 手順: 左右が決まったので幅は自動的に「画面幅 - 32」になる。
+- 手順: `heightAnchor ... 200` … 高さは制約から導けないので明示する。
+- 動く理由: 水平方向は左右の2本で位置と幅の両方が決まり、垂直方向は上端と高さで決まります。過不足がないため競合も未定義も起きず、どの端末幅でも同じ見た目になります。
+- よくある間違い: trailing に正の 16 を指定する間違いです。右へ16はみ出し、画面外にはみ出た見た目になります。
+- よくある間違い: 左右の制約に加えて幅も固定する間違いです。制約が過剰になり、競合の警告が出ます。
+- よくある間違い: 端末の画面幅を UIScreen から取得して計算する間違いです。画面分割やマルチタスクで値が合いません。
+- 関連例:
+```swift
+let screenWidth = 393.0
+let leading = 16.0
+let trailing = -16.0
+let cardWidth = screenWidth + trailing - leading
+print("画面幅:", screenWidth, "→ カード幅:", cardWidth)
+```
+- 関連例の出力: 画面幅: 393.0 → カード幅: 361.0
+- 関連例の説明: 幅を書かなくても、左右の制約から一意に決まります。画面幅が変われば自動的に追従します。
+- 覚えておくこと: trailing の constant は負。左右を張れば幅の指定は要らない。
+
+### practice-uikit-014 ボタンのタップ処理をつなぐ順に並べ替える [並べ替え / Lv2 基本]
+対象レッスン: uikit-events-delegate
+シリーズ: uikit-delegate (1段階目)
+スキル: uikit
+問題: ボタンがタップされたら saveTapped が呼ばれるようにします。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+let button = UIButton(type: .system)
+button.addTarget(self, action: #selector(saveTapped), for: .touchUpInside)
+view.addSubview(button)
+@objc private func saveTapped() {
+    print("保存")
+}
+```
+ヒント1: ボタンが存在しなければ、それに対して設定を行うことはできません。
+ヒント2: メソッドの定義は、addTarget の呼び出しとは別の場所に書かれる独立した宣言です。
+ヒント3: この問題では、設定してから画面に追加し、最後にメソッド定義を置く形にします。
+解説: 正しい順は「ボタンの生成 → addTarget → addSubview → メソッド定義（宣言・本体・閉じかっこ）」です。`addTarget(_:action:for:)` は Target-Action という UIKit の伝統的な仕組みで、「どのオブジェクトの（target）」「どのメソッドを（action）」「どのイベントで呼ぶか（for）」の3つを登録します。`self` を target に、`#selector(saveTapped)` を action に、`.touchUpInside` をイベントに指定しています。`.touchUpInside` は「ボタンの中で指を離した」という意味で、押したまま外へ指をずらして離した場合は呼ばれません。これが一般的なタップの定義です。呼ばれるメソッドには `@objc` が必要で、これは Objective-C ランタイム経由でメソッドを名前から探して呼び出す仕組みだからです。`@objc` を付け忘れると、コンパイル時ではなく実行時に「そのセレクタが見つからない」というクラッシュになります。
+- 使っている考え方: Target-Action は「イベントが起きたら、この相手のこのメソッドを呼ぶ」という登録です。呼び出しは実行時に名前で解決されるため、@objc による公開が必要になります。
+- 手順: `UIButton(type: .system)` … ボタンを生成する。
+- 手順: `addTarget(self, action:for:)` … 呼び出し先とイベント種別を登録する。
+- 手順: `view.addSubview(button)` … ビュー階層に追加し、タッチを受け取れるようにする。
+- 手順: `@objc private func saveTapped()` … 呼ばれる側のメソッド。@objc が必須。
+- 手順: `.touchUpInside` … ボタン内で指を離したときにだけ発火する。
+- 動く理由: 生成してから設定し、階層に追加するという依存順になっています。メソッド定義は独立した宣言なので、この並びの末尾に置いて構文として成立します。
+- よくある間違い: `@objc` を付け忘れる間違いです。コンパイルは通り、タップした瞬間に「unrecognized selector」で落ちます。
+- よくある間違い: `.touchDown` を使う間違いです。指を触れた瞬間に発火するため、ずらしてキャンセルする操作ができなくなります。
+- よくある間違い: addSubview を忘れる間違いです。ボタンが階層にないためタッチが届かず、何も起きません。
+- 関連例:
+```swift
+var handlers: [String: () -> Void] = [:]
+func addTarget(action name: String, handler: @escaping () -> Void) { handlers[name] = handler }
+addTarget(action: "saveTapped") { print("保存") }
+handlers["saveTapped"]?()
+```
+- 関連例の出力: 保存
+- 関連例の説明: 名前でメソッドを引いて呼ぶ、という Target-Action の構造をそのまま辞書で書いたものです。
+- 覚えておくこと: addTarget は target・action・イベントの3点セット。action には @objc が必要。
+
+### practice-uikit-015 delegateの受け渡しを完成させる [穴埋め / Lv2 基本]
+対象レッスン: uikit-events-delegate
+シリーズ: uikit-delegate (2段階目)
+スキル: uikit, protocols
+問題: 入力欄の編集完了を ViewController で受け取ります。空欄を埋めてください。
+埋めたあと:
+```swift
+final class FormViewController: UIViewController, UITextFieldDelegate {
+    private let textField = UITextField()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        textField.delegate = self
+    }
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        print("入力完了: \(textField.text ?? "")")
+    }
+}
+```
+ヒント1: 1つ目は、このクラスが「通知を受け取る資格がある」ことを表すプロトコル名です。
+ヒント2: 2つ目は「自分が受け取り役になる」ことを示す指定です。
+ヒント3: DataSource は表示するデータを提供する別の役割で、イベント通知とは異なります。
+解説: 1つ目は `UITextFieldDelegate` です。delegate プロパティに代入できるのは、このプロトコルに準拠した型だけなので、ViewController 側で準拠を宣言する必要があります。2つ目は `self` です。`textField.delegate = self` は「この入力欄で起きたことは、自分（この ViewController）に知らせてほしい」という登録です。これを書かないと、`textFieldDidEndEditing` を実装していても一度も呼ばれません。準拠の宣言と delegate への代入は別々の作業で、片方だけでは動かないことが、delegate まわりで最も多いつまずきどころです。`UITextFieldDataSource` というプロトコルは存在せず、DataSource は UITableView などで「表示するデータを提供する」別の役割を指します。delegate が「起きたことを知らせる」のに対し、DataSource は「何を表示するかを聞かれる」関係です。
+- 使っている考え方: delegate は「処理の一部を他のオブジェクトに委ねる」仕組みです。委ねる側はプロトコルで必要なメソッドを定義し、委ねられる側はそれに準拠して、自分を登録します。
+- 手順: `UITextFieldDelegate` に準拠する … 通知を受け取れる型であることを宣言する。
+- 手順: `textField.delegate = self` … 実際の受け取り役として自分を登録する。
+- 手順: 編集が終わると UITextField が delegate のメソッドを呼ぶ。
+- 手順: `textFieldDidEndEditing(_:)` が実行される。
+- 動く理由: 準拠の宣言によって型として資格を満たし、delegate への代入によって実際の受け取り先が確定します。この2つがそろって初めてメソッドが呼ばれます。
+- よくある間違い: プロトコルに準拠しただけで delegate への代入を忘れる間違いです。メソッドは書かれているのに一度も呼ばれません。
+- よくある間違い: delegate に textField 自身を代入する間違いです。自分に通知することになり、意味がありません。
+- よくある間違い: delegate を strong で保持する自作クラスを作る間違いです。循環参照が起きて解放されなくなります。
+- 関連例:
+```swift
+protocol FieldDelegate: AnyObject { func didEnd(_ text: String) }
+final class VC: FieldDelegate { func didEnd(_ text: String) { print("入力完了: \(text)") } }
+final class Field { weak var delegate: FieldDelegate?; func end(_ t: String) { delegate?.didEnd(t) } }
+let vc = VC(); let field = Field()
+field.end("代入前")
+field.delegate = vc
+field.end("代入後")
+```
+- 関連例の出力: 入力完了: 代入後
+- 関連例の説明: 代入前の呼び出しは delegate が nil なので何も起きません。準拠だけでは足りないことがはっきり分かります。
+- 覚えておくこと: delegate は「準拠」と「代入」の2つが必要。片方だけでは呼ばれない。
+
+### practice-uikit-016 画面が解放されないdelegateを直す [修正 / Lv4 応用]
+対象レッスン: uikit-events-delegate
+シリーズ: uikit-delegate (3段階目)
+スキル: uikit, memory, debugging
+問題: この画面を閉じても deinit が呼ばれず、メモリが解放されません。修正として最も適切なものを選んでください。
+正解: final class Uploader {
+    weak var delegate: UploaderDelegate?
+}
+ヒント1: ViewController は uploader を保持し、uploader は delegate として ViewController を保持しています。
+ヒント2: この2つの参照がどちらも強いと、互いに相手を生かし続けます。
+ヒント3: delegate 側の参照だけを弱くすれば、輪が切れます。
+解説: 問題は `var delegate: UploaderDelegate?` が強参照であることです。ViewController は `let uploader` で Uploader を強く保持し、Uploader は `delegate = self` で ViewController を強く保持しています。2つのオブジェクトが互いを強参照している状態（循環参照）では、外部からの参照がなくなっても参照カウントが 0 にならず、どちらも解放されません。その結果 deinit が呼ばれず、画面を開き直すたびにメモリが増えていきます。修正は `weak var delegate: UploaderDelegate?` にすることです。weak は参照カウントを増やさないため、外部からの参照がなくなった時点で ViewController が解放され、Uploader も一緒に解放されます。weak を使うにはプロトコルが `AnyObject` を継承している必要があり、この条件は既に満たされています。o2 の `weak var uploader = Uploader()` は生成直後に誰も強く保持していないため、その場で解放されて nil になります。o3 の deinit での nil 代入は、そもそも deinit が呼ばれないため実行されません。o4 は AnyObject を外す変更で、weak を使えなくなり悪化します。
+- 使っている考え方: ARC は参照カウントで解放を判断します。互いに強参照し合うとカウントが 0 にならないため、片方の参照を弱くして輪を切る必要があります。delegate は慣例的に弱いほうです。
+- 手順: ViewController → uploader（強参照）。
+- 手順: uploader → delegate = ViewController（強参照）。
+- 手順: 外部からの参照が消えても、互いのカウントが 1 ずつ残る。
+- 手順: どちらも解放されず deinit が呼ばれない。
+- 手順: delegate を weak にすると uploader → ViewController のカウントが増えず、輪が切れる。
+- 動く理由: delegate は「通知先を知っておく」だけの関係であり、通知先の生存を保証する必要はありません。したがって弱参照が意味的にも正しく、循環も解消します。
+- よくある間違い: 所有している側（uploader）を weak にする間違いです。誰も保持していないため即座に解放されます。
+- よくある間違い: deinit で参照を切る対応です。deinit 自体が呼ばれないため、この処理は実行されません。
+- よくある間違い: protocol から AnyObject を外す間違いです。struct も準拠できるようになる代わりに weak が使えなくなります。
+- 関連例:
+```swift
+protocol D: AnyObject {}
+final class VC: D { deinit { print("VC 解放") } }
+final class Uploader { weak var delegate: D? }
+do {
+    let vc = VC()
+    let up = Uploader()
+    up.delegate = vc
+}
+print("スコープを抜けた")
+```
+- 関連例の出力: VC 解放
+スコープを抜けた
+- 関連例の説明: weak なので輪ができず、スコープを抜けた時点で解放されます。strong だと VC 解放 が出力されません。
+- 覚えておくこと: delegate は weak。プロトコルは AnyObject 継承にする。
+
+### practice-uikit-017 入力を検証して結果を通知するメソッドを組み立てる [関数組み立て / Lv3 実装]
+対象レッスン: uikit-events-delegate
+スキル: uikit, controlFlow, optional
+問題: 入力欄の編集が終わったとき、空でなければ delegate に通知し、空ならエラー表示を出すメソッドを作ります。必要なブロックだけを正しい順に選んでください。
+正解の並び:
+```swift
+func textFieldDidEndEditing(_ textField: UITextField) {
+    let text = (textField.text ?? "").trimmingCharacters(in: .whitespaces)
+    guard !text.isEmpty else {
+        errorLabel.text = "名前を入力してください"
+        return
+    }
+    errorLabel.text = nil
+    delegate?.formDidEnterName(text)
+}
+```
+ヒント1: textField.text は Optional です。強制アンラップは避けます。
+ヒント2: 空白だけの入力も「空」として扱う必要があります。
+ヒント3: エラー表示は、正常だったときに消す処理も必要です。
+解説: 必要なのは、メソッド宣言、テキストの取り出しと空白除去、guard による空判定、エラー表示、return、guard を閉じる、エラー表示の消去、delegate への通知、閉じかっこの9ブロックです。要点は3つあります。1つ目は `textField.text ?? ""` で Optional を安全に扱うことです。UITextField の text は Optional なので、`!` で強制アンラップすると空の状態でクラッシュし得ます。2つ目は `trimmingCharacters(in: .whitespaces)` で、スペースだけの入力を空として扱えるようにしています。これがないと「   」が有効な名前として通ってしまいます。3つ目は `errorLabel.text = nil` の位置です。guard を通過した正常経路でエラー表示を消すことで、一度エラーを出したあとに正しく入力し直したときに表示が残りません。`delegate!` の強制アンラップは、delegate が未設定の場合にクラッシュするため使わず、`delegate?.` で安全に呼びます。
+- 使っている考え方: 入力の検証は「取り出す・正規化する・判定する・結果に応じて分岐する」という流れで書くと、条件が増えても構造が保たれます。
+- 手順: `textField.text ?? ""` … Optional を空文字に落として安全に扱う。
+- 手順: `trimmingCharacters(in: .whitespaces)` … 前後の空白を除き、見た目上の空を実際の空にする。
+- 手順: `guard !text.isEmpty else` … 不正な場合に早期脱出する。
+- 手順: エラー表示を設定して return。以降の処理は実行されない。
+- 手順: 通過した場合はエラー表示を消し、delegate に通知する。
+- 動く理由: Optional も空白のみの入力も安全に処理され、正常経路でエラー表示が確実に消えます。delegate が未設定でもクラッシュしません。
+- よくある間違い: `textField.text!` と強制アンラップする間違いです。編集をキャンセルした直後など、nil になる状況でクラッシュします。
+- よくある間違い: trimming を省く間違いです。空白だけの入力が有効として通り、以降の処理で空の名前が扱われます。
+- よくある間違い: `errorLabel.text = nil` を書き忘れる間違いです。一度エラーを出すと、正しく入力し直しても表示が残り続けます。
+- 関連例:
+```swift
+import Foundation
+let inputs: [String?] = [nil, "   ", " Yuki "]
+for input in inputs {
+    let text = (input ?? "").trimmingCharacters(in: .whitespaces)
+    print(input.map { "\"\($0)\"" } ?? "nil", "→", text.isEmpty ? "エラー" : "通知: \(text)")
+}
+```
+- 関連例の出力: nil → エラー
+"   " → エラー
+" Yuki " → 通知: Yuki
+- 関連例の説明: nil と空白のみを同じ「エラー」として扱えています。前後の空白も取り除かれます。
+- 覚えておくこと: Optional は ?? で受け、空白を除いてから判定する。正常時にエラー表示を消す。
+
+### practice-uikit-018 delegateが呼ばれないテスト結果を読み取る [テスト読解 / Lv3 実装]
+対象レッスン: uikit-events-delegate
+スキル: uikit, memory, testing
+問題: delegate の呼び出しを検証するテストです。同期的な呼び出しは成功し、画面を保持しないケースだけ失敗しています。原因として最も適切な説明を選んでください。
+正解: delegate が weak なので、生成した SpyDelegate を誰も強く保持しておらず、代入直後に解放されて nil になっている
+ヒント1: 成功と失敗の違いは、spy を変数に入れているかどうかだけです。
+ヒント2: weak は参照カウントを増やしません。
+ヒント3: 誰も強く保持していないオブジェクトは、いつまで生きているでしょうか。
+解説: テスト結果が示しているのは、spy をローカル変数で保持したときだけ成功するということです。原因は、`delegate` が weak であることと、`uploader.delegate = SpyDelegate()` が生成したインスタンスをどこにも強く保持していないことの組み合わせです。weak は参照カウントを増やさないため、代入した式が終わった時点で SpyDelegate への強参照が1つも存在しなくなり、ARC が即座に解放します。その結果 delegate は nil になり、`delegate?.uploaderDidFinish(self)` は何も呼ばずに終わります。これは delegate を weak にする設計そのものは正しく、テストの書き方の問題です。修正はローカル変数で spy を保持することです。o2 の struct 説は、weak が使えるのは参照型だけなので成立しません。o3 の非同期説は、finish() が同期的に呼び出していることと、成功するテストが存在することの両方に矛盾します。o4 は誤りで、weak プロパティへの代入自体は可能です。
+- 使っている考え方: weak な参照は「あってもいいし、なくてもいい」関係を表します。テストでは、その参照先を誰かが強く保持し続けなければ、検証の前に消えてしまいます。
+- 手順: 要件は「登録された delegate が呼ばれること」。
+- 手順: `uploader.delegate = SpyDelegate()` … 生成したインスタンスは一時的な値。
+- 手順: weak なので参照カウントが増えず、式の評価後に強参照が0になる。
+- 手順: ARC が即座に解放し、delegate は nil になる。
+- 手順: `delegate?.uploaderDidFinish(self)` が何もせずに終わる。
+- 動く理由: 3つのテストのうち、失敗するのは spy を保持していないケースだけです。保持したケースが成功していることが、解放が原因であることを示しています。
+- よくある間違い: この失敗を見て delegate を strong に変える対応です。テストは通りますが、本番で循環参照が発生します。
+- よくある間違い: テスト対象のコードに問題があると判断する間違いです。実装は正しく、テストの保持が不足しています。
+- よくある間違い: `let _ = SpyDelegate()` のように保持したつもりになる間違いです。ワイルドカードでは強参照が残りません。
+- 関連例:
+```swift
+final class Spy { var callCount = 0; deinit { print("Spy 解放") } }
+final class Uploader { weak var delegate: Spy?; func finish() { delegate?.callCount += 1 } }
+let u = Uploader()
+u.delegate = Spy()
+print("代入直後の delegate:", u.delegate == nil ? "nil" : "生存")
+```
+- 関連例の出力: Spy 解放
+代入直後の delegate: nil
+- 関連例の説明: 代入した次の行で既に nil です。解放が「あとで」ではなく即座に起きている点が重要です。
+- 覚えておくこと: weak な delegate をテストするときは、参照先をローカル変数で保持する。
+
+### practice-uikit-019 セルを返すメソッドに必要なものを選ぶ [ブロック選択 / Lv3 実装]
+対象レッスン: uikit-lists
+シリーズ: uikit-lists (1段階目)
+スキル: uikit, collections
+問題: UITableView の cellForRowAt を実装します。必要なブロックだけを正しい順に選んでください。不要なブロックが混ざっています。
+使うブロック:
+- func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+-     let cell = tableView.dequeueReusableCell(withIdentifier: "WorkoutCell", for: indexPath) as! WorkoutCell
+-     cell.configure(with: workouts[indexPath.row])
+-     return cell
+- }
+ヒント1: セルは毎回新しく作るのではなく、画面外へ出たものを使い回します。
+ヒント2: 使い回したセルには前の行の内容が残っているため、必ず設定し直します。
+ヒント3: このメソッドの中で一覧全体を再読み込みすると、呼び出しが無限に繰り返されます。
+解説: 必要なのは、メソッド宣言、`dequeueReusableCell` によるセルの取得、内容の設定、return、閉じかっこの5ブロックです。要点はセルの再利用です。`dequeueReusableCell(withIdentifier:for:)` は、画面外へスクロールして不要になったセルを再利用キューから取り出し、なければ新しく作ります。この仕組みによって、行が1万件あっても実際に生成されるセルは画面に見える数＋数個で済みます。`WorkoutCell()` を毎回生成すると、スクロールのたびにインスタンスが増え、メモリと生成コストが行数に比例します。次に `cell.configure(with:)` で必ず内容を設定します。再利用されたセルには前に表示していた行の内容が残っているため、設定を省くと別の行のデータが表示されます。`tableView.reloadData()` をこのメソッドの中に置くと、再読み込みが cellForRowAt を再び呼び、無限に繰り返してアプリが固まります。
+- 使っている考え方: UITableView は「見えている数ぶんのセルを使い回す」設計です。そのため、セルは常に「前の行の状態を持っているかもしれないもの」として扱う必要があります。
+- 手順: `dequeueReusableCell(withIdentifier:for:)` … 再利用キューから取得する。なければ生成される。
+- 手順: 取得したセルには、前に表示していた行の内容が残っている可能性がある。
+- 手順: `cell.configure(with: workouts[indexPath.row])` … この行の内容で必ず上書きする。
+- 手順: `return cell` … 設定済みのセルを返す。
+- 動く理由: 取得・設定・返却という3段階が過不足なくそろっています。再利用によって生成コストが行数に依存せず、毎回設定するため内容の残りも起きません。
+- よくある間違い: セルを毎回 `WorkoutCell()` で生成する間違いです。スクロールが重くなり、メモリも増え続けます。
+- よくある間違い: configure を条件付きにする間違いです。設定されない経路でセルに前の行の内容が残ります。
+- よくある間違い: cellForRowAt の中で reloadData を呼ぶ間違いです。呼び出しが再帰し、アプリが応答しなくなります。
+- 関連例:
+```swift
+var pool: [String] = []
+var created = 0
+func dequeue() -> String {
+    if let c = pool.popLast() { return c }
+    created += 1
+    return "Cell\(created)"
+}
+for _ in 1...100 { let c = dequeue(); pool.append(c) }
+print("100行表示して生成された数:", created)
+```
+- 関連例の出力: 100行表示して生成された数: 1
+- 関連例の説明: 再利用があると、行数が増えても生成数は増えません。これが一覧が軽い理由です。
+- 覚えておくこと: セルは使い回される。取得したら必ず全項目を設定し直す。
+
+### practice-uikit-020 セルの内容を設定するメソッドを組み立てる [関数組み立て / Lv3 実装]
+対象レッスン: uikit-lists
+シリーズ: uikit-lists (2段階目)
+スキル: uikit, optional
+問題: セル側で、渡された Workout の内容を表示します。再利用されても前の内容が残らないメソッドを作ってください。必要なブロックだけを正しい順に選んでください。
+正解の並び:
+```swift
+func configure(with workout: Workout) {
+    titleLabel.text = workout.name
+    minutesLabel.text = "\(workout.minutes)分"
+    noteLabel.text = workout.note
+    noteLabel.isHidden = (workout.note == nil)
+    accessoryType = workout.isDone ? .checkmark : .none
+}
+```
+ヒント1: 「条件を満たしたときだけ設定する」書き方は、満たさないときに前の値が残ります。
+ヒント2: すべてのプロパティを、条件に関係なく必ず設定し直します。
+ヒント3: 三項演算子を使うと、どちらの場合も必ず値が入ります。
+解説: 必要なのは、メソッド宣言、タイトル、時間、メモ、メモの表示制御、アクセサリ、閉じかっこの7ブロックです。要点は「すべてのプロパティを無条件に設定する」ことです。`if let note = workout.note { noteLabel.text = note }` は、note が nil のときに何もしないため、再利用されたセルに前の行のメモが残ります。`noteLabel.text = workout.note` は text が Optional String を受け取れるので、nil のときは自動的に空になります。同様に `if workout.isDone { accessoryType = .checkmark }` は、完了していない行でチェックマークを消さないため、一度チェックの付いたセルが使い回されると別の行にチェックが残ります。三項演算子で `.checkmark` と `.none` の両方を明示すれば、どちらの場合も必ず正しい値になります。`noteLabel.isHidden` も同様に、毎回条件から計算して設定します。この「分岐で設定を省かない」という原則が、セル再利用による表示崩れを防ぐ唯一の確実な方法です。
+- 使っている考え方: 再利用されるセルの設定は「差分の更新」ではなく「全項目の上書き」として書きます。前の状態が何であっても、設定後の状態が一意に決まるようにするためです。
+- 手順: `titleLabel.text = workout.name` … 常に上書きする。
+- 手順: `minutesLabel.text = ...` … 常に上書きする。
+- 手順: `noteLabel.text = workout.note` … Optional をそのまま代入し、nil なら空になる。
+- 手順: `noteLabel.isHidden = (workout.note == nil)` … 表示状態も毎回計算する。
+- 手順: `accessoryType = ... ? .checkmark : .none` … 両方の場合を明示する。
+- 動く理由: どのプロパティも条件に依存せず必ず代入されるため、設定後のセルの見た目は workout の内容だけで決まります。前に何を表示していたかが結果に影響しません。
+- よくある間違い: `if let` で nil のときに何もしない間違いです。前の行のメモが残って表示されます。
+- よくある間違い: `if isDone { accessoryType = .checkmark }` と片側だけ書く間違いです。未完了の行にチェックが残ります。
+- よくある間違い: prepareForReuse だけで初期化しようとする間違いです。設定漏れがあると結局残るため、configure 側で全項目を設定するほうが確実です。
+- 関連例:
+```swift
+var accessory = "checkmark"   // 前の行の残り
+let isDone = false
+if isDone { accessory = "checkmark" }
+print("片側だけ設定:", accessory)
+accessory = isDone ? "checkmark" : "none"
+print("両方設定:", accessory)
+```
+- 関連例の出力: 片側だけ設定: checkmark
+両方設定: none
+- 関連例の説明: 片側だけの分岐では、前の値がそのまま残ります。これがセル再利用の表示崩れの正体です。
+- 覚えておくこと: セルの設定は全項目を無条件に上書きする。片側だけの分岐を書かない。
+
+### practice-uikit-021 スクロールすると画像が入れ替わるセルを直す [修正 / Lv3 実装]
+対象レッスン: uikit-lists
+シリーズ: uikit-lists (3段階目)
+スキル: uikit, concurrency, debugging
+問題: 画像を非同期で読み込むセルです。速くスクロールすると、別の行の画像が一瞬表示されます。修正として最も適切なものを選んでください。
+正解: private var currentTask: Task<Void, Never>?
+
+func configure(with workout: Workout) {
+    titleLabel.text = workout.name
+    imageView?.image = nil
+    currentTask?.cancel()
+    let url = workout.imageURL
+    currentTask = Task { [weak self] in
+        let image = await loader.image(for: url)
+        guard !Task.isCancelled else { return }
+        self?.imageView?.image = image
+    }
+}
+
+override func prepareForReuse() {
+    super.prepareForReuse()
+    currentTask?.cancel()
+    imageView?.image = nil
+}
+ヒント1: 同じセルが別の行に使い回されたとき、前の行の読み込みはまだ走り続けています。
+ヒント2: 遅れて完了した読み込みが、いま表示すべき画像を上書きしています。
+ヒント3: 新しい設定を始める前に、前の読み込みを止める必要があります。
+解説: 問題は、前の行のために開始した読み込みをキャンセルしていないことです。セルが使い回されると、同じセルインスタンスに対して新しい configure が呼ばれますが、前の Task はまだ生きています。そちらが遅れて完了すると、いま表示すべき行の画像を上書きしてしまいます。修正は3点をまとめて行います。まず読み込み中の Task をプロパティで保持し、新しい configure のたびに `cancel()` します。次に完了後に `Task.isCancelled` を確認し、キャンセル済みなら反映しません。さらに `prepareForReuse` でもキャンセルと画像のクリアを行い、再利用の経路をすべて塞ぎます。`[weak self]` を付けているのは、セルが解放されたあとにタスクが self を保持し続けないためです。o2 は画像をクリアするだけで、遅れて完了した古いタスクが上書きする問題は残ります。o3 の同期読み込みはスクロール中にメインスレッドを止めるため、一覧が固まります。o4 の `Task.detached` はキャンセルが伝わらず、self を強く保持するため問題が悪化します。
+- 使っている考え方: セルは使い回されるため、「このセルが今どの行を表示しているか」は時間とともに変わります。非同期処理の結果を反映する前に、その前提がまだ有効かを確認する必要があります。
+- 手順: 行A のために読み込み開始 → 完了まで時間がかかる。
+- 手順: スクロールで同じセルが行B に再利用される。
+- 手順: 行B の configure が呼ばれ、新しい読み込みが始まる。
+- 手順: 行A の読み込みが遅れて完了し、imageView を上書きする。
+- 手順: `currentTask?.cancel()` と `Task.isCancelled` の確認で、この上書きを防ぐ。
+- 動く理由: キャンセルによって古い処理が止まり、isCancelled の確認によって万一完了しても反映されません。prepareForReuse も塞いでいるため、再利用のどの経路でも古い画像が出ません。
+- よくある間違い: 画像を nil にするだけで済ませる間違いです。ちらつきは減りますが、遅れて完了した古い画像が最終的に表示されます。
+- よくある間違い: 同期読み込みに変える対応です。競合はなくなりますが、スクロールが完全に止まります。
+- よくある間違い: `Task.detached` を使う間違いです。親のキャンセルが伝わらず、self を強く保持するため解放も遅れます。
+- 関連例:
+```swift
+var displayed = ""
+let completions = [("行Aの画像", 300), ("行Bの画像", 50)]
+for (name, ms) in completions.sorted(by: { $0.1 < $1.1 }) {
+    displayed = name
+    print("\(ms)ms で完了 → 表示: \(displayed)")
+}
+```
+- 関連例の出力: 50ms で完了 → 表示: 行Bの画像
+300ms で完了 → 表示: 行Aの画像
+- 関連例の説明: 遅い方が最後に書き込むため、古い画像が残ります。キャンセルはこの最後の書き込みを止めるための処置です。
+- 覚えておくこと: セルの非同期読み込みは、次の設定の前にキャンセルする。反映前に有効性を確認する。
+
+### practice-uikit-022 セルが再利用される順序を追う [実行追跡 / Lv3 実装]
+対象レッスン: uikit-lists
+スキル: uikit, debugging
+問題: 画面に5行が見えるテーブルで、行0が画面外へスクロールし、行5が現れました。このとき何が起きますか。
+正解: 行0 が使っていたセルが再利用キューに入り、行5 の cellForRowAt でそのセルが取り出されて設定し直される
+ヒント1: 画面外へ出たセルは、破棄されるのではなくどこかへ移されます。
+ヒント2: 新しく現れる行のためにセルを用意する必要がありますが、生成とは限りません。
+ヒント3: 内容の設定は必ず行われます。前の行の内容のままにはなりません。
+解説: 行0 が画面外へ出ると、そのセルは解放されずに再利用キューへ入ります。次に行5 を表示する必要が生じると、UITableView は `cellForRowAt` を呼び、その中の `dequeueReusableCell` がキューから同じセルを取り出します。取り出されたセルは行0 の内容を保持したままなので、`configure(with:)` などで行5 の内容に設定し直されます。この仕組みによって、行が何万件あっても実際に存在するセルは画面に見える数＋数個に保たれます。6個目を生成する（o2）のは再利用の目的に反します。解放して新規生成する（o3）とスクロールのたびに生成コストがかかり、再利用の意味がありません。cellForRowAt が呼ばれない（o4）というのも誤りで、呼ばれなければ行5 の内容を設定する機会がなく、行0 の内容が表示されたままになります。実際に「前の行の内容が見える」不具合が起きるのは、cellForRowAt が呼ばれていないからではなく、その中で全項目を設定していないからです。
+- 使っている考え方: UITableView のセルは「行に固定されたもの」ではなく「画面に見える枠を埋める使い回しの部品」です。行とセルの対応は、スクロールのたびに組み替えられます。
+- 手順: 行0 が画面外へ出る → そのセルが再利用キューに入る。
+- 手順: 行5 が必要になる → `cellForRowAt(indexPath: 5)` が呼ばれる。
+- 手順: `dequeueReusableCell` … キューから行0 が使っていたセルを取り出す。
+- 手順: 取り出したセルには行0 の内容が残っている。
+- 手順: configure で行5 の内容に上書きし、返す。
+- 動く理由: 生成数を一定に保つのが再利用の目的なので、新規生成も解放も起きません。内容を差し替えるために cellForRowAt は必ず呼ばれます。
+- よくある間違い: セルが行ごとに固定されていると考える間違いです。セルにデータを保持させる設計をすると、スクロールで内容が混ざります。
+- よくある間違い: cellForRowAt が呼ばれない場合があると考える間違いです。表示に必要な行では必ず呼ばれます。
+- よくある間違い: セルのプロパティに状態を持たせて次回に引き継ごうとする間違いです。別の行に引き継がれます。
+- 関連例:
+```swift
+var queue: [String] = []
+var cells = ["Cell0","Cell1","Cell2","Cell3","Cell4"]
+queue.append(cells.removeFirst())        // 行0 が画面外へ
+let reused = queue.removeLast()          // 行5 が dequeue
+cells.append(reused)
+print("行5 が使うセル:", reused, "／ 生成総数:", 5)
+```
+- 関連例の出力: 行5 が使うセル: Cell0 ／ 生成総数: 5
+- 関連例の説明: 行5 に割り当てられたのは、行0 が使っていたセルそのものです。総数は増えていません。
+- 覚えておくこと: セルは行に固定されない。使い回されるたびに内容を設定し直す。
+
+### practice-uikit-023 削除直後のクラッシュ原因を読み取る [テスト読解 / Lv3 実装]
+対象レッスン: uikit-lists
+スキル: uikit, testing, collections
+問題: 一覧の行削除のテスト結果です。reloadData を使う場合は成功し、deleteRows を使う場合だけクラッシュします。原因として最も適切な説明を選んでください。
+正解: deleteRows を呼んだ時点で UITableView が numberOfRows を再確認するが、配列がまだ10件のままなので「削除後の件数が合わない」と判断されている
+ヒント1: reloadData は「全部作り直す」ので、順序の問題が起きません。
+ヒント2: deleteRows は「1件減ったはず」という前提で件数を検算します。
+ヒント3: 検算のとき、配列の件数はどうなっているでしょうか。
+解説: テスト結果が示しているのは、deleteRows を使ったときだけ失敗するということです。原因は、`deleteRows` を先に呼び、そのあとで配列から削除していることです。deleteRows は「この行が減った」という宣言なので、UITableView は直後に `numberOfRowsInSection` を再度呼び、「削除前の件数 - 削除した件数」と一致するかを検算します。この時点で workouts はまだ10件のままなので、期待する9件と合わず、`NSInternalInconsistencyException` で意図的にクラッシュします。これは不整合を早期に発見させるための設計です。修正は、配列から先に削除してから deleteRows を呼ぶことです。`reloadData` が成功するのは、こちらが件数の検算を行わず単純に全行を作り直すためで、順序の問題が表面化しません。ただし reloadData はアニメーションがなく全行を再構築するため、1行の削除には deleteRows のほうが適しています。o2 の section は最初のセクションとして正しく、o3 のレースコンディションはメインスレッド上の同期処理なので該当せず、o4 は reloadData を呼ばずに更新する方法として deleteRows があるため誤りです。
+- 使っている考え方: UITableView の差分更新は「データ側の変更」と「表示側への通知」の2つが一致していることを前提にします。UIKit はその一致を検算し、合わなければ即座に落とします。
+- 手順: 要件は「表示とデータの件数が一致すること」。
+- 手順: `deleteRows` … 「1行減った」と UITableView に伝える。
+- 手順: UITableView が `numberOfRowsInSection` を再度呼ぶ。
+- 手順: 配列はまだ10件なので、期待する9件と一致しない。
+- 手順: 不整合として例外を投げる。配列を先に削除すれば一致する。
+- 動く理由: reloadData が成功し deleteRows が失敗するという差は、件数の検算を行うかどうかの違いに完全に対応します。他の説明では reloadData が成功する理由を説明できません。
+- よくある間違い: クラッシュを避けるために常に reloadData を使う対応です。動きますが、アニメーションが失われ、スクロール位置もリセットされます。
+- よくある間違い: deleteRows を try-catch で囲もうとする間違いです。Objective-C の例外なので Swift の do-catch では捕捉できません。
+- よくある間違い: beginUpdates / endUpdates で囲めば順序は問わないと考える間違いです。囲んでも検算は行われます。
+- 関連例:
+```swift
+var workouts = Array(1...10)
+func check(expected: Int) { print("期待:", expected, "実際:", workouts.count, expected == workouts.count ? "OK" : "不整合") }
+check(expected: 9)
+workouts.remove(at: 0)
+check(expected: 9)
+```
+- 関連例の出力: 期待: 9 実際: 10 不整合
+期待: 9 実際: 9 OK
+- 関連例の説明: UIKit が行っているのはこの検算です。削除を先に済ませておけば一致します。
+- 覚えておくこと: データを先に変更し、そのあとで deleteRows を呼ぶ。件数は必ず検算される。
+
+### practice-uikit-024 セルの登録を行う1行を書く [記述 / Lv2 基本]
+対象レッスン: uikit-lists
+スキル: uikit
+問題: コードで定義した WorkoutCell を、識別子 "WorkoutCell" として tableView に登録する1行を書いてください。
+想定する書き方: tableView.register(WorkoutCell.self, forCellReuseIdentifier: "WorkoutCell")
+ヒント1: 登録するのはインスタンスではなく、クラスそのものです。
+ヒント2: クラス自体を表すには .self を付けます。
+ヒント3: 引数ラベルは forCellReuseIdentifier です。
+解説: `tableView.register(WorkoutCell.self, forCellReuseIdentifier: "WorkoutCell")` と書きます。第1引数に渡すのはインスタンスではなくクラスそのもの（`WorkoutCell.self`）です。UITableView は必要になったときに自分でセルを生成するため、生成するための型を知っておく必要があるからです。第2引数の識別子は、`dequeueReusableCell(withIdentifier:for:)` で指定する文字列と完全に一致していなければなりません。一致していない場合、`for:` 付きの dequeue は「登録されていない識別子」として実行時にクラッシュします。この登録によって、再利用キューが空のときでも UITableView が自動的にセルを生成できるようになり、`dequeueReusableCell(withIdentifier:for:)` が nil を返さないことが保証されます。Storyboard や xib でセルを定義した場合は、`register(UINib(nibName:bundle:), forCellReuseIdentifier:)` を使うか、Storyboard 上で識別子を設定するため、このコードは不要です。
+- 使っている考え方: セルの登録は「識別子と型の対応表」を作る作業です。UITableView はこの表を見て、必要なときに自力でセルを生成します。
+- 手順: `register(_:forCellReuseIdentifier:)` … 識別子と型を対応づける。
+- 手順: `WorkoutCell.self` … インスタンスではなく型そのものを渡す。
+- 手順: `dequeueReusableCell(withIdentifier:for:)` … 再利用キューが空なら、表を見て生成する。
+- 手順: そのため戻り値が非Optionalになり、nil チェックが不要になる。
+- 動く理由: 型と識別子の両方を渡しているため、UITableView が必要に応じてセルを生成できます。識別子が dequeue 側と一致しているので、実行時の不一致も起きません。
+- よくある間違い: `WorkoutCell()` とインスタンスを渡す間違いです。register は型を要求するためコンパイルエラーになります。
+- よくある間違い: 識別子の文字列を dequeue 側と揃えない間違いです。実行時にクラッシュします。定数にまとめると防げます。
+- よくある間違い: register を書かずに `dequeueReusableCell(withIdentifier:for:)` を使う間違いです。未登録の識別子として落ちます。
+- 関連例:
+```swift
+var registry: [String: String] = [:]
+func register(_ type: String, forCellReuseIdentifier id: String) { registry[id] = type }
+register("WorkoutCell", forCellReuseIdentifier: "WorkoutCell")
+print(registry["WorkoutCell"] ?? "未登録")
+print(registry["TypoCell"] ?? "未登録")
+```
+- 関連例の出力: WorkoutCell
+未登録
+- 関連例の説明: 識別子が1文字でも違えば「未登録」になります。実際の UITableView ではこれがクラッシュになります。
+- 覚えておくこと: register は型（.self）と識別子の組。識別子は dequeue と一致させる。
+
+### practice-uikit-025 SwiftUIの画面をUIKitに埋め込む [ブロック選択 / Lv4 応用]
+対象レッスン: uikit-interoperability
+スキル: uikit, swiftui, architecture
+問題: 既存の UIViewController の中に SwiftUI の SettingsView を埋め込みます。必要なブロックだけを正しい順に選んでください。不要なブロックが混ざっています。
+使うブロック:
+- let hosting = UIHostingController(rootView: SettingsView())
+- addChild(hosting)
+- hosting.view.translatesAutoresizingMaskIntoConstraints = false
+- view.addSubview(hosting.view)
+- NSLayoutConstraint.activate([
+    hosting.view.topAnchor.constraint(equalTo: view.topAnchor),
+    hosting.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+    hosting.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+    hosting.view.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+])
+- hosting.didMove(toParent: self)
+ヒント1: SwiftUI の View を UIKit の画面として扱う入れ物のクラス名を選びます。
+ヒント2: 子の ViewController を追加するときは、決められた3手順があります。
+ヒント3: UIViewRepresentable は逆方向（UIKit を SwiftUI に埋め込む）のための仕組みです。
+解説: 必要なのは、UIHostingController の生成、addChild、自動制約の無効化、addSubview、制約の有効化、didMove の6ブロックです。`UIHostingController` は SwiftUI の View を包んで UIViewController として扱えるようにするクラスで、UIKit 側から SwiftUI を使う際の入口になります。子の ViewController を組み込むときは `addChild` → view の追加 → `didMove(toParent:)` という3手順が決まっており、この順序を守らないとライフサイクルイベント（viewWillAppear など）が子に正しく伝わりません。addChild を省くと、子の ViewController が親のライフサイクルから切り離され、画面回転や表示・非表示の通知を受け取れなくなります。`UIViewRepresentable` は逆方向、つまり UIKit の View を SwiftUI の中で使うためのプロトコルであり、ここでは使いません。`frame = view.bounds` による指定は、制約を使う場合には不要で、`translatesAutoresizingMaskIntoConstraints = false` と併せると意味を持ちません。回転やサイズ変更にも追従しないため、制約で指定します。
+- 使っている考え方: Container View Controller の仕組みでは、子の ViewController を親に組み込む手順が決まっています。UIHostingController もただの ViewController なので、この手順に従います。
+- 手順: `UIHostingController(rootView:)` … SwiftUI の View を ViewController として包む。
+- 手順: `addChild(hosting)` … 親子関係を作り、ライフサイクルを繋ぐ。
+- 手順: `translatesAutoresizingMaskIntoConstraints = false` … 制約で配置するため自動生成を止める。
+- 手順: `view.addSubview(hosting.view)` … ビュー階層に追加する。
+- 手順: 制約を有効化して四辺を親に合わせる。
+- 手順: `didMove(toParent: self)` … 組み込み完了を子に通知する。
+- 動く理由: ViewController の親子関係とビュー階層の両方が正しく構成され、制約によってサイズ変更にも追従します。didMove まで呼ぶことで、子がライフサイクル通知を受け取れます。
+- よくある間違い: `addChild` と `didMove` を省いて view だけ追加する間違いです。子の viewWillAppear などが呼ばれず、SwiftUI 側の .task も期待どおりに動きません。
+- よくある間違い: `frame = view.bounds` で配置する間違いです。回転やキーボード表示でサイズが変わっても追従しません。
+- よくある間違い: UIHostingController を毎回作り直す間違いです。SwiftUI 側の @State が毎回初期化されます。
+- 関連例:
+```swift
+var children: [String] = []
+var lifecycleConnected = false
+func addChild(_ c: String) { children.append(c) }
+func didMove() { lifecycleConnected = true }
+addChild("UIHostingController")
+didMove()
+print("子:", children, "ライフサイクル接続:", lifecycleConnected)
+```
+- 関連例の出力: 子: ["UIHostingController"] ライフサイクル接続: true
+- 関連例の説明: この2つを呼んで初めて、子がライフサイクルの通知対象になります。view の追加だけでは繋がりません。
+- 覚えておくこと: UIHostingController も子ViewController。addChild → view追加 → didMove の順を守る。
+
+### practice-uikit-026 UIKitの部品をSwiftUIから使えるようにする [関数組み立て / Lv4 応用]
+対象レッスン: uikit-interoperability
+スキル: uikit, swiftui, protocols
+問題: UIActivityIndicatorView を SwiftUI から使えるようにします。isAnimating の変化に追従する必要があります。必要なブロックだけを正しい順に選んでください。
+正解の並び:
+```swift
+struct LoadingSpinner: UIViewRepresentable {
+    let isAnimating: Bool
+    func makeUIView(context: Context) -> UIActivityIndicatorView {
+        UIActivityIndicatorView(style: .medium)
+    }
+    func updateUIView(_ view: UIActivityIndicatorView, context: Context) {
+        isAnimating ? view.startAnimating() : view.stopAnimating()
+    }
+}
+```
+ヒント1: 生成と更新は別のメソッドに分かれています。生成は1回、更新は状態が変わるたびです。
+ヒント2: makeUIView の中で開始してしまうと、停止する手段がなくなります。
+ヒント3: 片側だけの分岐にすると、false になったときに止まりません。
+解説: 必要なのは、struct 宣言、`isAnimating` プロパティ、`makeUIView` の宣言と本体、閉じかっこ、`updateUIView` の宣言と本体、閉じかっこ2つの9ブロックです。`UIViewRepresentable` は UIKit の View を SwiftUI の中で使うためのプロトコルで、2つのメソッドを要求します。`makeUIView` は View を1回だけ生成するためのもので、ここでは UIActivityIndicatorView を返すだけにします。`updateUIView` は SwiftUI 側の状態が変わるたびに呼ばれ、その状態を UIKit の View に反映する場所です。`isAnimating ? startAnimating() : stopAnimating()` と三項演算子で両方の場合を書くのが要点で、`if isAnimating { startAnimating() }` のように片側だけ書くと、true から false に変わったときに停止せず、回り続けます。`makeUIView` の中で `startAnimating()` を呼ぶ案は、生成が1回しか行われないため、あとから isAnimating が変わっても反映されません。生成と更新を分ける設計は、状態の反映を必ず updateUIView に集めるためのものです。
+- 使っている考え方: UIViewRepresentable は「生成」と「状態の反映」を分離します。SwiftUI の宣言的な更新モデルを UIKit の可変な View に橋渡しするための構造です。
+- 手順: `makeUIView(context:)` … View を1回だけ生成する。状態は設定しない。
+- 手順: `updateUIView(_:context:)` … SwiftUI 側の値が変わるたびに呼ばれる。
+- 手順: `isAnimating ? start : stop` … 両方の場合を明示し、どちらの状態にも到達できるようにする。
+- 手順: `isAnimating` は struct のプロパティなので、値が変われば新しい構造体として渡り、update が呼ばれる。
+- 動く理由: 生成は1回、反映は毎回という役割分担が守られ、三項演算子によって true と false の両方向の変化に追従します。SwiftUI 側から見ると、通常の View と同じように状態で制御できます。
+- よくある間違い: `makeUIView` の中で startAnimating を呼ぶ間違いです。初回だけ反映され、以後の変化を無視します。
+- よくある間違い: `if isAnimating { start() }` と片側だけ書く間違いです。false になっても停止せず、回り続けます。
+- よくある間違い: updateUIView の中で View を作り直す間違いです。毎回新しいインスタンスになり、アニメーションが途切れます。
+- 関連例:
+```swift
+var animating = false
+func update(_ isAnimating: Bool) { animating = isAnimating ? true : false }
+update(true)
+print("開始後:", animating)
+update(false)
+print("停止後:", animating)
+```
+- 関連例の出力: 開始後: true
+停止後: false
+- 関連例の説明: 両方の場合を書いているので、どちらの方向の変化にも追従します。片側だけなら停止後も true のままです。
+- 覚えておくこと: 生成は makeUIView、状態の反映は updateUIView。両方向の変化を書く。
+
+### practice-uikit-027 混在画面で状態が戻る原因を読み取る [テスト読解 / Lv4 応用]
+対象レッスン: uikit-interoperability
+スキル: uikit, swiftui, testing, architecture
+問題: UIKit の画面に埋め込んだ SwiftUI の入力状態が、画面回転のたびに初期化されます。テスト結果から原因を選んでください。
+正解: viewDidLayoutSubviews がレイアウトのたびに呼ばれるため、そのたびに新しい UIHostingController と SwiftUI View が生成され、@State が初期値に戻っている
+ヒント1: 4つ目のテスト結果が決定的です。子ViewControllerが増え続けています。
+ヒント2: 回転もキーボード表示も、どちらもレイアウトの再計算を引き起こします。
+ヒント3: 組み込み処理を書いた場所は、何回呼ばれるメソッドでしょうか。
+解説: 決定的なのは4つ目のテストで、回転3回のあとに子ViewControllerが4つになっています。これは組み込み処理が4回実行されたことを意味します。原因は、組み込みを `viewDidLayoutSubviews` に書いていることです。このメソッドはレイアウトが再計算されるたびに呼ばれるため、画面回転でもキーボード表示でも実行されます。そのたびに新しい `UIHostingController(rootView: SettingsView())` が生成され、新しい SettingsView インスタンスの @State は初期値から始まります。古い hosting も children に残ったままなので、ViewController が積み重なりメモリも増えます。回転しないテストだけが成功するのは、その場合だけ組み込みが1回で済むからです。修正は、組み込みを `viewDidLoad` に移し、frame ではなく制約でサイズを追従させることです。o2 の frame は追従しない問題を持ちますが、状態の初期化とは無関係です。o3 の didMove のタイミングは呼び出し回数の問題を説明できず、o4 は誤りで、@State は UIKit に埋め込まれても保持されます。
+- 使っている考え方: SwiftUI の @State は View インスタンスの外側で保持されますが、その保持は UIHostingController に紐づきます。ホスト自体を作り直せば、状態も新しく始まります。
+- 手順: 要件は「レイアウト再計算が起きても入力が保持されること」。
+- 手順: `viewDidLayoutSubviews` は回転・キーボード表示などのたびに呼ばれる。
+- 手順: そのたびに UIHostingController と SettingsView が新規生成される。
+- 手順: 新しいインスタンスの @State は初期値から始まる。
+- 手順: 古い hosting も children に残るため、数が増え続ける。
+- 動く理由: children.count が4になっている事実が、組み込みが4回行われたことを直接示しています。状態の初期化も、インスタンスの重複も、この1つの原因ですべて説明できます。
+- よくある間違い: 回転時に状態を手動で保存・復元する対応です。原因を残したまま複雑さだけが増え、ViewController の重複も解消しません。
+- よくある間違い: @AppStorage に切り替える対応です。状態は残りますが、一時的な入力を永続化することになり、ホストの重複も残ります。
+- よくある間違い: viewWillLayoutSubviews に移す間違いです。呼ばれる回数は同じなので、症状は変わりません。
+- 関連例:
+```swift
+var children = 0
+func viewDidLayoutSubviews() { children += 1 }
+viewDidLayoutSubviews()
+for _ in 1...3 { viewDidLayoutSubviews() }
+print("回転3回後の子の数:", children)
+```
+- 関連例の出力: 回転3回後の子の数: 4
+- 関連例の説明: テスト結果の 4 と一致します。呼ばれた回数がそのまま子の数になっています。
+- 覚えておくこと: 子ViewControllerの組み込みは viewDidLoad で1回だけ。レイアウト系メソッドに書かない。
 
 ---
