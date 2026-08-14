@@ -15249,6 +15249,3182 @@
       },
       "seriesId": "concurrency-sendable",
       "seriesStep": 3
+    },
+    {
+      "id": "practice-development-001",
+      "track": "development",
+      "lessonId": "dev-xcode-structure",
+      "type": "matching",
+      "difficulty": 1,
+      "title": "Xcodeプロジェクトの構成要素を対応づける",
+      "prompt": "Xcode のプロジェクト構成に出てくる用語と、その役割を対応させてください。",
+      "skills": [
+        "architecture"
+      ],
+      "content": {
+        "left": [
+          {
+            "id": "l1",
+            "label": "Target"
+          },
+          {
+            "id": "l2",
+            "label": "Scheme"
+          },
+          {
+            "id": "l3",
+            "label": "Build Configuration"
+          },
+          {
+            "id": "l4",
+            "label": "Info.plist"
+          }
+        ],
+        "right": [
+          {
+            "id": "r1",
+            "label": "ビルドして作られる成果物の単位（アプリ本体・テストなど）"
+          },
+          {
+            "id": "r2",
+            "label": "どの成果物をどの設定でビルド・実行するかの組み合わせ"
+          },
+          {
+            "id": "r3",
+            "label": "Debug / Release など、ビルド設定の切り替え単位"
+          },
+          {
+            "id": "r4",
+            "label": "表示名や必要な権限など、アプリの情報を宣言する設定ファイル"
+          },
+          {
+            "id": "r5",
+            "label": "依存ライブラリの解決済みバージョンを固定して記録するファイル"
+          }
+        ]
+      },
+      "solution": {
+        "pairs": {
+          "l1": "r1",
+          "l2": "r2",
+          "l3": "r3",
+          "l4": "r4"
+        }
+      },
+      "hints": [
+        "「作られるもの」と「どう作るかの選択」を分けて考えてください。",
+        "Debug と Release の切り替えは、実行の組み合わせではなく設定の種類です。",
+        "r5 は Package.resolved の説明なので、この4つとは対応しません。"
+      ],
+      "explanation": "Target はビルドの成果物の単位で、アプリ本体・テスト・ウィジェットなどがそれぞれ Target になります。Scheme は「どの Target を、どの Build Configuration で、どのアクション（実行・テストなど）に使うか」の組み合わせです。Build Configuration は Debug / Release といった設定の切り替え単位で、最適化やフラグが変わります。Info.plist はアプリの表示名や必要な権限を宣言する設定ファイルです。r5 は Package.resolved の説明です。",
+      "detail": {
+        "concept": "Xcode の設定は階層になっています。Target が「何を作るか」、Build Configuration が「どんな設定で作るか」、Scheme が「その組み合わせをどう実行するか」を担当します。",
+        "steps": [
+          "Target … アプリ、テスト、拡張などの成果物ごとに1つ。",
+          "Build Configuration … Debug は最適化なし＋デバッグ情報、Release は最適化あり。",
+          "Scheme … Run は Debug、Archive は Release、のように行為ごとに構成を指定する。",
+          "Info.plist … 実行時に OS が読む宣言情報（権限、表示名、対応バージョンなど）。"
+        ],
+        "whyCorrect": "4つはそれぞれ成果物・実行の組み合わせ・設定の種類・宣言情報という別の階層を担当しており、説明と1対1で対応します。",
+        "commonMistakes": [
+          "Scheme と Target を同じものと考える間違いです。1つの Scheme が複数の Target（アプリとテスト）をまとめて扱います。",
+          "Debug でだけ動く不具合を調べるとき、Build Configuration の違い（最適化やアサーションの有無）を見落とすと原因にたどり着けません。"
+        ],
+        "takeaway": "Target は成果物、Configuration は設定、Scheme はその組み合わせ。",
+        "example": {
+          "code": "// 概念の対応関係\n// Scheme \"MyApp\" = Target(MyApp) + Configuration(Debug) + Action(Run)\n// Scheme \"MyApp\" = Target(MyAppTests) + Configuration(Debug) + Action(Test)\nlet actions = [\"Run\", \"Test\", \"Archive\"]\nprint(actions.count)",
+          "output": "3",
+          "explanation": "1つの Scheme に、アクションごとの構成がぶら下がる形になっています。"
+        }
+      }
+    },
+    {
+      "id": "practice-development-002",
+      "track": "development",
+      "lessonId": "dev-build-errors",
+      "type": "fillBlank",
+      "difficulty": 2,
+      "title": "自動生成される初期化子の呼び方",
+      "prompt": "struct を初期化して値を表示します。空欄を埋めてください。",
+      "skills": [
+        "types",
+        "debugging"
+      ],
+      "content": {
+        "template": "struct User {\n    let name: String\n}\nlet u = User({{1}} \"Yuki\")\nprint(u.{{2}})",
+        "blanks": [
+          {
+            "id": "1",
+            "options": [
+              "name:",
+              "user:",
+              "value:",
+              "text:"
+            ]
+          },
+          {
+            "id": "2",
+            "options": [
+              "name",
+              "Name",
+              "value",
+              "text"
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "1": "name:",
+          "2": "name"
+        }
+      },
+      "hints": [
+        "struct には初期化子を書いていませんが、自動的に用意されています。",
+        "その初期化子の引数ラベルは、宣言したプロパティから決まります。",
+        "ラベルもプロパティ名も、宣言した綴りとまったく同じでなければなりません。"
+      ],
+      "explanation": "struct は初期化子を書かなくても、全プロパティを引数に取るメンバーワイズイニシャライザが自動生成されます。その引数ラベルはプロパティ名そのままなので `User(name: \"Yuki\")` と書きます。プロパティへのアクセスも宣言どおり `u.name` です。大文字小文字が違うだけでも 'Value of type User has no member Name' というエラーになります。実行すると Yuki が表示されます。",
+      "detail": {
+        "concept": "コンパイルエラーの多くは「名前が一致していない」ことが原因です。自動生成される初期化子は宣言をそのまま反映するため、エラーメッセージを読めば期待されている名前がわかります。",
+        "steps": [
+          "`struct User { let name: String }` … メンバーワイズイニシャライザが自動生成される。",
+          "生成されるのは `init(name: String)`。ラベルはプロパティ名。",
+          "`User(name: \"Yuki\")` で初期化する。",
+          "`u.name` でプロパティにアクセスする。"
+        ],
+        "whyCorrect": "自動生成の規則が「プロパティ名 = 引数ラベル」であるため、宣言と呼び出しが一致します。名前が一致していることがコンパイルの条件です。",
+        "commonMistakes": [
+          "自分で init を書くと、メンバーワイズイニシャライザは生成されなくなります（extension に書けば両方使えます）。",
+          "'Missing argument for parameter' が出たら、プロパティを増やしたのに呼び出し側を直していない可能性が高いです。"
+        ],
+        "takeaway": "struct の初期化子は自動生成される。ラベルはプロパティ名そのまま。",
+        "example": {
+          "code": "struct User { let name: String; let age: Int }\nlet u = User(name: \"Yuki\", age: 24)\nprint(u.name, u.age)",
+          "output": "Yuki 24",
+          "explanation": "プロパティを増やすと、初期化子の引数も自動的に増えます。"
+        }
+      },
+      "seriesId": "development-build-errors",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-development-003",
+      "track": "development",
+      "lessonId": "dev-build-errors",
+      "type": "bugHunt",
+      "difficulty": 2,
+      "title": "引数が足りない呼び出しを見つける",
+      "prompt": "このコードは 'Missing argument for parameter age in call' でビルドできません。原因になっている行を選んでください。",
+      "skills": [
+        "types",
+        "debugging"
+      ],
+      "content": {
+        "lines": [
+          {
+            "id": "l1",
+            "code": "struct User {"
+          },
+          {
+            "id": "l2",
+            "code": "    let name: String"
+          },
+          {
+            "id": "l3",
+            "code": "    let age: Int"
+          },
+          {
+            "id": "l4",
+            "code": "}"
+          },
+          {
+            "id": "l5",
+            "code": "let u = User(name: \"Yuki\")"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "l5",
+        "fixedCode": "struct User {\n    let name: String\n    let age: Int\n}\nlet u = User(name: \"Yuki\", age: 24)\nprint(u.name, u.age)"
+      },
+      "hints": [
+        "エラーメッセージに書かれている引数名を、宣言と見比べてください。",
+        "自動生成される初期化子は、すべてのプロパティを引数に取ります。",
+        "プロパティは2つあるのに、呼び出しでは1つしか渡されていません。"
+      ],
+      "explanation": "バグは5行目の呼び出しです。User には name と age の2つのプロパティがあるため、自動生成される初期化子は `init(name:age:)` になります。呼び出し側で age を渡していないため 'Missing argument for parameter age in call' というコンパイルエラーになります。ビルドが止まるだけで実行時の問題ではありません。修正は `User(name: \"Yuki\", age: 24)` と両方を渡すことです。age に既定値を持たせたい場合は、`var age: Int = 0` のように宣言するか、自分で初期化子を書きます。",
+      "detail": {
+        "concept": "エラーメッセージは「何が足りないか」を具体的な名前で教えてくれます。パラメータ名が書かれているときは、その名前で宣言側を検索するのが最短の調査手順です。",
+        "steps": [
+          "プロパティは name と age の2つ。",
+          "自動生成される初期化子は init(name:age:)。",
+          "呼び出しは name だけなので、age が不足している。",
+          "age を渡すか、既定値を持たせる。"
+        ],
+        "whyCorrect": "エラーは呼び出し側の引数不足に対して出ています。宣言（1〜4行目）自体は正しく、2つのプロパティを持つ型として矛盾がありません。",
+        "commonMistakes": [
+          "`let age: Int = 0` としても、let の場合は既定値があってもメンバーワイズイニシャライザの引数に含まれ続けます。省略したいなら var にします。",
+          "プロパティを追加したときに呼び出し側の修正を忘れる典型例です。コンパイラが全箇所を教えてくれるので、順に直します。"
+        ],
+        "takeaway": "エラーメッセージのパラメータ名で宣言を検索する。それが最短経路。",
+        "example": {
+          "code": "struct User {\n    let name: String\n    var age: Int = 0\n}\nprint(User(name: \"Yuki\").age, User(name: \"Ko\", age: 30).age)",
+          "output": "0 30",
+          "explanation": "var に既定値を持たせると、その引数を省略した呼び出しもできるようになります。"
+        }
+      },
+      "seriesId": "development-build-errors",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-development-004",
+      "track": "development",
+      "lessonId": "dev-build-errors",
+      "type": "repair",
+      "difficulty": 2,
+      "title": "型注釈が合っていない宣言を直す",
+      "prompt": "合計を数値のまま使いたいのですが、2行目がビルドできません。修正として正しいものを選んでください。",
+      "skills": [
+        "types",
+        "debugging"
+      ],
+      "content": {
+        "code": "let numbers = [1, 2, 3]\nlet total: String = numbers.reduce(0, +)\nprint(total)",
+        "options": [
+          {
+            "id": "o1",
+            "code": "let total = numbers.reduce(0, +)"
+          },
+          {
+            "id": "o2",
+            "code": "let total: String = String(numbers.reduce(0, +))"
+          },
+          {
+            "id": "o3",
+            "code": "let total: String = numbers.reduce(\"0\", +)"
+          },
+          {
+            "id": "o4",
+            "code": "let total: Int = numbers.reduce(0, +).description"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1",
+        "fixedCode": "let numbers = [1, 2, 3]\nlet total = numbers.reduce(0, +)\nprint(total)"
+      },
+      "hints": [
+        "reduce(0, +) が返す型は何でしょうか。宣言した型と一致しているか確認してください。",
+        "要件は「数値のまま使いたい」です。文字列に変換する修正は要件に反します。",
+        "型注釈を外せば、右辺から正しい型が推論されます。"
+      ],
+      "explanation": "バグは2行目の型注釈です。`numbers.reduce(0, +)` は Int を返すのに String と宣言しているため 'Cannot convert value of type Int to specified type String' になります。要件は「数値のまま使いたい」なので、修正は型注釈を外して推論に任せることです（`let total: Int = ...` と明示しても構いません）。String() で包む o2 はビルドは通りますが型が String になり、以降の計算ができなくなるため要件に反します。o3 は Int 配列に String の初期値を渡しており、o4 は description が String を返すため、どちらも型が合いません。",
+      "detail": {
+        "concept": "型注釈は「この値はこの型であるべき」という宣言です。エラーが出たときは、注釈と右辺のどちらが正しいのかを要件に照らして判断します。",
+        "steps": [
+          "`numbers` は [Int]。reduce(0, +) の結果も Int。",
+          "型注釈が String なので不一致になる。",
+          "要件は数値なので、正しいのは右辺のほう。",
+          "注釈を外すと Int と推論され、そのまま計算に使える。"
+        ],
+        "whyCorrect": "右辺の型が要件と一致しているため、注釈を外すのが最小の修正です。値の意味を変えずにエラーだけを解消できます。",
+        "commonMistakes": [
+          "エラーを消すために右辺を変換する対応です。ビルドは通っても、意図した型でなくなり後続の処理が壊れます。",
+          "型注釈をすべて省くのも極端です。公開APIや意図が伝わりにくい場面では明示したほうが読みやすくなります。"
+        ],
+        "takeaway": "型不一致は「注釈と右辺のどちらが正しいか」を要件で決める。",
+        "example": {
+          "code": "let numbers = [1, 2, 3]\nlet total = numbers.reduce(0, +)\nlet label: String = \"合計: \\(total)\"\nprint(total + 1, label)",
+          "output": "7 合計: 6",
+          "explanation": "数値として保持しておけば計算に使え、表示が必要なときだけ文字列にできます。"
+        }
+      },
+      "seriesId": "development-build-errors",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-development-005",
+      "track": "development",
+      "lessonId": "dev-build-errors",
+      "type": "testReasoning",
+      "difficulty": 3,
+      "title": "小文字の入力でだけ落ちるテストを読む",
+      "prompt": "ビルドは通りますが、テストが1件失敗しています。実装のどこが要件と食い違っていますか。",
+      "skills": [
+        "testing",
+        "debugging"
+      ],
+      "content": {
+        "requirement": "initials(_:) は氏名を空白で区切り、各語の頭文字を大文字にして連結して返す（\"yuki ko\" なら \"YK\"）。",
+        "code": "func initials(_ name: String) -> String {\n    name.split(separator: \" \").map { String($0.first!) }.joined()\n}",
+        "tests": [
+          {
+            "name": "先頭が大文字の入力",
+            "input": "\"Yuki Ko\"",
+            "expected": "\"YK\"",
+            "result": "成功"
+          },
+          {
+            "name": "すべて小文字の入力",
+            "input": "\"yuki ko\"",
+            "expected": "\"YK\"",
+            "result": "失敗（\"yk\" が返った）"
+          }
+        ],
+        "options": [
+          {
+            "id": "o1",
+            "label": "頭文字を大文字に変換する処理がないため、入力が小文字のときにそのまま小文字で返る"
+          },
+          {
+            "id": "o2",
+            "label": "split の区切り文字が誤っているため、語の分割ができていない"
+          },
+          {
+            "id": "o3",
+            "label": "first! が空文字に対してクラッシュしている"
+          },
+          {
+            "id": "o4",
+            "label": "joined の区切り文字が指定されていないため連結されていない"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "2つのテストの違いは、入力の大文字小文字だけです。",
+        "実装のどこにも大文字へ変換する処理はありません。",
+        "1件目が通ったのは、入力がもともと大文字だったからです。"
+      ],
+      "explanation": "失敗したテストが表しているのは「頭文字を大文字にして返す」という要件です。検証している入力はすべて小文字の氏名で、変換処理の有無が結果に現れるケースを狙っています。実装は先頭の文字を取り出して連結しているだけで、大文字化を一切行っていません。そのため入力が小文字なら出力も小文字になります。1件目が成功したのは入力がもともと大文字だったためで、実装が要件を満たしている証拠にはなりません。分割も連結も正しく動いており、クラッシュも起きていないため、原因は大文字化の欠落だけです。修正は `String($0.first!).uppercased()` とするか、`$0.prefix(1).uppercased()` を使うことです。",
+      "detail": {
+        "concept": "「たまたま通るテスト」は、実装の正しさを保証しません。入力の性質が要件の分岐点と一致していないと、欠落した処理を検出できません。",
+        "steps": [
+          "要件は「頭文字を大文字にして連結」。",
+          "実装は頭文字の取り出しと連結しか行っていない。",
+          "大文字の入力ではそのまま通ってしまう。",
+          "小文字の入力で初めて欠落が表面化する。"
+        ],
+        "whyCorrect": "失敗しているのが小文字入力のときだけであり、件数や連結の形は期待どおりです。この分かれ方は、変換処理の欠落を正確に指しています。",
+        "commonMistakes": [
+          "大文字の入力だけでテストを書いてしまう間違いです。要件に変換が含まれるなら、変換が必要な入力を必ず含めます。",
+          "`first!` は空の語があるとクラッシュしますが、split は空の要素を作らないため、この実装では発生しません。ただし入力の前提が変われば危険になります。"
+        ],
+        "takeaway": "変換が要件なら、変換が必要な入力でテストする。通ったことは保証ではない。",
+        "example": {
+          "code": "func initials(_ name: String) -> String {\n    name.split(separator: \" \").map { $0.prefix(1).uppercased() }.joined()\n}\nprint(initials(\"Yuki Ko\"), initials(\"yuki ko\"))",
+          "output": "YK YK",
+          "explanation": "大文字化を加えると、どちらの入力でも同じ結果になります。"
+        }
+      },
+      "seriesId": "development-build-errors",
+      "seriesStep": 4
+    },
+    {
+      "id": "practice-development-006",
+      "track": "development",
+      "lessonId": "dev-modules-files",
+      "type": "chooseBlocks",
+      "difficulty": 2,
+      "title": "同じモジュールの別ファイルから使える形を選ぶ",
+      "prompt": "同じモジュール内の別ファイルから Config を使いたいです。必要な行だけを選び、正しい順に並べてください。",
+      "skills": [
+        "architecture",
+        "types"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "struct Config {"
+          },
+          {
+            "id": "b2",
+            "code": "    let retries: Int"
+          },
+          {
+            "id": "b3",
+            "code": "    init(retries: Int) { self.retries = retries }"
+          },
+          {
+            "id": "b4",
+            "code": "}"
+          },
+          {
+            "id": "b5",
+            "code": "private struct Config {"
+          },
+          {
+            "id": "b6",
+            "code": "    fileprivate let retries: Int"
+          }
+        ],
+        "requireOrder": true
+      },
+      "solution": {
+        "selected": [
+          "b1",
+          "b2",
+          "b3",
+          "b4"
+        ],
+        "order": [
+          "b1",
+          "b2",
+          "b3",
+          "b4"
+        ]
+      },
+      "hints": [
+        "アクセス修飾子を書かなかった場合、既定はどの範囲でしょうか。",
+        "private や fileprivate は、そのファイルの外からは見えなくなります。",
+        "モジュール内で共有したいだけなら、修飾子を書かないのがちょうどよい範囲です。"
+      ],
+      "explanation": "Swift の既定のアクセスレベルは internal で、「同じモジュール内なら別ファイルからも使える」という範囲です。要件がまさにこれなので、修飾子を書かないのが正解です。`private struct Config` にすると宣言したファイルの外からは見えず、`fileprivate let retries` にすると型は見えてもプロパティが読めません。必要以上に広げず（public にしない）、必要以上に狭めない（private にしない）のがアクセス制御の基本方針です。",
+      "detail": {
+        "concept": "アクセスレベルは「どこまで見せるか」の宣言です。狭すぎれば使えず、広すぎれば変更の影響範囲が広がります。要件にちょうど合う範囲を選びます。",
+        "steps": [
+          "既定は internal（モジュール内で公開）。",
+          "要件は「同じモジュールの別ファイルから使う」なので internal が一致する。",
+          "private は宣言したスコープ内（トップレベルならファイル内）だけ。",
+          "public はモジュール外にも公開するため、今回は広すぎる。"
+        ],
+        "whyCorrect": "internal の定義が要件そのものと一致しているため、修飾子を書かない形が最も素直です。明示したい場合に `internal` と書いても意味は同じです。",
+        "commonMistakes": [
+          "とりあえず public を付ける習慣です。ライブラリでは公開APIが増え、変更が破壊的になりやすくなります。",
+          "型は internal なのにプロパティだけ fileprivate にすると、別ファイルから初期化も参照もできず、原因が分かりにくいエラーになります。"
+        ],
+        "takeaway": "既定の internal はモジュール内公開。広げるのも狭めるのも理由があるときだけ。",
+        "example": {
+          "code": "struct Config {\n    let retries: Int\n    init(retries: Int) { self.retries = retries }\n}\nprint(Config(retries: 3).retries)",
+          "output": "3",
+          "explanation": "修飾子なしの宣言が、モジュール内で共有する既定の形です。"
+        }
+      },
+      "seriesId": "development-access",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-development-007",
+      "track": "development",
+      "lessonId": "dev-modules-files",
+      "type": "fillBlank",
+      "difficulty": 3,
+      "title": "モジュール外に読み取りだけ公開する",
+      "prompt": "Token をモジュール外からも使えるようにしつつ、value の書き換えは型の内部だけに制限します。空欄を埋めてください。",
+      "skills": [
+        "architecture",
+        "types"
+      ],
+      "content": {
+        "template": "{{1}} struct Token {\n    {{2}} var value: String = \"\"\n    mutating func set(_ v: String) { value = v }\n}",
+        "blanks": [
+          {
+            "id": "1",
+            "options": [
+              "public",
+              "private",
+              "fileprivate",
+              "internal"
+            ]
+          },
+          {
+            "id": "2",
+            "options": [
+              "private(set)",
+              "private",
+              "public",
+              "let"
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "1": "public",
+          "2": "private(set)"
+        }
+      },
+      "hints": [
+        "「モジュール外からも使える」ためには、既定の internal では足りません。",
+        "読み取りと書き込みで別々のアクセスレベルを指定できる書き方があります。",
+        "1つめはモジュール外への公開を表す修飾子、2つめは設定側だけを制限する修飾子です。"
+      ],
+      "explanation": "モジュール外に公開するには `public` が必要です（既定の internal はモジュール内限定）。`private(set)` は「取得は宣言どおりのレベル、設定は private」という指定なので、外部から読めても書き換えられません。型の内部にある `set(_:)` からは変更できるため、値の変更経路をメソッドに限定できます。`private` にすると外部から読めなくなり、`let` にすると内部からも変更できなくなって set(_:) がコンパイルエラーになります。",
+      "detail": {
+        "concept": "公開APIの設計では「見せる」と「触らせる」を分けて考えます。読み取りだけ公開すれば、利用側は状態を参照できるが不正な状態を作れない、という関係になります。",
+        "steps": [
+          "`public struct Token` … モジュール外から型を使えるようにする。",
+          "`private(set) var value` … 取得は public、設定は private。",
+          "外部からは `token.value` が読めるが、`token.value = ...` は書けない。",
+          "内部の `set(_:)` からは変更できるため、検証や整形を挟める。"
+        ],
+        "whyCorrect": "public が可視性を、private(set) が変更経路を制御しており、要件の2点をそれぞれ満たします。片方だけでは要件が成立しません。",
+        "commonMistakes": [
+          "public にすると、その型が参照する他の型も public でなければならない場合があります。公開範囲は連鎖します。",
+          "public struct のメンバーワイズイニシャライザは自動的には public になりません。ライブラリでは public な init を自分で書く必要があります。"
+        ],
+        "takeaway": "見せる範囲は public、触らせる範囲は private(set)。2つは別の軸。",
+        "example": {
+          "code": "public struct Token {\n    public private(set) var value: String = \"\"\n    public init() {}\n    public mutating func set(_ v: String) { value = v }\n}\nvar t = Token()\nt.set(\"abc\")\nprint(t.value)",
+          "output": "abc",
+          "explanation": "ライブラリとして公開する場合は、init も明示的に public にする必要があります。"
+        }
+      },
+      "seriesId": "development-access",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-development-008",
+      "track": "development",
+      "lessonId": "dev-spm",
+      "type": "reorder",
+      "difficulty": 3,
+      "title": "Package.swiftの構成を並べ替える",
+      "prompt": "ライブラリを1つ提供する Package.swift を作ります。ブロックを正しい順に並べ替えてください。",
+      "skills": [
+        "architecture"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "let package = Package("
+          },
+          {
+            "id": "b2",
+            "code": "// swift-tools-version: 6.0"
+          },
+          {
+            "id": "b3",
+            "code": "import PackageDescription"
+          },
+          {
+            "id": "b4",
+            "code": "    name: \"MyLib\","
+          },
+          {
+            "id": "b5",
+            "code": "    products: [.library(name: \"MyLib\", targets: [\"MyLib\"])],"
+          },
+          {
+            "id": "b6",
+            "code": "    targets: [.target(name: \"MyLib\")]"
+          },
+          {
+            "id": "b7",
+            "code": ")"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b2",
+          "b3",
+          "b1",
+          "b4",
+          "b5",
+          "b6",
+          "b7"
+        ]
+      },
+      "hints": [
+        "ツールのバージョン宣言は、コメントの形をしていますが必ず最初の行でなければなりません。",
+        "Package 型を使うには、先にモジュールを import する必要があります。",
+        "バージョン宣言 → import → Package( → name → products → targets → ) の順です。"
+      ],
+      "explanation": "`// swift-tools-version:` は単なるコメントではなく、SwiftPM が読み取る宣言なので必ずファイルの先頭行に置きます。次に PackageDescription を import し、Package のインスタンスを組み立てます。name はパッケージ名、products は外部に提供する成果物、targets はビルドの単位です。products で参照している target 名（\"MyLib\"）は、targets 側に存在していなければ解決に失敗します。",
+      "detail": {
+        "concept": "Package.swift は設定ファイルであると同時に Swift のコードです。マニフェストとして実行され、その結果の Package の値が構成として使われます。",
+        "steps": [
+          "1行目の swift-tools-version が、使えるマニフェスト機能とSwiftのバージョンを決める。",
+          "`import PackageDescription` で Package や Target の型を使えるようにする。",
+          "`name` … パッケージ名。",
+          "`products` … 他のパッケージから参照できる成果物。",
+          "`targets` … 実際にビルドされるソースの単位。"
+        ],
+        "whyCorrect": "バージョン宣言が先頭にあり、import が型の使用より前にあるため、マニフェストとして正しく解釈されます。products が参照する target も定義済みです。",
+        "commonMistakes": [
+          "swift-tools-version を2行目以降に書く間違いです。コメントとして無視され、古い既定のバージョンで解釈されます。",
+          "products の targets に存在しない名前を書くと、解決時にエラーになります。名前は文字列なのでコンパイラが検出できません。",
+          "ソースの配置は規約で決まっています（Sources/MyLib/）。target 名とディレクトリ名が一致していないと見つかりません。"
+        ],
+        "takeaway": "swift-tools-version は必ず1行目。products と targets の名前は一致させる。",
+        "example": {
+          "code": "// swift-tools-version: 6.0\n// import PackageDescription\n// let package = Package(\n//     name: \"MyLib\",\n//     products: [.library(name: \"MyLib\", targets: [\"MyLib\"])],\n//     targets: [.target(name: \"MyLib\")]\n// )\nlet layout = [\"Package.swift\", \"Sources/MyLib/MyLib.swift\", \"Tests/MyLibTests/MyLibTests.swift\"]\nprint(layout.count)",
+          "output": "3",
+          "explanation": "マニフェストと規約どおりのディレクトリ構成がそろって、はじめてビルドできます。"
+        }
+      },
+      "seriesId": "development-spm",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-development-009",
+      "track": "development",
+      "lessonId": "dev-spm",
+      "type": "matching",
+      "difficulty": 1,
+      "title": "SwiftPMの要素を対応づける",
+      "prompt": "Swift Package Manager に関する用語と、その役割を対応させてください。",
+      "skills": [
+        "architecture"
+      ],
+      "content": {
+        "left": [
+          {
+            "id": "l1",
+            "label": "Package.swift"
+          },
+          {
+            "id": "l2",
+            "label": "Package.resolved"
+          },
+          {
+            "id": "l3",
+            "label": ".target"
+          },
+          {
+            "id": "l4",
+            "label": ".product"
+          }
+        ],
+        "right": [
+          {
+            "id": "r1",
+            "label": "パッケージの構成を記述する定義ファイル"
+          },
+          {
+            "id": "r2",
+            "label": "解決された依存のバージョンを固定して記録するファイル"
+          },
+          {
+            "id": "r3",
+            "label": "ソースコードをビルドする単位"
+          },
+          {
+            "id": "r4",
+            "label": "他のパッケージが提供する成果物への参照"
+          },
+          {
+            "id": "r5",
+            "label": "テストを実行するためのスキーム設定"
+          }
+        ]
+      },
+      "solution": {
+        "pairs": {
+          "l1": "r1",
+          "l2": "r2",
+          "l3": "r3",
+          "l4": "r4"
+        }
+      },
+      "hints": [
+        "人が書くファイルと、ツールが書き出すファイルを区別してください。",
+        "ビルドの単位と、外部から使う参照は別の概念です。",
+        "r5 は Xcode の Scheme の説明なので、SwiftPM の要素とは対応しません。"
+      ],
+      "explanation": "Package.swift は人が書く構成の定義で、Package.resolved は依存解決の結果をツールが書き出す記録です。`.target` はソースをビルドする単位、`.product` は他のパッケージが公開している成果物への参照で、依存先のライブラリを使うときに指定します。r5 は Xcode の Scheme の説明で、SwiftPM の要素ではありません。",
+      "detail": {
+        "concept": "SwiftPM は「宣言（Package.swift）」と「解決結果（Package.resolved）」を分けています。前者は許容範囲を、後者は実際に使う具体的なバージョンを表します。",
+        "steps": [
+          "Package.swift に `from: \"1.5.0\"` のような許容範囲を書く。",
+          "解決時に、その範囲を満たす具体的なバージョンが決まる。",
+          "決まったバージョンが Package.resolved に記録される。",
+          "resolved をコミットしておくと、他の環境でも同じバージョンが使われる。"
+        ],
+        "whyCorrect": "4つは宣言・記録・ビルド単位・外部参照という別の役割を持ち、説明と1対1で対応します。ファイル2つと構成要素2つという分かれ方も理解の助けになります。",
+        "commonMistakes": [
+          "Package.resolved を .gitignore に入れる間違いです。環境ごとに違うバージョンが解決され、再現性が失われます。",
+          "target と product を混同する間違いです。自分のソースは target、依存先から使うものは product です。"
+        ],
+        "takeaway": "Package.swift は許容範囲、Package.resolved は確定したバージョン。両方コミットする。",
+        "example": {
+          "code": "let manifest = \"Package.swift\"\nlet lockfile = \"Package.resolved\"\nprint(\"\\(manifest): 人が書く / \\(lockfile): ツールが書く\")",
+          "output": "Package.swift: 人が書く / Package.resolved: ツールが書く",
+          "explanation": "どちらもコミット対象ですが、編集するのは前者だけです。"
+        }
+      },
+      "seriesId": "development-spm",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-development-010",
+      "track": "development",
+      "lessonId": "dev-dependencies",
+      "type": "shortCode",
+      "difficulty": 2,
+      "title": "依存を追加する1行を書く",
+      "prompt": "Package.swift の dependencies に、https://github.com/apple/swift-log を「1.5.0 以上（メジャーバージョンは 1 のまま）」で追加する1行を書いてください。末尾のカンマは不要です。",
+      "skills": [
+        "architecture"
+      ],
+      "content": {
+        "context": "dependencies: [\n    // ここに1行書く\n],",
+        "placeholder": "例: .package(url: \"...\", from: \"...\")"
+      },
+      "solution": {
+        "accepted": [
+          ".package(url: \"https://github.com/apple/swift-log\", from: \"1.5.0\")"
+        ]
+      },
+      "hints": [
+        "依存の指定は Package 型の静的メソッドとして書きます。先頭はドットで始まります。",
+        "「その版以上で、メジャーバージョンは上げない」を表す指定方法が用意されています。",
+        "url ラベルにリポジトリのURL、from ラベルに最低バージョンを文字列で渡します。"
+      ],
+      "explanation": "`.package(url: \"https://github.com/apple/swift-log\", from: \"1.5.0\")` と書きます。`from:` は「そのバージョン以上で、次のメジャーバージョン未満」という意味（ここでは 1.5.0 以上 2.0.0 未満）で、セマンティックバージョニングに従う多くのライブラリで既定の選び方になります。厳密に固定したい場合は `exact:` を、範囲を明示したい場合は `\"1.5.0\"..<\"1.7.0\"` のような指定を使います。",
+      "detail": {
+        "concept": "依存の指定は「どこまでの更新を自動で受け入れるか」の宣言です。広すぎると予期しない破壊的変更を拾い、狭すぎると修正版を取り込めません。",
+        "steps": [
+          "`.package(url:from:)` … 最も一般的な指定方法。",
+          "`from: \"1.5.0\"` … 1.5.0 以上 2.0.0 未満を許容する。",
+          "実際に解決されたバージョンは Package.resolved に記録される。",
+          "target 側の dependencies にも `.product(name:package:)` を書いて、使う宣言をする。"
+        ],
+        "whyCorrect": "from はセマンティックバージョニングの前提（メジャーが同じなら互換性が保たれる）に沿った指定です。要件の「1.5.0 以上、メジャーは 1 のまま」とちょうど一致します。",
+        "commonMistakes": [
+          "dependencies に書いただけでは使えません。target の dependencies にも product を追加する必要があります。",
+          "`branch: \"main\"` で依存する間違いです。いつビルドが壊れるか分からなくなるため、リリース版を指定します。"
+        ],
+        "takeaway": "依存は from で範囲を宣言し、確定版は Package.resolved に残す。",
+        "example": {
+          "code": "// dependencies: [\n//     .package(url: \"https://github.com/apple/swift-log\", from: \"1.5.0\")\n// ],\n// targets: [\n//     .target(name: \"MyLib\", dependencies: [.product(name: \"Logging\", package: \"swift-log\")])\n// ]\nlet steps = [\"パッケージを追加\", \"targetのdependenciesに追加\", \"importして使う\"]\nprint(steps.count)",
+          "output": "3",
+          "explanation": "依存を使えるようにするには、パッケージ追加と target への追加の2段階が必要です。"
+        }
+      },
+      "seriesId": "development-spm",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-development-011",
+      "track": "development",
+      "lessonId": "dev-debugger",
+      "type": "trace",
+      "difficulty": 3,
+      "title": "ループを途中で抜ける条件を追う",
+      "prompt": "ブレークポイントを置いて total を観察するつもりで、まず手で追ってみます。最後に表示される値を選んでください。",
+      "skills": [
+        "debugging",
+        "controlFlow"
+      ],
+      "content": {
+        "code": "var total = 0\nfor i in 1...3 {\n    total += i\n    if total > 3 { break }\n}\nprint(total)",
+        "options": [
+          {
+            "id": "o1",
+            "label": "6"
+          },
+          {
+            "id": "o2",
+            "label": "3"
+          },
+          {
+            "id": "o3",
+            "label": "1"
+          },
+          {
+            "id": "o4",
+            "label": "10"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "判定は加算のあとに行われます。加算前の値ではありません。",
+        "2周目が終わった時点で total はいくつでしょうか。",
+        "1周目が1、2周目が3、3周目で6になり、そこで初めて条件を満たします。"
+      ],
+      "explanation": "各周回で先に加算し、そのあとで判定します。1周目は total = 1（1 > 3 は偽）、2周目は total = 3（3 > 3 は偽、等しいだけでは真になりません）、3周目は total = 6 となりここで条件を満たして break します。break は「そこで抜ける」だけで値を戻さないため、最後の加算は反映されたままです。したがって表示は6です。境界値の3で抜けなかった点が、この問題の要です。",
+      "detail": {
+        "concept": "デバッガで変数を観察するとき、「その行を実行する前か後か」で値が変わります。加算と判定の順序を意識しないと、観察した値を誤って解釈します。",
+        "steps": [
+          "i=1: total = 0 + 1 = 1。1 > 3 は偽。",
+          "i=2: total = 1 + 2 = 3。3 > 3 は偽（等号を含まない）。",
+          "i=3: total = 3 + 3 = 6。6 > 3 は真なので break。",
+          "ループを抜けて print(total) が 6 を表示する。"
+        ],
+        "whyCorrect": "break は値を巻き戻さないため、条件を満たした時点の値がそのまま残ります。判定が加算のあとにあるので、閾値を超えた値が最終値になります。",
+        "commonMistakes": [
+          "`>` を `>=` と読み違えて、2周目で抜けると考える間違いです。境界値は1文字で変わります。",
+          "break が「その周回の変更を取り消す」と考える間違いです。break はループを抜けるだけです。"
+        ],
+        "takeaway": "判定の位置と境界の等号を確認する。break は値を戻さない。",
+        "example": {
+          "code": "var total = 0\nfor i in 1...3 {\n    total += i\n    print(\"i=\\(i) total=\\(total)\")\n    if total > 3 { break }\n}",
+          "output": "i=1 total=1\ni=2 total=3\ni=3 total=6",
+          "explanation": "各周回の値を出力すると、デバッガで1行ずつ止めたのと同じ情報が得られます。"
+        }
+      },
+      "seriesId": "development-debugging",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-development-012",
+      "track": "development",
+      "lessonId": "dev-debugger",
+      "type": "bugHunt",
+      "difficulty": 3,
+      "title": "リリースに残してはいけない行を見つける",
+      "prompt": "この関数はリリースビルドに含めるべきでない出力を行っています。取り除くべき行を選んでください。",
+      "skills": [
+        "debugging",
+        "architecture"
+      ],
+      "content": {
+        "lines": [
+          {
+            "id": "l1",
+            "code": "func price(_ n: Int) -> Int {"
+          },
+          {
+            "id": "l2",
+            "code": "    print(\"DEBUG price called with \\(n)\")"
+          },
+          {
+            "id": "l3",
+            "code": "    return n * 110 / 100"
+          },
+          {
+            "id": "l4",
+            "code": "}"
+          },
+          {
+            "id": "l5",
+            "code": "print(price(1000))"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "l2",
+        "fixedCode": "func price(_ n: Int) -> Int {\n    return n * 110 / 100\n}\nprint(price(1000))"
+      },
+      "hints": [
+        "調査のために一時的に入れた出力と、本来の出力を見分けてください。",
+        "print はビルド構成に関係なく常に実行されます。",
+        "関数の戻り値を表示している行は、この関数の利用側の正当な出力です。"
+      ],
+      "explanation": "取り除くべきは2行目のデバッグ用 print です。print はビルド構成に関わらず常に実行されるため、リリースビルドでも標準出力に流れ続けます。呼び出しごとに文字列を組み立てるコストがかかるうえ、引数の値がログに残るため、金額やユーザー情報が意図せず露出する危険もあります。挙動としてはクラッシュせず、余計な出力と性能低下という形で現れます。恒久的なログが必要なら、os の Logger を使ってレベルとプライバシー指定を明示し、デバッグ時だけ必要なら `#if DEBUG` で囲みます。5行目の print は呼び出し側が結果を表示しているだけなので、この関数の責務としては問題ありません。",
+      "detail": {
+        "concept": "デバッグ出力は「一時的な足場」です。恒久的に必要な情報はログ基盤に載せ、一時的なものは消す、という区別を付けないとノイズが蓄積します。",
+        "steps": [
+          "print はビルド構成による除去が行われず、常に実行される。",
+          "引数を文字列に補間するコストが、呼び出しのたびに発生する。",
+          "出力先が標準出力なので、フィルタリングやプライバシー指定ができない。",
+          "残す必要があるなら Logger、不要なら削除か #if DEBUG。"
+        ],
+        "whyCorrect": "取り除く対象は、調査目的で追加された行です。関数の戻り値を表示している呼び出し側の print は、その場の要件として正当な出力です。",
+        "commonMistakes": [
+          "`#if DEBUG` で囲めば安全だと考えて、機密情報の出力を続ける間違いです。デバッグビルドのログも共有端末では見られます。",
+          "print を Logger に置き換えるだけで、プライバシー指定を省く間違いです。os.Logger では既定で値が伏せられますが、明示的に public を指定すると露出します。"
+        ],
+        "takeaway": "print は常に実行される。残すなら Logger、消すなら消し切る。",
+        "example": {
+          "code": "func price(_ n: Int) -> Int {\n    #if DEBUG\n    print(\"DEBUG price called\")\n    #endif\n    return n * 110 / 100\n}\nprint(price(1000))",
+          "output": "1100",
+          "explanation": "DEBUG が定義されていないビルド（リリース相当）で実行した結果です。print の行はコンパイル対象から丸ごと外れるため、実行時のコストもゼロになります。DEBUG が定義されたビルドでは、この前に「DEBUG price called」が出力されます。"
+        }
+      },
+      "seriesId": "development-debugging",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-development-013",
+      "track": "development",
+      "lessonId": "dev-dependencies",
+      "type": "testReasoning",
+      "difficulty": 3,
+      "title": "手元では通るのにCIで落ちる原因を読む",
+      "prompt": "同じコードなのに、手元では通るテストが CI でだけ失敗します。設定のどこが要件に反していますか。",
+      "skills": [
+        "testing",
+        "architecture"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "requirement": "CI と手元で、依存ライブラリのまったく同じバージョンを使ってテストする。",
+        "code": "# .gitignore\nPackage.resolved\n\n# Package.swift\n.package(url: \"https://github.com/example/lib\", from: \"1.5.0\")",
+        "tests": [
+          {
+            "name": "手元でのテスト",
+            "input": "解決済みの依存を使用",
+            "expected": "全件成功",
+            "result": "成功"
+          },
+          {
+            "name": "CI でのテスト",
+            "input": "クリーンな環境で依存を解決",
+            "expected": "全件成功",
+            "result": "失敗（一部のAPIの挙動が変わっている）"
+          }
+        ],
+        "options": [
+          {
+            "id": "o1",
+            "label": "Package.resolved を除外しているため、CI では from: の範囲内で別のバージョンが解決され、環境が一致しない"
+          },
+          {
+            "id": "o2",
+            "label": "CI のマシンが遅いため、テストがタイムアウトしている"
+          },
+          {
+            "id": "o3",
+            "label": "Package.swift の記述が壊れており、依存をまったく取得できていない"
+          },
+          {
+            "id": "o4",
+            "label": "テストコードがリポジトリに含まれていないため、CI では実行されていない"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "手元では以前に解決した依存がそのまま残っています。CI は毎回まっさらな状態から始まります。",
+        "from: はバージョンの範囲を指定するもので、1つに固定するものではありません。",
+        "解決した結果を記録するファイルが、リポジトリから除外されています。"
+      ],
+      "explanation": "失敗したテストが表しているのは「CI と手元で同じ依存バージョンを使う」という再現性の要件です。検証している条件は、クリーンな環境で依存を解決し直す CI 実行で、これは新しいバージョンが選ばれうる唯一のタイミングです。Package.swift の `from: \"1.5.0\"` は「1.5.0 以上 2.0.0 未満」という範囲指定なので、その後に 1.6.0 が公開されていれば CI ではそちらが解決されます。手元は以前に解決した 1.5.0 が Package.resolved と依存キャッシュに残っているため通り続けます。この差を埋めるのが Package.resolved で、それを .gitignore に入れているため CI と共有されていません。修正は Package.resolved を .gitignore から外してコミットすることです。",
+      "detail": {
+        "concept": "ビルドの再現性は「宣言（許容範囲）」と「確定（実際に使うバージョン）」の両方を共有することで得られます。片方だけでは環境ごとに結果が変わります。",
+        "steps": [
+          "`from: \"1.5.0\"` は範囲であって固定ではない。",
+          "手元には過去に解決した Package.resolved と依存キャッシュが残っている。",
+          "CI はクリーンな状態から解決するため、範囲内の最新版を選ぶ。",
+          "Package.resolved を共有すれば、CI も同じバージョンを使う。"
+        ],
+        "whyCorrect": "手元と CI の唯一の違いが「依存を解決し直すかどうか」であり、その結果を固定するファイルが共有されていません。マシン性能やマニフェストの破損なら、手元のテストにも影響が出るはずです。",
+        "commonMistakes": [
+          "`exact:` ですべての依存を固定する対応です。再現性は上がりますが、脆弱性修正の取り込みが手作業になります。範囲指定＋resolved の共有が標準的な折衷案です。",
+          "Package.resolved を lockfile ではなく生成物とみなして無視する間違いです。アプリケーションでは必ずコミットします（ライブラリでは扱いが異なります）。"
+        ],
+        "takeaway": "アプリでは Package.resolved をコミットする。from: は固定ではなく範囲。",
+        "example": {
+          "code": "let declared = \"from: 1.5.0（1.5.0以上2.0.0未満）\"\nlet resolvedLocal = \"1.5.0\"\nlet resolvedCI = \"1.6.0\"\nprint(declared)\nprint(\"手元:\", resolvedLocal, \"/ CI:\", resolvedCI, \"→ 一致しない\")",
+          "output": "from: 1.5.0（1.5.0以上2.0.0未満）\n手元: 1.5.0 / CI: 1.6.0 → 一致しない",
+          "explanation": "同じ宣言から別のバージョンが解決されうることが、不一致の原因です。"
+        }
+      },
+      "seriesId": "development-spm",
+      "seriesStep": 4
+    },
+    {
+      "id": "practice-development-014",
+      "track": "development",
+      "lessonId": "dev-modules-files",
+      "type": "repair",
+      "difficulty": 3,
+      "title": "公開範囲が食い違う宣言を直す",
+      "prompt": "Client のプロパティが private な型を使っているためビルドできません。Config はモジュール外には公開したくありません。1行目の修正として正しいものを選んでください。",
+      "skills": [
+        "architecture",
+        "debugging"
+      ],
+      "content": {
+        "code": "private struct Config {\n    let retries: Int\n}\nstruct Client {\n    let config: Config\n}",
+        "options": [
+          {
+            "id": "o1",
+            "code": "struct Config {"
+          },
+          {
+            "id": "o2",
+            "code": "public struct Config {"
+          },
+          {
+            "id": "o3",
+            "code": "fileprivate struct Config {"
+          },
+          {
+            "id": "o4",
+            "code": "private struct Config: Sendable {"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1",
+        "fixedCode": "struct Config {\n    let retries: Int\n}\nstruct Client {\n    let config: Config\n}\nprint(Client(config: Config(retries: 3)).config.retries)"
+      },
+      "hints": [
+        "公開されている型のプロパティに、それより狭い型を使うことはできません。",
+        "Client は既定の internal です。プロパティの型も同じ範囲まで見えている必要があります。",
+        "モジュール外には出したくないので、public にする必要はありません。"
+      ],
+      "explanation": "バグは1行目のアクセスレベルです。Client は既定の internal（モジュール内で公開）なのに、そのプロパティの型 Config が private（このファイル内のみ）なので、'Property must be declared private because its type uses a private type' というコンパイルエラーになります。公開されている宣言は、それより狭い型を露出できません。要件は「モジュール外には公開しない」なので、Config を internal（修飾子なし）にするのが正解です。public にすると要件を超えて外部にも公開してしまい、fileprivate はファイル内限定のままなので同じエラーが残ります。Sendable を足しても可視性は変わりません。",
+      "detail": {
+        "concept": "アクセスレベルには「露出の整合性」という規則があります。ある宣言は、自分より狭いアクセスレベルの型をシグネチャに使えません。使えてしまうと、参照できない型を参照させることになるためです。",
+        "steps": [
+          "Client は internal。つまりモジュール内のどこからでも見える。",
+          "その `config` プロパティの型は Config。",
+          "Config が private だと、Client を見られる場所から Config が見えない矛盾が生じる。",
+          "Config を internal にすると、両者の範囲が一致する。"
+        ],
+        "whyCorrect": "Client と同じ internal にそろえることで、露出の整合性が満たされます。要件が「モジュール内で使う」ことなので、この範囲がちょうど必要十分です。",
+        "commonMistakes": [
+          "エラーを消すために public にする対応です。ビルドは通りますが、モジュール外のAPIが増えて後戻りしにくくなります。",
+          "逆に Client 側を private にする対応もありえますが、Client を他のファイルから使えなくなるため、要件次第です。エラーは2通りの直し方があることを意識します。"
+        ],
+        "takeaway": "公開する宣言は、それより狭い型を露出できない。範囲は要件でそろえる。",
+        "example": {
+          "code": "struct Config { let retries: Int }\nstruct Client { let config: Config }\nprint(Client(config: Config(retries: 3)).config.retries)",
+          "output": "3",
+          "explanation": "両方を internal にそろえることで、露出の整合性が満たされます。"
+        }
+      },
+      "seriesId": "development-access",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-development-015",
+      "track": "development",
+      "lessonId": "dev-logging",
+      "type": "fillBlank",
+      "difficulty": 2,
+      "title": "構造化ログを出す準備をする",
+      "prompt": "OSLog を使ってログを出します。空欄を埋めてください。",
+      "skills": [
+        "architecture",
+        "debugging"
+      ],
+      "content": {
+        "template": "import OSLog\nlet logger = {{1}}(subsystem: \"com.example.app\", category: \"network\")\nlogger.{{2}}(\"リクエスト開始\")",
+        "blanks": [
+          {
+            "id": "1",
+            "options": [
+              "Logger",
+              "OSLog",
+              "NSLog",
+              "Printer"
+            ]
+          },
+          {
+            "id": "2",
+            "options": [
+              "info",
+              "print",
+              "write",
+              "emit"
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "1": "Logger",
+          "2": "info"
+        }
+      },
+      "hints": [
+        "subsystem と category を受け取って作る型があります。フレームワーク名と型名は別です。",
+        "ログにはレベル（重要度）があります。debug / info / error などです。",
+        "1つめは Logger、2つめは通常の記録に使うレベル名です。print ではありません。"
+      ],
+      "explanation": "`Logger(subsystem:category:)` で用意すると、subsystem（アプリの識別子）と category（機能単位）でログを分類できます。出力にはレベルごとのメソッドを使い、通常の記録なら `info`、詳細な調査用は `debug`、異常時は `error` を使い分けます。print と違い、レベルやカテゴリでフィルタでき、リリースビルドでも Console.app や log コマンドから追跡できます。",
+      "detail": {
+        "concept": "ログは「あとから絞り込めること」が価値です。subsystem と category で場所を、レベルで重要度を表すことで、必要な情報だけを取り出せます。",
+        "steps": [
+          "`import OSLog` … Logger は OSLog フレームワークにある。",
+          "`Logger(subsystem:category:)` … 分類のための2つの識別子を渡す。",
+          "`logger.info(...)` … 通常の記録レベル。",
+          "出力先は標準出力ではなく、システムのログストア。"
+        ],
+        "whyCorrect": "Logger は型名、info はレベル名で、どちらも標準の API 名です。print はログ基盤を経由しないため、フィルタも保存も行われません。",
+        "commonMistakes": [
+          "debug レベルは既定でストアに残らない設定のことがあります。あとから調査したい情報は info 以上にします。",
+          "ログメッセージを文字列連結で組み立てると、補間による最適化やプライバシー指定が効きません。補間はそのまま書きます。"
+        ],
+        "takeaway": "ログは Logger + レベル + カテゴリ。print はフィルタも保存もできない。",
+        "example": {
+          "code": "import OSLog\nlet logger = Logger(subsystem: \"com.example.app\", category: \"network\")\nlogger.info(\"リクエスト開始\")\nlogger.error(\"リクエスト失敗\")\nprint(\"ログはシステムのログストアに記録され、標準出力には出ません\")",
+          "output": "ログはシステムのログストアに記録され、標準出力には出ません",
+          "explanation": "Logger の出力は標準出力に現れません。Console.app や log コマンドで確認します。"
+        }
+      },
+      "seriesId": "development-logging",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-development-016",
+      "track": "development",
+      "lessonId": "dev-logging",
+      "type": "bugHunt",
+      "difficulty": 3,
+      "title": "機密情報を露出しているログ行を見つける",
+      "prompt": "このログはリリースビルドで問題になります。原因になっている行を選んでください。",
+      "skills": [
+        "architecture",
+        "debugging"
+      ],
+      "content": {
+        "lines": [
+          {
+            "id": "l1",
+            "code": "import OSLog"
+          },
+          {
+            "id": "l2",
+            "code": "let logger = Logger(subsystem: \"com.example.app\", category: \"auth\")"
+          },
+          {
+            "id": "l3",
+            "code": "let token = \"secret-abc\""
+          },
+          {
+            "id": "l4",
+            "code": "logger.info(\"token=\\(token, privacy: .public)\")"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "l4",
+        "fixedCode": "import OSLog\nlet logger = Logger(subsystem: \"com.example.app\", category: \"auth\")\nlet token = \"secret-abc\"\nlogger.info(\"token=\\(token, privacy: .private)\")\nprint(\"トークンはログに残らない\")"
+      },
+      "hints": [
+        "OSLog では、補間した値をログに残すかどうかを指定できます。",
+        "既定では動的な値は伏せ字になります。それを上書きしている箇所があります。",
+        "認証トークンのような値を、明示的に公開扱いにしている行があります。"
+      ],
+      "explanation": "バグは4行目です。OSLog は補間された動的な値を既定で伏せ字（&lt;private&gt;）にしますが、`privacy: .public` を指定するとその保護を解除して値をそのまま記録します。認証トークンをこの指定で出すと、端末のログストアに平文で残り、デバイスのログを取得できる人が読めてしまいます。クラッシュもエラーも起きず、動作としては正常に見えるのが危険な点です。修正は `.private` を指定する（または指定を省いて既定に任せる）ことです。どうしても関連付けが必要なら `.private(mask: .hash)` でハッシュ化した値を残せます。",
+      "detail": {
+        "concept": "ログのプライバシー指定は「その値を端末に残してよいか」の判断です。静的な文字列は常に残り、補間された値だけが既定で保護されます。",
+        "steps": [
+          "静的な文字列部分（token=）は常にログに残る。",
+          "補間された値は既定で伏せ字になる。",
+          "`privacy: .public` はその保護を明示的に解除する指定。",
+          "トークンや個人情報には `.private` を使い、必要なら hash マスクを使う。"
+        ],
+        "whyCorrect": "問題は値そのものではなく、保護を解除している指定です。3行目でトークンを持つこと自体は必要な処理であり、ログに出す方法だけが誤っています。",
+        "commonMistakes": [
+          "デバッグ時に .public を付けて、そのままコミットしてしまう典型例です。レビューで検索すべきキーワードのひとつです。",
+          "「開発ビルドだけだから安全」と考える間違いです。ログストアはビルド構成に関わらず端末に残ります。"
+        ],
+        "takeaway": "OSLog の補間値は既定で保護される。.public は保護の解除であって既定ではない。",
+        "example": {
+          "code": "import OSLog\nlet logger = Logger(subsystem: \"com.example.app\", category: \"auth\")\nlet token = \"secret-abc\"\nlogger.info(\"token=\\(token)\")\nlogger.info(\"token=\\(token, privacy: .private(mask: .hash))\")\nprint(\"既定は伏せ字、hash なら同一性だけ追える\")",
+          "output": "既定は伏せ字、hash なら同一性だけ追える",
+          "explanation": "同じトークンかどうかを追跡したいだけなら、hash マスクで値を残さずに済みます。"
+        }
+      },
+      "seriesId": "development-logging",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-development-017",
+      "track": "development",
+      "lessonId": "dev-logging",
+      "type": "chooseBlocks",
+      "difficulty": 3,
+      "title": "失敗時だけ記録する行を選ぶ",
+      "prompt": "ログイン失敗のときだけログに残します。必要な行だけを選び、正しい順に並べてください。",
+      "skills": [
+        "architecture",
+        "debugging"
+      ],
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "import OSLog"
+          },
+          {
+            "id": "b2",
+            "code": "let logger = Logger(subsystem: \"com.example.app\", category: \"auth\")"
+          },
+          {
+            "id": "b3",
+            "code": "func login(_ user: String) -> Bool { user == \"yuki\" }"
+          },
+          {
+            "id": "b4",
+            "code": "if !login(\"taro\") { logger.error(\"ログイン失敗 user=\\(\"taro\")\") }"
+          },
+          {
+            "id": "b5",
+            "code": "print(\"ログイン失敗 user=taro\")"
+          },
+          {
+            "id": "b6",
+            "code": "logger.debug(\"ログイン成功も含めてすべて記録\")"
+          }
+        ],
+        "requireOrder": true
+      },
+      "solution": {
+        "selected": [
+          "b1",
+          "b2",
+          "b3",
+          "b4"
+        ],
+        "order": [
+          "b1",
+          "b2",
+          "b3",
+          "b4"
+        ]
+      },
+      "hints": [
+        "print はログ基盤を通らないため、レベルもフィルタも使えません。",
+        "要件は「失敗のときだけ」です。成功も含めて記録する行は不要です。",
+        "異常を表すレベルのメソッドを、条件付きで呼ぶ形にします。"
+      ],
+      "explanation": "失敗時のみ記録するので、`if !login(...)` の条件付きで `logger.error(...)` を呼びます。error レベルにしておくと、あとから重要度で絞り込めます。print はログストアに残らずフィルタもできないため、リリース後の調査に使えません。成功も含めてすべてを記録する行は、ログ量を増やして必要な情報を埋もれさせるだけで、要件にも反します。",
+      "detail": {
+        "concept": "ログ設計は「あとで何を知りたいか」から逆算します。すべてを記録すると探せなくなり、記録しなさすぎると調査できません。異常系を優先的に残すのが基本です。",
+        "steps": [
+          "`login(...)` の結果が false のときだけ分岐に入る。",
+          "`logger.error(...)` … 異常を表すレベルで記録する。",
+          "レベルとカテゴリが付くので、あとから絞り込める。",
+          "成功時は記録しないため、ログ量が抑えられる。"
+        ],
+        "whyCorrect": "条件付きの error 呼び出しが「失敗のときだけ」という要件をそのまま表しています。レベル指定によって、調査時の絞り込みも可能になります。",
+        "commonMistakes": [
+          "すべてを debug で記録して、あとから探せなくなる例です。件数が多いログは既定で保持されないこともあります。",
+          "失敗の記録にユーザー識別子を含める場合、プライバシー指定を忘れないようにします。既定では伏せ字になります。"
+        ],
+        "takeaway": "異常系を error で残す。print はリリース後の調査に使えない。",
+        "example": {
+          "code": "import OSLog\nlet logger = Logger(subsystem: \"com.example.app\", category: \"auth\")\nfunc login(_ user: String) -> Bool { user == \"yuki\" }\nfor user in [\"yuki\", \"taro\"] {\n    if !login(user) { logger.error(\"ログイン失敗\") }\n    print(user, login(user))\n}",
+          "output": "yuki true\ntaro false",
+          "explanation": "失敗した taro のときだけ error が記録されます（ログ自体は標準出力には出ません）。"
+        }
+      },
+      "seriesId": "development-logging",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-development-018",
+      "track": "development",
+      "lessonId": "dev-instruments",
+      "type": "trace",
+      "difficulty": 3,
+      "title": "重複判定のループを追う",
+      "prompt": "Instruments で遅さの原因を探す前に、まず動作を手で追います。最後に表示される値を選んでください。",
+      "skills": [
+        "debugging",
+        "collections"
+      ],
+      "content": {
+        "code": "var seen: [String] = []\nvar dupes = 0\nfor w in [\"a\", \"b\", \"a\", \"c\", \"b\"] {\n    if seen.contains(w) { dupes += 1 } else { seen.append(w) }\n}\nprint(seen.count, dupes)",
+        "options": [
+          {
+            "id": "o1",
+            "label": "3 2"
+          },
+          {
+            "id": "o2",
+            "label": "5 0"
+          },
+          {
+            "id": "o3",
+            "label": "3 5"
+          },
+          {
+            "id": "o4",
+            "label": "2 3"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "seen に追加されるのは、まだ見ていない語だけです。",
+        "重複としてカウントされるのは、すでに seen にある語が現れたときです。",
+        "登場する語の種類は a・b・c の3つ、そのうち重複して現れたのは2回です。"
+      ],
+      "explanation": "初出の語だけが seen に追加されるため、seen には a・b・c の3件が入ります。すでに seen にある語（3番目の a と5番目の b）が現れたときに dupes が増えるので、dupes は2になります。したがって「3 2」が表示されます。なお、この実装は `seen.contains` が配列の線形探索（要素数に比例した時間）なので、語彙が増えると急激に遅くなります。Instruments で計測すると contains に時間が集中していることが見えるはずで、Set に置き換えるのが定石です。",
+      "detail": {
+        "concept": "性能の問題は、まず動作の正しさを確認してから計測します。正しく動いているコードのどこに時間がかかっているかを、推測ではなく計測で特定するのが Instruments の役割です。",
+        "steps": [
+          "a: 未登録なので seen に追加（seen=[a]）。",
+          "b: 未登録なので追加（seen=[a,b]）。",
+          "a: 既にあるので dupes=1。",
+          "c: 追加（seen=[a,b,c]）。",
+          "b: 既にあるので dupes=2。結果は「3 2」。"
+        ],
+        "whyCorrect": "初出かどうかで追加と加算が排他的に分岐するため、種類数と重複数の合計が入力件数（5）に一致します。3 + 2 = 5 という関係が検算になります。",
+        "commonMistakes": [
+          "dupes を「重複した種類の数」と読み違える間違いです。ここでは重複して現れた回数を数えています。",
+          "配列の contains を頻繁に呼ぶ実装は、件数が増えると計算量が二乗に近づきます。Set なら要素数によらず高速です。"
+        ],
+        "takeaway": "動作を確認してから計測する。配列の contains はループ内で使うと重い。",
+        "example": {
+          "code": "var seen = Set<String>()\nvar dupes = 0\nfor w in [\"a\", \"b\", \"a\", \"c\", \"b\"] {\n    if !seen.insert(w).inserted { dupes += 1 }\n}\nprint(seen.count, dupes)",
+          "output": "3 2",
+          "explanation": "Set に置き換えても結果は同じで、件数が増えたときの速度だけが変わります。"
+        }
+      }
+    },
+    {
+      "id": "practice-development-019",
+      "track": "development",
+      "lessonId": "dev-swift-testing",
+      "type": "testReasoning",
+      "difficulty": 2,
+      "title": "0を渡したときだけ落ちるテストを読む",
+      "prompt": "新しく追加した1件のテストだけが失敗します。実装と要件のどこがずれていますか。",
+      "skills": [
+        "testing",
+        "debugging"
+      ],
+      "content": {
+        "requirement": "isEven(_:) は偶数なら true を返す。0 は偶数として扱う。",
+        "code": "func isEven(_ n: Int) -> Bool { n > 0 && n % 2 == 0 }",
+        "tests": [
+          {
+            "name": "正の偶数",
+            "input": "4",
+            "expected": "true",
+            "result": "成功"
+          },
+          {
+            "name": "ゼロ",
+            "input": "0",
+            "expected": "true",
+            "result": "失敗（false が返った）"
+          }
+        ],
+        "options": [
+          {
+            "id": "o1",
+            "label": "n > 0 という条件が余分にあるため、要件どおり 0 を偶数として扱えていない"
+          },
+          {
+            "id": "o2",
+            "label": "% 演算子は 0 に対して使えないため、実行時エラーになっている"
+          },
+          {
+            "id": "o3",
+            "label": "戻り値が Optional のため、期待値と比較できていない"
+          },
+          {
+            "id": "o4",
+            "label": "0 は偶数ではないので、テストの期待値のほうが誤っている"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "要件に「0 は偶数として扱う」と明記されています。",
+        "実装の条件式は2つの条件を && でつないでいます。それぞれが 0 に対してどうなるか確かめてください。",
+        "0 % 2 == 0 は真ですが、もう片方の条件が偽になっています。"
+      ],
+      "explanation": "失敗したテストが表しているのは「0 を偶数として扱う」という要件です。検証している入力は 0 そのもので、正負の境界にあたる代表的な値です。実装は `n > 0 && n % 2 == 0` となっており、0 では前半の条件が偽になるため全体が false になります。偶数判定に必要なのは剰余の条件だけで、正の数に限る条件は要件のどこにも書かれていません。4 のテストが通っているのは、たまたま両方の条件を満たすためです。修正は `n % 2 == 0` だけにすることで、0 も負の偶数も正しく判定できます。",
+      "detail": {
+        "concept": "実装に「要件に書かれていない条件」が紛れ込むと、特定の入力でだけ結果がずれます。境界値のテストは、この種の余分な条件を露出させます。",
+        "steps": [
+          "要件は「偶数なら true、0 も偶数」。",
+          "実装は正の数であることも要求している。",
+          "0 は 0 > 0 が偽なので false になる。",
+          "`n % 2 == 0` だけにすると、0 も -2 も true になる。"
+        ],
+        "whyCorrect": "失敗しているのが 0 のときだけであり、正の偶数は通っています。この分かれ方は、正負を判定する余分な条件の存在を正確に指しています。",
+        "commonMistakes": [
+          "負の数のテストがないため、-2 でも同じ問題が起きることに気づけません。境界は 0 の前後で考えます。",
+          "Swift の % は負の数にも使えます（-3 % 2 は -1）。偶数判定では結果が 0 かどうかを見るので問題ありません。"
+        ],
+        "takeaway": "要件にない条件を足さない。境界値のテストがそれを暴く。",
+        "example": {
+          "code": "func isEven(_ n: Int) -> Bool { n % 2 == 0 }\nprint(isEven(4), isEven(0), isEven(-2), isEven(3))",
+          "output": "true true true false",
+          "explanation": "剰余の条件だけにすると、0 と負の偶数も要件どおりに判定されます。"
+        }
+      },
+      "seriesId": "development-testing",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-development-020",
+      "track": "development",
+      "lessonId": "dev-swift-testing",
+      "type": "fillBlank",
+      "difficulty": 2,
+      "title": "Swift Testingのテストを書く",
+      "prompt": "Swift Testing でテストを1件書きます。空欄を埋めてください。",
+      "skills": [
+        "testing"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "template": "import Testing\n\n@{{1}}(\"偶数の判定\")\nfunc evenNumbers() {\n    #{{2}}(isEven(4))\n}",
+        "blanks": [
+          {
+            "id": "1",
+            "options": [
+              "Test",
+              "Suite",
+              "XCTest",
+              "Check"
+            ]
+          },
+          {
+            "id": "2",
+            "options": [
+              "expect",
+              "assert",
+              "require",
+              "verify"
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "1": "Test",
+          "2": "expect"
+        }
+      },
+      "hints": [
+        "テスト関数であることを示す属性は、@ で始まる1語です。",
+        "検証は関数ではなくマクロで、# で始まります。",
+        "1つめはテスト1件を表す属性、2つめは「失敗しても続行する」検証マクロです。"
+      ],
+      "explanation": "Swift Testing では `@Test` 属性でテスト関数を宣言し、`#expect(...)` マクロで条件を検証します。関数名がそのままテスト名になりますが、`@Test(\"表示名\")` で読みやすい名前を付けられます。`#expect` は失敗しても以降の行を続行し、`#require` は失敗した時点でそのテストを中断します（Optional のアンラップにも使えます）。XCTest とは別のフレームワークなので、XCTAssert 系の関数は使いません。",
+      "detail": {
+        "concept": "Swift Testing はマクロを使って、失敗時に式の中身（左辺と右辺の実際の値）を自動的に表示します。XCTest のように専用の比較関数を覚える必要がありません。",
+        "steps": [
+          "`import Testing` … フレームワークを読み込む。",
+          "`@Test(\"表示名\")` … この関数がテストであることを宣言する。",
+          "`#expect(条件)` … 条件が false ならテストが失敗する。",
+          "失敗時には条件式の中の実際の値が出力される。"
+        ],
+        "whyCorrect": "@Test と #expect は Swift Testing の中心的な API です。属性とマクロという記法の違いが、そのまま @ と # の使い分けに対応します。",
+        "commonMistakes": [
+          "XCTest の XCTAssertEqual をそのまま使おうとする間違いです。フレームワークが違うため、import も記法も異なります。",
+          "#expect と #require の使い分けを誤る間違いです。それ以降の検証が意味をなさない前提条件には #require を使います。"
+        ],
+        "takeaway": "Swift Testing は @Test と #expect。前提が崩れたら止めたいときは #require。",
+        "example": {
+          "code": "func isEven(_ n: Int) -> Bool { n % 2 == 0 }\n// import Testing\n// @Test(\"偶数の判定\")\n// func evenNumbers() {\n//     #expect(isEven(4))\n//     #expect(!isEven(3))\n// }\nprint(isEven(4), !isEven(3))",
+          "output": "true true",
+          "explanation": "テストが検証している条件そのものを、通常のコードとして確認したものです。"
+        }
+      },
+      "seriesId": "development-testing",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-development-021",
+      "track": "development",
+      "lessonId": "dev-swift-testing",
+      "type": "reorder",
+      "difficulty": 3,
+      "title": "テスト1件の構成を並べ替える",
+      "prompt": "税込み価格のテストを1件書きます。ブロックを正しい順に並べ替えてください。",
+      "skills": [
+        "testing"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "func taxCalculation() {"
+          },
+          {
+            "id": "b2",
+            "code": "import Testing"
+          },
+          {
+            "id": "b3",
+            "code": "    let result = priceWithTax(1000, rate: 0.1)"
+          },
+          {
+            "id": "b4",
+            "code": "@Test(\"税込み価格を計算する\")"
+          },
+          {
+            "id": "b5",
+            "code": "    #expect(result == 1100)"
+          },
+          {
+            "id": "b6",
+            "code": "}"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b2",
+          "b4",
+          "b1",
+          "b3",
+          "b5",
+          "b6"
+        ]
+      },
+      "hints": [
+        "import はファイルの先頭に置きます。",
+        "属性は、それが修飾する宣言の直前に書きます。",
+        "import → @Test → func → 実行 → 検証 → 閉じかっこ、の順です。"
+      ],
+      "explanation": "属性（@Test）は修飾する宣言（func）の直前に置きます。テスト本体は「実行して結果を得る → 期待値と比較する」という順序で、この2段構えが読みやすさの基本形です。`#expect(result == 1100)` は失敗時に result の実際の値を表示してくれるため、比較結果だけを別に組み立てるより調査が早くなります。",
+      "detail": {
+        "concept": "テストは「準備・実行・検証」の3段構成（Arrange / Act / Assert）で書くと、何を確かめているかが読み取りやすくなります。",
+        "steps": [
+          "`import Testing` … フレームワークを読み込む。",
+          "`@Test(\"...\")` … 直後の func をテストとして登録する。",
+          "`let result = ...` … 実行して結果を取り出す（Act）。",
+          "`#expect(result == 1100)` … 期待値と比較する（Assert）。"
+        ],
+        "whyCorrect": "属性が宣言の直前にあり、実行が検証より前にあるという2つの順序制約が守られています。この形なら、失敗時にどの値が想定と違ったかがすぐ分かります。",
+        "commonMistakes": [
+          "`#expect(priceWithTax(1000, rate: 0.1) == 1100)` と1行にまとめると、失敗時の表示は読めますが、複数回検証したいときに毎回計算し直すことになります。",
+          "1つのテスト関数に多くの検証を詰め込むと、最初の失敗以降の状況が分かりにくくなります。観点ごとに分けます。"
+        ],
+        "takeaway": "属性は宣言の直前。テスト本体は実行してから検証する。",
+        "example": {
+          "code": "func priceWithTax(_ price: Int, rate: Double) -> Int {\n    price + Int(Double(price) * rate)\n}\nlet result = priceWithTax(1000, rate: 0.1)\nprint(result == 1100, result)",
+          "output": "true 1100",
+          "explanation": "テストが検証している内容を、通常のコードとして確認したものです。"
+        }
+      },
+      "seriesId": "development-testing",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-development-022",
+      "track": "development",
+      "lessonId": "dev-swift-testing",
+      "type": "testReasoning",
+      "difficulty": 3,
+      "title": "常に成功するテストの問題点を読む",
+      "prompt": "このテストは成功していますが、結果を信頼してよいか判断してください。問題点として最も妥当なものを選んでください。",
+      "skills": [
+        "testing",
+        "debugging"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "requirement": "applyDiscount(price:percent:) が割引後の正しい価格を返すことを検証する。",
+        "code": "@Test func discount() {\n    let result = applyDiscount(price: 1000, percent: 20)\n    #expect(result == result)\n}",
+        "tests": [
+          {
+            "name": "通常実行",
+            "input": "price: 1000, percent: 20",
+            "expected": "成功すること",
+            "result": "成功"
+          },
+          {
+            "name": "実装をわざと壊して実行",
+            "input": "常に 0 を返す実装に差し替え",
+            "expected": "失敗すること",
+            "result": "失敗（壊しても成功してしまう）"
+          }
+        ],
+        "options": [
+          {
+            "id": "o1",
+            "label": "期待値が実際の値自身と比較されているため、実装が何を返しても必ず成功する"
+          },
+          {
+            "id": "o2",
+            "label": "#expect を2つ以上書かないとテストとして成立しない"
+          },
+          {
+            "id": "o3",
+            "label": "テスト関数に @Test が付いていないため実行されていない"
+          },
+          {
+            "id": "o4",
+            "label": "割引率が20%では小さすぎて差が出ないため検証にならない"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "2件目のテストは「実装を壊したら失敗するか」を確かめる観点です。",
+        "壊しても成功するということは、実装の結果を実質的に見ていないということです。",
+        "#expect の中身をよく読んでください。左辺と右辺は何と何を比べているでしょうか。"
+      ],
+      "explanation": "2件目のテストが表しているのは「このテストが本当に不具合を検出できるか」という観点（変異テスト）です。検証している条件は、実装をわざと壊しても失敗するかどうかです。実装は `#expect(result == result)` と、取得した値を自分自身と比較しているため、result が何であっても常に true になります。つまり applyDiscount が 0 を返しても -1 を返しても成功してしまい、要件である「正しい価格を返すこと」を一切検証していません。1件目が成功しているのは当然で、成功していること自体が問題の徴候です。修正は `#expect(result == 800)` のように、実装から独立した期待値と比較することです。",
+      "detail": {
+        "concept": "テストの価値は「壊れたときに失敗すること」にあります。実装から導いた値を期待値にすると、実装が間違っていても一致してしまい、検出力がゼロになります。",
+        "steps": [
+          "要件は「正しい価格を返すこと」。",
+          "期待値は要件から人が計算した値（1000 の 20% 引きで 800）であるべき。",
+          "実装の戻り値を両辺に置くと、恒真な比較になる。",
+          "実装を壊しても失敗しないため、テストとして機能していない。"
+        ],
+        "whyCorrect": "実装を壊しても成功したという事実が、検証が実装に依存していることを直接示しています。@Test は付いており実行もされているため、実行の問題ではありません。",
+        "commonMistakes": [
+          "期待値を `price - price * percent / 100` のように実装と同じ式で書く間違いです。式ごと間違っていた場合に検出できません。",
+          "テストが成功していることだけを確認して満足する間違いです。落ちることを一度確認しておくと、検出力を確かめられます。"
+        ],
+        "takeaway": "期待値は実装から導かない。壊したら落ちることを一度確かめる。",
+        "example": {
+          "code": "func applyDiscount(price: Int, percent: Int) -> Int {\n    price - price * percent / 100\n}\nlet result = applyDiscount(price: 1000, percent: 20)\nprint(result == result, result == 800)",
+          "output": "true true",
+          "explanation": "左の比較は常に true です。右のように独立した期待値と比べて初めて検証になります。"
+        }
+      },
+      "seriesId": "development-testing",
+      "seriesStep": 4
+    },
+    {
+      "id": "practice-development-023",
+      "track": "development",
+      "lessonId": "dev-testing-parameterized",
+      "type": "buildFunction",
+      "difficulty": 3,
+      "title": "境界値をまとめて検証するテストを組み立てる",
+      "prompt": "割引率の境界値（0% と 100%）をまとめて検証するテストを作ります。必要なブロックだけを選んで正しい順に並べてください。",
+      "skills": [
+        "testing"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "import Testing"
+          },
+          {
+            "id": "b2",
+            "code": "@Test(\"割引率の境界値\", arguments: [0, 100])"
+          },
+          {
+            "id": "b3",
+            "code": "func discountBoundary(percent: Int) {"
+          },
+          {
+            "id": "b4",
+            "code": "    let result = applyDiscount(price: 1000, percent: percent)"
+          },
+          {
+            "id": "b5",
+            "code": "    #expect(result == (percent == 0 ? 1000 : 0))"
+          },
+          {
+            "id": "b6",
+            "code": "}"
+          },
+          {
+            "id": "b7",
+            "code": "func discountBoundary() {"
+          },
+          {
+            "id": "b8",
+            "code": "    for percent in [0, 100] { }"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5",
+          "b6"
+        ]
+      },
+      "hints": [
+        "パラメータ化テストでは、値の一覧を属性側に書きます。",
+        "属性に値を渡すなら、テスト関数はその値を引数として受け取る必要があります。",
+        "ループで回すと、1件のテストとして扱われて失敗箇所が分かりにくくなります。"
+      ],
+      "explanation": "`@Test(arguments:)` に値の一覧を渡すと、各値ごとに独立したテストケースとして実行されます。テスト関数はその値を引数で受け取るため、`func discountBoundary(percent: Int)` という形になります。ループで回す書き方（b8）でも検証はできますが、全体が1件のテストとして扱われるため、どの値で失敗したかが分かりにくく、途中で止まると残りが検証されません。引数を受け取らない宣言（b7）は、arguments を渡す属性と噛み合いません。",
+      "detail": {
+        "concept": "パラメータ化テストは「同じ観点を複数の入力で検証する」ための仕組みです。ケースごとに独立して実行・報告されるため、失敗の切り分けが速くなります。",
+        "steps": [
+          "`@Test(..., arguments: [0, 100])` … 入力の一覧を宣言する。",
+          "`func discountBoundary(percent: Int)` … 各入力が引数として渡される。",
+          "テスト本体は1つの入力だけを扱えばよい。",
+          "実行時には入力ごとに別々のテストケースとして報告される。"
+        ],
+        "whyCorrect": "arguments の要素の型と、テスト関数の引数の型が一致しているため成立します。ケースが分かれることで、失敗した入力が一目で分かります。",
+        "commonMistakes": [
+          "ループで回して1件のテストにまとめる書き方です。最初の失敗で止まると、残りの入力が検証されません。",
+          "arguments に渡す値の個数と、関数の引数の個数を取り違える間違いです。2つの一覧を渡すと全組み合わせが実行されます。"
+        ],
+        "takeaway": "同じ観点で入力が複数あるならパラメータ化。ループで束ねない。",
+        "example": {
+          "code": "func applyDiscount(price: Int, percent: Int) -> Int {\n    guard percent >= 0, percent <= 100 else { return price }\n    return price - price * percent / 100\n}\nfor percent in [0, 100] {\n    print(percent, applyDiscount(price: 1000, percent: percent))\n}",
+          "output": "0 1000\n100 0",
+          "explanation": "パラメータ化テストが検証している内容を、通常のコードで確認したものです。"
+        }
+      },
+      "seriesId": "development-parameterized",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-development-024",
+      "track": "development",
+      "lessonId": "dev-testing-parameterized",
+      "type": "testReasoning",
+      "difficulty": 3,
+      "title": "3件中1件だけ失敗する入力を読む",
+      "prompt": "パラメータ化テストの一部のケースだけが失敗しています。どの性質が検出されたのかを読み取ってください。",
+      "skills": [
+        "testing",
+        "debugging"
+      ],
+      "content": {
+        "requirement": "pageCount(items:perPage:) は、端数が出る場合に切り上げたページ数を返す（1ページ2件の場合、7件なら4ページ）。",
+        "code": "func pageCount(items: Int, perPage: Int) -> Int {\n    items / perPage\n}",
+        "tests": [
+          {
+            "name": "割り切れる件数",
+            "input": "items: 6, perPage: 2",
+            "expected": "3",
+            "result": "成功"
+          },
+          {
+            "name": "端数が出る件数",
+            "input": "items: 7, perPage: 2",
+            "expected": "4",
+            "result": "失敗（3 が返った）"
+          },
+          {
+            "name": "割り切れる件数",
+            "input": "items: 8, perPage: 2",
+            "expected": "4",
+            "result": "成功"
+          }
+        ],
+        "options": [
+          {
+            "id": "o1",
+            "label": "整数除算が切り捨てになるため、割り切れない件数のときだけ1ページ不足する"
+          },
+          {
+            "id": "o2",
+            "label": "perPage が 0 のときに 0 除算でクラッシュしている"
+          },
+          {
+            "id": "o3",
+            "label": "items が負の値のときに符号を誤っている"
+          },
+          {
+            "id": "o4",
+            "label": "7 件なら 3 ページが正しく、テストの期待値のほうが誤っている"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "成功した2件と失敗した1件で、入力の何が違うかを比べてください。",
+        "6 と 8 は 2 で割り切れますが、7 は割り切れません。",
+        "Int 同士の割り算は、小数点以下をどう扱うでしょうか。"
+      ],
+      "explanation": "失敗したテストが表しているのは「端数が出たら切り上げる」という要件です。検証している入力 7 件は、perPage で割り切れない唯一のケースで、切り上げの有無が結果に現れる境界にあたります。実装は `items / perPage` という整数除算だけなので、7 / 2 は 3 に切り捨てられ、余った1件分のページが数えられません。6 件と 8 件のテストが成功しているのは、割り切れて切り上げが不要だからで、実装の正しさを示すものではありません。0 除算や負の値は今回の入力に含まれておらず、失敗の説明になりません。修正は `(items + perPage - 1) / perPage` のような切り上げ除算にすることです。",
+      "detail": {
+        "concept": "パラメータ化テストでは「どの入力が失敗したか」が直接ヒントになります。成功した入力と失敗した入力の差分が、原因の性質を指し示します。",
+        "steps": [
+          "6 と 8 は perPage で割り切れる → 切り捨てが起きない → 成功。",
+          "7 は割り切れない → 切り捨てで1ページ不足 → 失敗。",
+          "したがって原因は端数処理の欠落。",
+          "切り上げ除算にすると3件とも通る。"
+        ],
+        "whyCorrect": "失敗が「割り切れない入力」に限定されており、割り切れる入力はすべて成功しています。この分かれ方は、整数除算の切り捨て以外では説明できません。",
+        "commonMistakes": [
+          "テストデータを割り切れる値だけで用意すると、この不具合は永久に見つかりません。境界は「割り切れない値」です。",
+          "`Int(ceil(Double(items) / Double(perPage)))` でも切り上げできますが、浮動小数点の丸め誤差が入る可能性があり、整数演算のほうが安全です。"
+        ],
+        "takeaway": "失敗した入力と成功した入力の差分が原因を指す。端数は必ずテストする。",
+        "example": {
+          "code": "func pageCount(items: Int, perPage: Int) -> Int {\n    (items + perPage - 1) / perPage\n}\nfor items in [6, 7, 8] { print(items, pageCount(items: items, perPage: 2)) }",
+          "output": "6 3\n7 4\n8 4",
+          "explanation": "切り上げ除算にすると、割り切れる場合も端数がある場合も要件どおりになります。"
+        }
+      },
+      "seriesId": "development-parameterized",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-development-025",
+      "track": "development",
+      "lessonId": "dev-swift-testing",
+      "type": "shortCode",
+      "difficulty": 2,
+      "title": "検証の1行を書く",
+      "prompt": "Swift Testing で、result が 1100 であることを検証する1行を書いてください。失敗しても後続の検証を続けたい場合のマクロを使います。",
+      "skills": [
+        "testing"
+      ],
+      "content": {
+        "context": "import Testing\n\n@Test func tax() {\n    let result = priceWithTax(1000, rate: 0.1)\n    // ここに1行書く\n}",
+        "placeholder": "例: #マクロ(条件)"
+      },
+      "solution": {
+        "accepted": [
+          "#expect(result == 1100)"
+        ]
+      },
+      "hints": [
+        "Swift Testing の検証はマクロなので、# で始まります。",
+        "失敗しても続行するほうのマクロを使います。中断するほうではありません。",
+        "かっこの中には、result と期待値を比較する条件式をそのまま書きます。"
+      ],
+      "explanation": "`#expect(result == 1100)` と書きます。`#expect` は条件が false ならテストを失敗として記録しますが、その後の行も実行を続けます。失敗した時点で中断したい場合（それ以降の検証が意味をなさない前提条件など）は `#require` を使います。XCTest の XCTAssertEqual と違い、比較演算子をそのまま書けるうえ、失敗時には result の実際の値が自動的に表示されます。",
+      "detail": {
+        "concept": "検証マクロは式そのものを受け取り、失敗時に式の各部分の値を展開して表示します。そのため専用の比較関数を覚える必要がなく、通常の条件式の書き方がそのまま使えます。",
+        "steps": [
+          "`#expect(条件)` … 条件が false なら失敗として記録する。",
+          "失敗しても関数の実行は続くため、複数の観点をまとめて確認できる。",
+          "失敗時には result の実際の値が出力される。",
+          "前提条件の検証には #require を使い、失敗時に中断する。"
+        ],
+        "whyCorrect": "要件が「失敗しても後続を続けたい」なので、中断しない #expect が該当します。比較は通常の == で書けます。",
+        "commonMistakes": [
+          "XCTAssertEqual(result, 1100) と書く間違いです。Swift Testing では使えません。",
+          "すべてを #require にすると、最初の失敗以降の情報が得られなくなります。前提条件だけに使います。"
+        ],
+        "takeaway": "続行するなら #expect、中断するなら #require。条件式はそのまま書ける。",
+        "example": {
+          "code": "func priceWithTax(_ price: Int, rate: Double) -> Int {\n    price + Int(Double(price) * rate)\n}\nlet result = priceWithTax(1000, rate: 0.1)\nprint(result == 1100)",
+          "output": "true",
+          "explanation": "#expect が評価している条件式そのものを、通常のコードとして確認したものです。"
+        }
+      },
+      "seriesId": "development-testing",
+      "seriesStep": 5
+    },
+    {
+      "id": "practice-development-026",
+      "track": "development",
+      "lessonId": "dev-xctest-ui",
+      "type": "testReasoning",
+      "difficulty": 4,
+      "title": "CIでだけ不安定になるUIテストを読む",
+      "prompt": "手元では常に通る UI テストが、CI ではときどき失敗します。原因の説明として最も妥当なものを選んでください。",
+      "skills": [
+        "testing",
+        "debugging"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "requirement": "「追加」ボタンを押したあと、一覧に現れた最初の項目をタップする。",
+        "code": "app.buttons[\"追加\"].tap()\nsleep(1)\napp.cells.firstMatch.tap()",
+        "tests": [
+          {
+            "name": "手元の実機・シミュレータ",
+            "input": "通常の実行",
+            "expected": "全件成功",
+            "result": "成功"
+          },
+          {
+            "name": "CI のシミュレータ",
+            "input": "負荷の高い環境で実行",
+            "expected": "全件成功",
+            "result": "失敗（ときどき要素が見つからない）"
+          }
+        ],
+        "options": [
+          {
+            "id": "o1",
+            "label": "固定時間の sleep で待っているため、描画が遅い環境では要素が現れる前にタップしてしまう"
+          },
+          {
+            "id": "o2",
+            "label": "tap() を2回呼んでいるため、二重に反応して状態がずれている"
+          },
+          {
+            "id": "o3",
+            "label": "firstMatch は常に nil を返すため、そもそも要素を取得できていない"
+          },
+          {
+            "id": "o4",
+            "label": "UI テストは CI 環境では実行できない仕組みになっている"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "手元と CI の違いは、マシンの速度と負荷です。",
+        "1秒という待ち時間は、何を根拠に決められているでしょうか。",
+        "「要素が現れるまで待つ」ことを表現できる API があります。"
+      ],
+      "explanation": "失敗したテストが表しているのは「項目が現れてからタップする」という前提条件です。検証している環境は負荷の高い CI で、描画完了までの時間が手元より延びる状況にあたります。実装は `sleep(1)` という固定時間で待っているため、1秒以内に描画が終わる環境では通り、遅れた環境では要素が存在しない状態で tap を呼んで失敗します。ときどき失敗する（flaky）という現れ方は、待ち時間と実際の所要時間が近いことを示しています。修正は `waitForExistence(timeout:)` を使い、「要素が現れるまで最大N秒待つ」という条件で待つことです。これなら速い環境では即座に進み、遅い環境でも取りこぼしません。",
+      "detail": {
+        "concept": "非同期な UI を待つときは「時間」ではなく「状態」を条件にします。時間で待つと、速い環境では無駄に遅く、遅い環境では失敗するという両方の欠点を抱えます。",
+        "steps": [
+          "tap のあと、画面の更新は非同期に行われる。",
+          "sleep(1) は状態と無関係に1秒だけ待つ。",
+          "CI では描画が1秒を超えることがあり、その場合に要素が未出現のままタップされる。",
+          "waitForExistence(timeout:) なら、出現した時点で先へ進む。"
+        ],
+        "whyCorrect": "手元と CI の唯一の違いが実行速度であり、待ち方が時間ベースであることがその差を吸収できていません。tap の回数や API の存在自体は問題ではありません。",
+        "commonMistakes": [
+          "sleep の秒数を増やして対処する間違いです。テスト全体が遅くなるうえ、閾値を超えれば同じ失敗が再発します。",
+          "失敗を「CI が不安定だから」と片付ける間違いです。flaky テストは実装かテストのどちらかに、時間依存の前提が残っている徴候です。"
+        ],
+        "takeaway": "UI の待機は時間ではなく状態で。sleep は flaky テストの主要因。",
+        "example": {
+          "code": "// XCTest の書き方\n// XCTAssertTrue(app.cells.firstMatch.waitForExistence(timeout: 5))\n// app.cells.firstMatch.tap()\nlet strategies = [\"sleep(1): 時間で待つ（環境依存）\", \"waitForExistence: 状態で待つ（環境非依存）\"]\nfor s in strategies { print(s) }",
+          "output": "sleep(1): 時間で待つ（環境依存）\nwaitForExistence: 状態で待つ（環境非依存）",
+          "explanation": "待ち方の違いが、環境差に耐えられるかどうかを決めます。"
+        }
+      },
+      "seriesId": "development-uitest",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-development-027",
+      "track": "development",
+      "lessonId": "dev-xctest-ui",
+      "type": "repair",
+      "difficulty": 3,
+      "title": "時間で待つUIテストを直す",
+      "prompt": "描画を待つのに固定時間を使っているため、環境によって失敗します。修正として最も適切なものを選んでください。",
+      "skills": [
+        "testing",
+        "debugging"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "code": "app.buttons[\"追加\"].tap()\nsleep(1)\napp.cells.firstMatch.tap()",
+        "options": [
+          {
+            "id": "o1",
+            "code": "app.buttons[\"追加\"].tap()\nXCTAssertTrue(app.cells.firstMatch.waitForExistence(timeout: 5))\napp.cells.firstMatch.tap()"
+          },
+          {
+            "id": "o2",
+            "code": "app.buttons[\"追加\"].tap()\nsleep(5)\napp.cells.firstMatch.tap()"
+          },
+          {
+            "id": "o3",
+            "code": "app.buttons[\"追加\"].tap()\napp.cells.firstMatch.tap()"
+          },
+          {
+            "id": "o4",
+            "code": "app.buttons[\"追加\"].tap()\nwhile app.cells.count == 0 { }\napp.cells.firstMatch.tap()"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1",
+        "fixedCode": "app.buttons[\"追加\"].tap()\nXCTAssertTrue(app.cells.firstMatch.waitForExistence(timeout: 5))\napp.cells.firstMatch.tap()"
+      },
+      "hints": [
+        "待ち時間を延ばしても、閾値を超える環境では同じ失敗が起きます。",
+        "待つべきなのは「時間」ではなく「要素が現れたという状態」です。",
+        "現れなかった場合にテストとして失敗させる形にすると、原因も明確になります。"
+      ],
+      "explanation": "問題は `sleep(1)` が状態と無関係に固定時間だけ待っていることです。修正は `waitForExistence(timeout:)` を使い、要素が現れるまで待ち、現れなければタイムアウトさせることです。XCTAssertTrue で包むと、現れなかった場合に「待機に失敗した」という明確な失敗として報告されるため、tap の行で分かりにくいエラーになるのを防げます。sleep を5秒に延ばす修正はテスト全体を遅くするだけで根本解決にならず、待機をなくす修正は速い環境でも失敗しやすくなります。空のループで待つ方法は CPU を占有し続け、UI の更新自体を妨げる可能性があります。",
+      "detail": {
+        "concept": "UI テストの安定性は「待ち方」でほぼ決まります。状態を条件に待ち、待てなかったことを失敗として報告するのが基本形です。",
+        "steps": [
+          "tap 後の描画は非同期に行われる。",
+          "`waitForExistence(timeout: 5)` … 現れたら即座に true、5秒経っても現れなければ false。",
+          "XCTAssertTrue で包み、待機失敗をテスト失敗として明示する。",
+          "現れたあとに tap するので、環境の速度に依存しない。"
+        ],
+        "whyCorrect": "出現という状態を条件にしているため、速い環境では待たず、遅い環境では必要なだけ待ちます。失敗時の原因も「待機のタイムアウト」として明確になります。",
+        "commonMistakes": [
+          "sleep の秒数を調整して「安定した」と判断する間違いです。負荷が変われば再発します。",
+          "ビジーループで待つ方法は、CPU を占有してメインスレッドの描画を妨げ、かえって出現を遅らせることがあります。"
+        ],
+        "takeaway": "UI テストは状態で待つ。待てなかったことを失敗として報告する。",
+        "example": {
+          "code": "// 修正後の意図\n// 1. 操作する\n// 2. 期待する状態が現れるまで待つ（最大5秒）\n// 3. 現れたら次の操作へ、現れなければ失敗\nlet steps = [\"操作\", \"状態の待機\", \"次の操作\"]\nprint(steps.joined(separator: \" → \"))",
+          "output": "操作 → 状態の待機 → 次の操作",
+          "explanation": "この3段構えを守ると、環境差に強い UI テストになります。"
+        }
+      },
+      "seriesId": "development-uitest",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-development-028",
+      "track": "development",
+      "lessonId": "dev-testing-parameterized",
+      "type": "testReasoning",
+      "difficulty": 4,
+      "title": "全件通ったのに不具合が出た理由を読む",
+      "prompt": "テストは全件成功していますが、リリース後に不具合が報告されました。テスト設計のどこに穴がありますか。",
+      "skills": [
+        "testing",
+        "debugging"
+      ],
+      "content": {
+        "requirement": "splitName(_:) は氏名を空白で姓と名に分ける。空白が連続していても2要素に分ける。",
+        "code": "import Foundation\nfunc splitName(_ s: String) -> [String] {\n    s.components(separatedBy: \" \")\n}",
+        "tests": [
+          {
+            "name": "通常の氏名",
+            "input": "\"Yuki Ko\"",
+            "expected": "2要素",
+            "result": "成功"
+          },
+          {
+            "name": "別の氏名",
+            "input": "\"Taro Yamada\"",
+            "expected": "2要素",
+            "result": "成功"
+          },
+          {
+            "name": "報告された不具合",
+            "input": "\"Yuki  Ko\"（空白2つ）",
+            "expected": "2要素",
+            "result": "テストが存在しない（実際は3要素になる）"
+          }
+        ],
+        "options": [
+          {
+            "id": "o1",
+            "label": "テストの入力がすべて空白1つの正常系で、要件に書かれた「空白が連続する場合」を1件も検証していない"
+          },
+          {
+            "id": "o2",
+            "label": "components(separatedBy:) は存在しないメソッドなので、そもそもビルドできない"
+          },
+          {
+            "id": "o3",
+            "label": "テストの件数が2件では少なすぎるため、件数を100件に増やすべきである"
+          },
+          {
+            "id": "o4",
+            "label": "姓と名の順序が逆になっていることが不具合の原因である"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "要件に明記されている条件のうち、テストで確かめられていないものはどれでしょうか。",
+        "2件のテストはどちらも同じ形の入力です。観点としては1つしかありません。",
+        "件数の問題ではなく、検証している入力の種類の問題です。"
+      ],
+      "explanation": "不具合が表しているのは「空白が連続していても2要素に分ける」という要件です。報告された入力は空白が2つ連続した氏名で、区切り文字の扱いが結果に現れる境界にあたります。`components(separatedBy: \" \")` は連続した区切りの間に空文字列を作るため、\"Yuki  Ko\" は [\"Yuki\", \"\", \"Ko\"] の3要素になります。既存の2件のテストはどちらも空白1つの正常系で、観点としては同一のケースを2回確かめているにすぎません。件数を増やしても、同じ形の入力ばかりでは検出できません。修正は `split(separator: \" \", omittingEmptySubsequences: true)` を使うか、空要素を除去することです。",
+      "detail": {
+        "concept": "テストの網羅性は件数ではなく観点の数で決まります。要件に条件が書かれているなら、その条件ごとにテストが必要です。",
+        "steps": [
+          "要件には「空白が連続していても」という条件が明記されている。",
+          "既存のテストはどちらも空白1つの入力。",
+          "連続空白という観点が一度も検証されていない。",
+          "components は空文字列を残すため、その入力で3要素になる。"
+        ],
+        "whyCorrect": "2件のテストが同じ観点しか見ていないことが、要件の一部が未検証のまま残った理由です。ビルドは通っており、順序も正しいため、他の選択肢は現象を説明できません。",
+        "commonMistakes": [
+          "テストの件数を増やすことで安心する間違いです。同じ観点を繰り返しても網羅性は上がりません。",
+          "split と components の違いを把握していないと、同じ関数だと思って置き換えて挙動が変わります。split は既定で空の部分を除きます。"
+        ],
+        "takeaway": "網羅性は件数ではなく観点の数。要件に書かれた条件ごとにテストする。",
+        "example": {
+          "code": "import Foundation\nlet s = \"Yuki  Ko\"\nprint(s.components(separatedBy: \" \"))\nprint(s.split(separator: \" \").map(String.init))",
+          "output": "[\"Yuki\", \"\", \"Ko\"]\n[\"Yuki\", \"Ko\"]",
+          "explanation": "components は空文字列を残し、split は既定で除きます。この違いが不具合の原因でした。"
+        }
+      },
+      "seriesId": "development-parameterized",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-development-029",
+      "track": "development",
+      "lessonId": "dev-di",
+      "type": "repair",
+      "difficulty": 3,
+      "title": "テストできない依存関係を直す",
+      "prompt": "ProfileLoader が内部で本番用の APIClient を直接生成しているため、テストからネットワークを差し替えられません。修正として最も適切なものを選んでください。",
+      "skills": [
+        "architecture",
+        "testing"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "code": "final class ProfileLoader {\n    private let client = APIClient(baseURL: URL(string: \"https://api.example.com\")!)\n\n    func load(id: Int) async throws -> Profile {\n        try await client.get(\"/profiles/\\(id)\")\n    }\n}",
+        "options": [
+          {
+            "id": "o1",
+            "code": "protocol ProfileFetching {\n    func get(_ path: String) async throws -> Profile\n}\n\nfinal class ProfileLoader {\n    private let client: ProfileFetching\n\n    init(client: ProfileFetching) {\n        self.client = client\n    }\n\n    func load(id: Int) async throws -> Profile {\n        try await client.get(\"/profiles/\\(id)\")\n    }\n}"
+          },
+          {
+            "id": "o2",
+            "code": "final class ProfileLoader {\n    static let shared = ProfileLoader()\n    private let client = APIClient(baseURL: URL(string: \"https://api.example.com\")!)\n\n    func load(id: Int) async throws -> Profile {\n        try await client.get(\"/profiles/\\(id)\")\n    }\n}"
+          },
+          {
+            "id": "o3",
+            "code": "final class ProfileLoader {\n    private var client = APIClient(baseURL: URL(string: \"https://api.example.com\")!)\n\n    func replaceClientForTesting(_ new: APIClient) {\n        client = new\n    }\n\n    func load(id: Int) async throws -> Profile {\n        try await client.get(\"/profiles/\\(id)\")\n    }\n}"
+          },
+          {
+            "id": "o4",
+            "code": "final class ProfileLoader {\n    private let client = APIClient(baseURL: URL(string: ProcessInfo.processInfo.environment[\"BASE_URL\"] ?? \"https://api.example.com\")!)\n\n    func load(id: Int) async throws -> Profile {\n        try await client.get(\"/profiles/\\(id)\")\n    }\n}"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1",
+        "fixedCode": "protocol ProfileFetching {\n    func get(_ path: String) async throws -> Profile\n}\n\nfinal class ProfileLoader {\n    private let client: ProfileFetching\n\n    init(client: ProfileFetching) {\n        self.client = client\n    }\n\n    func load(id: Int) async throws -> Profile {\n        try await client.get(\"/profiles/\\(id)\")\n    }\n}"
+      },
+      "hints": [
+        "「誰が依存を用意するか」を、使う側から呼び出し側へ移すのが出発点です。",
+        "具体的な型ではなく、必要な機能だけを表す抽象に依存させると差し替えられます。",
+        "テスト用の抜け道を追加するのではなく、生成の責任そのものを外に出します。"
+      ],
+      "explanation": "問題は ProfileLoader が `APIClient(baseURL:)` を自分の中で生成していることです。生成をクラス内部に閉じ込めると、外から別の実装に置き換える手段が存在しなくなり、テストのたびに実際のネットワーク通信が発生します。修正は、必要な機能だけを表すプロトコル `ProfileFetching` を定義し、それをイニシャライザで受け取る形（イニシャライザ注入）にすることです。本番では APIClient を、テストでは固定値を返すスタブを渡せます。シングルトン化する案は生成場所を変えていないため問題は残り、むしろグローバル状態が増えます。テスト用の差し替えメソッドを足す案は本番コードにテスト専用の穴を開けるうえ、型が APIClient のままなので結局本物のクラスが必要です。環境変数で URL を変える案は接続先を変えるだけで、通信そのものは実行されます。",
+      "detail": {
+        "concept": "Dependency Injection は「使う側が依存を作らない」という設計です。依存を作る責任を呼び出し側（コンポジションルート）に集めると、同じクラスを本番とテストで別の部品と組み合わせられます。",
+        "steps": [
+          "現状は client の生成が ProfileLoader の内部にあり、外部から観測も置換もできない。",
+          "ProfileLoader が実際に必要としているのは「path を渡すと Profile が返る」ことだけ。",
+          "その最小限をプロトコル ProfileFetching として切り出す。",
+          "init(client:) で受け取ると、本番は APIClient、テストはスタブを渡せる。"
+        ],
+        "whyCorrect": "依存が抽象型のプロパティになり、生成が呼び出し側に移ったため、ProfileLoader のコードを一切変えずに実装を差し替えられます。テストではネットワークもタイムアウトも発生しません。",
+        "commonMistakes": [
+          "テスト専用の setter を本番クラスに追加する対応です。本番コードから誤って呼べる穴が残り、実行順によって状態が壊れます。",
+          "シングルトンにすれば共有できると考える間違いです。共有はできても差し替えはできず、テスト間で状態が持ち越されます。",
+          "プロトコルを APIClient の全機能をそのまま写した巨大なものにする間違いです。スタブ側で不要なメソッドまで実装させられます。"
+        ],
+        "takeaway": "依存は内部で作らず、抽象として外から受け取る。",
+        "example": {
+          "code": "protocol Greeting { func text() -> String }\nstruct RealGreeting: Greeting { func text() -> String { \"real\" } }\nstruct StubGreeting: Greeting { func text() -> String { \"stub\" } }\nstruct Screen {\n    let source: Greeting\n    func show() -> String { source.text() }\n}\nprint(Screen(source: RealGreeting()).show())\nprint(Screen(source: StubGreeting()).show())",
+          "output": "real\nstub",
+          "explanation": "Screen のコードは1行も変わらないまま、渡す部品だけで振る舞いが切り替わります。これが注入の効果です。"
+        }
+      },
+      "seriesId": "development-di",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-development-030",
+      "track": "development",
+      "lessonId": "dev-di",
+      "type": "matching",
+      "difficulty": 2,
+      "title": "テストダブルの種類を対応づける",
+      "prompt": "テストで本物の代わりに置く部品（テストダブル）の名前と、その役割を対応づけてください。",
+      "skills": [
+        "testing",
+        "architecture"
+      ],
+      "content": {
+        "left": [
+          {
+            "id": "l1",
+            "label": "Stub"
+          },
+          {
+            "id": "l2",
+            "label": "Spy"
+          },
+          {
+            "id": "l3",
+            "label": "Fake"
+          },
+          {
+            "id": "l4",
+            "label": "Dummy"
+          }
+        ],
+        "right": [
+          {
+            "id": "r1",
+            "label": "決められた値をそのまま返し、テストの入力条件を固定する"
+          },
+          {
+            "id": "r2",
+            "label": "呼ばれた回数や引数を記録し、あとから検証できるようにする"
+          },
+          {
+            "id": "r3",
+            "label": "本物より簡略だが実際に動く実装（例：メモリ上の保存）を提供する"
+          },
+          {
+            "id": "r4",
+            "label": "引数を埋めるためだけに渡され、中身は一度も使われない"
+          },
+          {
+            "id": "r5",
+            "label": "本番のサーバに接続して実際の応答を取得する"
+          }
+        ]
+      },
+      "solution": {
+        "pairs": {
+          "l1": "r1",
+          "l2": "r2",
+          "l3": "r3",
+          "l4": "r4"
+        }
+      },
+      "hints": [
+        "「値を返すだけ」なのか「呼ばれ方を覚えている」のかで、まず2つに分かれます。",
+        "実際に動くロジックを持つものが1つだけあります。保存や検索が本当に行われる種類です。",
+        "1つは中身をまったく使われない、型を満たすためだけの存在です。"
+      ],
+      "explanation": "Stub は「入力を固定する」ための部品で、決められた値を返すだけです。Spy は「出力を検証する」ための部品で、呼ばれた回数や渡された引数を記録し、テスト側で確認します。Fake は本物と同じ役割を果たす簡略実装で、例えばディスクではなくメモリ上に保存する Repository が該当します。Dummy は引数の型を満たすためだけに渡され、中身が呼ばれることはありません。残る選択肢の「本番のサーバに接続する」はテストダブルではなく本物そのもので、テストが外部環境に依存してしまうため、これを使うと単体テストではなくなります。使い分けの基準は「何を確かめたいか」で、戻り値の扱いを確かめたいなら Stub、副作用が起きたことを確かめたいなら Spy です。",
+      "detail": {
+        "concept": "テストダブルは本物の代役の総称です。名前が分かれているのは、それぞれ「テストの何を制御・観測したいか」が違うためで、目的に合わないものを選ぶとテストが壊れやすくなります。",
+        "steps": [
+          "テストは「入力を固定し、出力を確認する」構造を持つ。",
+          "入力側を固定したい → 決められた値を返す Stub。",
+          "出力側（副作用）を確認したい → 呼ばれ方を記録する Spy。",
+          "処理そのものが必要だが本物は重い → 簡略実装の Fake。",
+          "型を満たすだけで使わない → Dummy。"
+        ],
+        "whyCorrect": "4つの役割は「値を返す／記録する／動く／使わない」で互いに重ならないため、それぞれの説明文と1対1で対応します。本番サーバへの接続だけはどの役割にも当てはまりません。",
+        "commonMistakes": [
+          "Stub と Spy を同じものとして扱う間違いです。検証したい対象が入力側か副作用側かで、必要な部品が変わります。",
+          "何でも Fake で用意しようとする間違いです。Fake は自前のロジックを持つぶんバグを含み得るので、Fake 自体のテストが必要になります。",
+          "Dummy に本物のインスタンスを渡す間違いです。使われないつもりでも実際には初期化コストや副作用が走ることがあります。"
+        ],
+        "takeaway": "入力を固定するなら Stub、呼ばれ方を確かめるなら Spy。",
+        "example": {
+          "code": "protocol Notifier { func send(_ text: String) }\nfinal class SpyNotifier: Notifier {\n    private(set) var sent: [String] = []\n    func send(_ text: String) { sent.append(text) }\n}\nlet spy = SpyNotifier()\nspy.send(\"done\")\nprint(spy.sent.count, spy.sent.first ?? \"-\")",
+          "output": "1 done",
+          "explanation": "Spy は呼ばれた事実と引数を残すので、戻り値を持たない処理でも「起きたこと」を検証できます。"
+        }
+      },
+      "seriesId": "development-di",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-development-031",
+      "track": "development",
+      "lessonId": "dev-network-architecture",
+      "type": "reorder",
+      "difficulty": 3,
+      "title": "APIクライアントの1回分の処理を並べ替える",
+      "prompt": "1件のリクエストを送って、DTOにデコードして返すメソッドです。ブロックを正しい順に並べ替えてください。",
+      "skills": [
+        "architecture",
+        "foundation",
+        "concurrency"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "    let (data, response) = try await session.data(for: request)"
+          },
+          {
+            "id": "b2",
+            "code": "func fetch<T: Decodable>(_ path: String) async throws -> T {"
+          },
+          {
+            "id": "b3",
+            "code": "    return try decoder.decode(T.self, from: data)"
+          },
+          {
+            "id": "b4",
+            "code": "    guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {"
+          },
+          {
+            "id": "b5",
+            "code": "    var request = URLRequest(url: baseURL.appendingPathComponent(path))"
+          },
+          {
+            "id": "b6",
+            "code": "        throw APIError.badStatus(response)"
+          },
+          {
+            "id": "b7",
+            "code": "    }"
+          },
+          {
+            "id": "b8",
+            "code": "    request.httpMethod = \"GET\""
+          },
+          {
+            "id": "b9",
+            "code": "}"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b2",
+          "b5",
+          "b8",
+          "b1",
+          "b4",
+          "b6",
+          "b7",
+          "b3",
+          "b9"
+        ]
+      },
+      "hints": [
+        "リクエストは「組み立てる → 送る → 応答を検査する → 中身を解釈する」の順で扱います。",
+        "デコードは、ステータスコードの検査を通過したあとでなければ意味がありません。",
+        "guard の本体（throw）と閉じかっこは、guard 行の直後にひとまとまりで置きます。"
+      ],
+      "explanation": "正しい順は「関数宣言 → URLRequest を組み立てる → HTTPメソッドを設定する → 送信して応答を受け取る → ステータスコードを検査する → 不正なら throw → guard を閉じる → デコードして返す → 関数を閉じる」です。この順序には理由があります。まず `request.httpMethod` は URLRequest が存在してからでないと設定できません。次に、ステータス検査をデコードより前に置くのが重要で、サーバがエラーを返したときの本文はエラーメッセージのJSONであることが多く、先にデコードしようとすると「デコード失敗」という実際の原因とは違うエラーが表面化します。ステータスを先に見れば `APIError.badStatus` として正確に伝わります。guard は条件を満たさない場合に脱出する構文なので、throw と閉じかっこは guard 行の直後にひとまとまりで置きます。",
+      "detail": {
+        "concept": "ネットワーク層は「組み立て・送信・検査・変換」という4段階に分けて考えると、どこで失敗したかを区別できるエラーが返せるようになります。",
+        "steps": [
+          "`URLRequest(url:)` … 送り先を決めて、リクエストの入れ物を作る。",
+          "`request.httpMethod = \"GET\"` … 入れ物に対して設定を加える（順序上、生成のあと）。",
+          "`try await session.data(for:)` … 送信し、本文と応答メタ情報を受け取る。",
+          "`guard ... 200..<300 ~= http.statusCode` … 通信は成功しても、サーバがエラーを返している場合を弾く。",
+          "`decoder.decode(T.self, from: data)` … 正常応答であることが分かってから、本文を型に変換する。"
+        ],
+        "whyCorrect": "各段階が、前段階の結果を必要とする順に並んでいます。特にステータス検査がデコードより前にあるため、サーバエラーが「デコード失敗」に化けず、呼び出し側が原因を正しく判別できます。",
+        "commonMistakes": [
+          "デコードを先に書いてしまう間違いです。500応答のエラーJSONを T にデコードしようとして失敗し、根本原因が分からなくなります。",
+          "`response as? HTTPURLResponse` の判定を省く間違いです。statusCode は HTTPURLResponse にしかないため、キャストなしでは検査できません。",
+          "エラーを throw せずに空の値を返す間違いです。呼び出し側が「データがない」のか「失敗した」のか区別できなくなります。"
+        ],
+        "takeaway": "検査してからデコードする。順序を逆にすると原因が別のエラーに化ける。",
+        "example": {
+          "code": "let codes = [200, 204, 404, 500]\nfor code in codes {\n    let ok = 200..<300 ~= code\n    print(code, ok ? \"decode へ進む\" : \"badStatus を throw\")\n}",
+          "output": "200 decode へ進む\n204 decode へ進む\n404 badStatus を throw\n500 badStatus を throw",
+          "explanation": "検査を先に置くと、デコードに到達するのは正常応答だけになります。"
+        }
+      },
+      "seriesId": "development-network",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-development-032",
+      "track": "development",
+      "lessonId": "dev-network-architecture",
+      "type": "chooseBlocks",
+      "difficulty": 3,
+      "title": "Repository が返すべきものを選ぶ",
+      "prompt": "Repository は APIClient から受け取った DTO を、画面が使うドメインモデルに変換して返します。この関数に必要なブロックだけを、正しい順に選んでください。不要なブロックが混ざっています。",
+      "skills": [
+        "architecture",
+        "foundation"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "requireOrder": true,
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "func loadUser(id: Int) async throws -> User {"
+          },
+          {
+            "id": "b2",
+            "code": "    let dto: UserDTO = try await client.fetch(\"/users/\\(id)\")"
+          },
+          {
+            "id": "b3",
+            "code": "    return User(id: dto.id, name: dto.name, joinedAt: dto.joined_at)"
+          },
+          {
+            "id": "b4",
+            "code": "}"
+          },
+          {
+            "id": "b5",
+            "code": "    return dto"
+          },
+          {
+            "id": "b6",
+            "code": "func loadUser(id: Int) async throws -> UserDTO {"
+          },
+          {
+            "id": "b7",
+            "code": "    print(\"response: \\(dto)\")"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b1",
+          "b2",
+          "b3",
+          "b4"
+        ],
+        "selected": [
+          "b1",
+          "b2",
+          "b3",
+          "b4"
+        ]
+      },
+      "hints": [
+        "戻り値の型が、この層の役割を決めています。画面側が知るべき型はどちらでしょうか。",
+        "DTO は通信の都合（キー名や日付の形式）を持ち込む型で、画面に渡すには向きません。",
+        "受け取った値をそのまま返すブロックと、変換して返すブロックのどちらか一方だけが必要です。"
+      ],
+      "explanation": "必要なのは「User を返す宣言」「DTOを取得する」「User に変換して返す」「閉じかっこ」の4ブロックです。Repository の役割は、通信層の表現（DTO）とアプリ内部の表現（ドメインモデル）の境界になることです。DTO はサーバのJSONに合わせた型で、`joined_at` のようなスネークケースのキー名やAPI側の都合がそのまま現れます。これを画面まで持ち回ると、サーバのキー名が変わっただけで画面のコードまで修正が必要になります。`UserDTO` を返す宣言と `return dto` はこの境界を壊すため不要です。`print(\"response: ...\")` はデバッグの名残で、本番コードに残すと応答内容がコンソールに出続け、個人情報がログに漏れる危険があります。",
+      "detail": {
+        "concept": "DTO（Data Transfer Object）は外部との受け渡し専用の型、ドメインモデルはアプリが扱いたい概念を表す型です。Repository はこの2つを変換する場所で、変換を行う層が1つに決まっていることが重要です。",
+        "steps": [
+          "戻り値を User にすると、呼び出し側は DTO の存在を知らずに済む。",
+          "`client.fetch` で DTO を受け取る（ここまでが通信の都合）。",
+          "`User(id:name:joinedAt:)` に詰め替える（ここから先はアプリの都合）。",
+          "変換が1箇所に集まるため、APIのキー名変更の影響がこの関数の中で止まる。"
+        ],
+        "whyCorrect": "DTO が Repository の外へ出ないため、通信仕様の変更が画面に波及しません。呼び出し側は User だけを知ればよく、テストでも User を作って渡せます。",
+        "commonMistakes": [
+          "DTO をそのまま画面まで渡す間違いです。サーバのキー名変更が画面のコード修正に直結します。",
+          "変換を画面側で毎回書く間違いです。同じ変換が複数箇所に散らばり、片方だけ直し忘れます。",
+          "デバッグ用の print を残す間違いです。応答本文には氏名やメールが含まれることがあり、ログに残り続けます。"
+        ],
+        "takeaway": "DTO は Repository の外に出さない。変換は1箇所に集める。",
+        "example": {
+          "code": "struct UserDTO { let id: Int; let name: String; let joined_at: String }\nstruct User { let id: Int; let name: String; let joinedAt: String }\nlet dto = UserDTO(id: 1, name: \"Yuki\", joined_at: \"2026-01-01\")\nlet user = User(id: dto.id, name: dto.name, joinedAt: dto.joined_at)\nprint(user.joinedAt)",
+          "output": "2026-01-01",
+          "explanation": "詰め替えを1回行うだけで、スネークケースというAPI側の都合がここから先に出ていかなくなります。"
+        }
+      },
+      "seriesId": "development-network",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-development-033",
+      "track": "development",
+      "lessonId": "dev-persistence-choice",
+      "type": "matching",
+      "difficulty": 2,
+      "title": "保存先の選び方を対応づける",
+      "prompt": "保存したいデータと、iOSで使うべき保存先を対応づけてください。",
+      "skills": [
+        "foundation",
+        "architecture"
+      ],
+      "content": {
+        "left": [
+          {
+            "id": "l1",
+            "label": "ログイン用のアクセストークン"
+          },
+          {
+            "id": "l2",
+            "label": "「ダークモードを使う」というユーザー設定"
+          },
+          {
+            "id": "l3",
+            "label": "検索と絞り込みを行う大量のトレーニング記録"
+          },
+          {
+            "id": "l4",
+            "label": "ユーザーが選んだプロフィール画像の原本"
+          }
+        ],
+        "right": [
+          {
+            "id": "r1",
+            "label": "Keychain"
+          },
+          {
+            "id": "r2",
+            "label": "UserDefaults"
+          },
+          {
+            "id": "r3",
+            "label": "SwiftData（永続ストア）"
+          },
+          {
+            "id": "r4",
+            "label": "ファイル（Documents ディレクトリ）"
+          },
+          {
+            "id": "r5",
+            "label": "ソースコード内の定数"
+          }
+        ]
+      },
+      "solution": {
+        "pairs": {
+          "l1": "r1",
+          "l2": "r2",
+          "l3": "r3",
+          "l4": "r4"
+        }
+      },
+      "hints": [
+        "秘密として扱うべきものは1つだけです。暗号化された保管場所が必要になります。",
+        "小さな設定値と、検索が必要な大量データは、同じ場所に置くべきではありません。",
+        "画像のようなバイナリは、キーと値の保存には向きません。"
+      ],
+      "explanation": "アクセストークンは秘密情報なので Keychain に保存します。Keychain は暗号化されたうえ、端末のロック状態に応じたアクセス制御も指定できます。ダークモード設定のような小さな設定値は UserDefaults が適切で、plist として保存されるため大量データや秘密情報には向きません。検索・絞り込みを行う大量の記録は SwiftData のような永続ストアを使い、Predicate で必要な分だけ取り出します。全件をメモリに読み込んで filter するとデータ量に比例して遅くなります。画像の原本はファイルとして Documents に置き、参照するパスやIDだけをデータベース側に持たせます。ソースコード内の定数はビルド成果物から容易に取り出せるため、どのケースでも保存先にはなりません。",
+      "detail": {
+        "concept": "保存先の選択は「秘密かどうか」「量と検索の必要性」「形（小さな値かバイナリか）」の3点で決まります。iOSはこの3点に対応する仕組みを別々に用意しています。",
+        "steps": [
+          "秘密か？ → はいなら Keychain（暗号化・アクセス制御あり）。",
+          "小さな設定値か？ → はいなら UserDefaults（起動時に読み込まれる plist）。",
+          "検索・関連づけが必要な構造化データか？ → はいなら SwiftData。",
+          "画像・動画などのバイナリか？ → はいならファイル。DBにはパスだけを持たせる。"
+        ],
+        "whyCorrect": "4つの用途が上の判断軸で互いに重ならないため、それぞれ1つの保存先に決まります。秘密・設定・構造化データ・バイナリという分類が、そのまま仕組みの分かれ方に対応しています。",
+        "commonMistakes": [
+          "トークンを UserDefaults に保存する間違いです。plist は暗号化されておらず、バックアップ経由でも読み出せます。",
+          "画像そのものを UserDefaults や DB のカラムに入れる間違いです。起動時の読み込みが重くなり、メモリを圧迫します。",
+          "大量データを1つのJSONファイルにまとめて保存する間違いです。1件更新するたびに全件の書き込みが発生します。"
+        ],
+        "takeaway": "秘密は Keychain、設定は UserDefaults、構造化データは DB、バイナリはファイル。",
+        "example": {
+          "code": "let choices = [\n    (\"token\", \"Keychain\"),\n    (\"isDarkMode\", \"UserDefaults\"),\n    (\"workoutLogs\", \"SwiftData\"),\n    (\"avatar.png\", \"File\")\n]\nfor (data, store) in choices { print(\"\\(data) -> \\(store)\") }",
+          "output": "token -> Keychain\nisDarkMode -> UserDefaults\nworkoutLogs -> SwiftData\navatar.png -> File",
+          "explanation": "保存先の判断は、データの性質を先に言葉にすれば機械的に決まります。"
+        }
+      },
+      "seriesId": "development-persistence",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-development-034",
+      "track": "development",
+      "lessonId": "dev-persistence-choice",
+      "type": "bugHunt",
+      "difficulty": 2,
+      "title": "保存処理の中の危険な1行を見つける",
+      "prompt": "ログイン成功後の保存処理です。セキュリティ上、問題のある行を1つ選んでください。",
+      "skills": [
+        "foundation",
+        "architecture",
+        "debugging"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "lines": [
+          {
+            "id": "l1",
+            "code": "let session = try await auth.login(email: email, password: password)"
+          },
+          {
+            "id": "l2",
+            "code": "UserDefaults.standard.set(session.accessToken, forKey: \"accessToken\")"
+          },
+          {
+            "id": "l3",
+            "code": "UserDefaults.standard.set(session.user.displayName, forKey: \"displayName\")"
+          },
+          {
+            "id": "l4",
+            "code": "UserDefaults.standard.set(true, forKey: \"isLoggedIn\")"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "l2",
+        "fixedCode": "let session = try await auth.login(email: email, password: password)\ntry keychain.set(session.accessToken, forKey: \"accessToken\")\nUserDefaults.standard.set(session.user.displayName, forKey: \"displayName\")\nUserDefaults.standard.set(true, forKey: \"isLoggedIn\")"
+      },
+      "hints": [
+        "4行のうち、盗まれた場合に他人がアカウントを操作できてしまう値は1つだけです。",
+        "UserDefaults がどこにどんな形で保存されるかを思い出してください。暗号化はされません。",
+        "表示名やログイン状態のフラグは、漏れても直接の悪用にはつながりません。"
+      ],
+      "explanation": "問題は2行目で、アクセストークンを UserDefaults に保存していることです。UserDefaults の中身はアプリのコンテナ内に平文の plist として書き出されます。暗号化されないため、端末のバックアップやファイルシステムへアクセスできる状況では、そのまま読み取れます。アクセストークンは「その人として API を呼べる鍵」なので、盗まれた時点でアカウントを操作されます。修正は Keychain に保存することで、Keychain は暗号化されたうえ `kSecAttrAccessible` で端末ロック中の読み出しを禁止するなどの制御もできます。3行目の表示名と4行目のログイン状態フラグは、漏れても直接の悪用につながらない情報であり、起動時に即座に読みたい小さな値なので UserDefaults のままで問題ありません。1行目はログイン処理そのもので、保存は行っていません。",
+      "detail": {
+        "concept": "「暗号化されているか」と「アクセス制御があるか」は別の性質です。UserDefaults はどちらも持たない代わりに軽量で、Keychain は両方を持つ代わりに読み書きに失敗し得る API です。",
+        "steps": [
+          "UserDefaults の実体はアプリコンテナ内の plist ファイル。",
+          "plist は平文なので、ファイルを取り出せれば内容は読める。",
+          "アクセストークンは認証を通過した証明そのもので、パスワードと同等に扱う必要がある。",
+          "Keychain へ移すと、暗号化とアクセス制御の両方がかかる。"
+        ],
+        "whyCorrect": "漏洩したときの被害の大きさで比べると、トークンだけが「他人になりすませる」という質の違う被害を生みます。他の3行は表示や分岐に使う情報にすぎません。",
+        "commonMistakes": [
+          "トークンを Base64 でエンコードして UserDefaults に入れる対応です。符号化は暗号化ではないため、簡単に元に戻せます。",
+          "「シミュレータでは見えないから大丈夫」と判断する間違いです。実機のバックアップからも取り出され得ます。",
+          "Keychain の書き込みエラーを無視する間違いです。保存に失敗しても気づかず、次回起動でログアウト状態になります。"
+        ],
+        "takeaway": "トークンやパスワードは UserDefaults に置かない。Keychain を使う。",
+        "example": {
+          "code": "let stored: [String: String] = [\"displayName\": \"Yuki\", \"isLoggedIn\": \"true\"]\nfor (key, value) in stored.sorted(by: { $0.key < $1.key }) {\n    print(\"\\(key)=\\(value) （平文で読めても被害は限定的）\")\n}",
+          "output": "displayName=Yuki （平文で読めても被害は限定的）\nisLoggedIn=true （平文で読めても被害は限定的）",
+          "explanation": "UserDefaults に残してよいのは、このように読まれても悪用できない情報だけです。"
+        }
+      },
+      "seriesId": "development-persistence",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-development-035",
+      "track": "development",
+      "lessonId": "dev-swiftdata-basics",
+      "type": "fillBlank",
+      "difficulty": 2,
+      "title": "SwiftDataのモデル定義を完成させる",
+      "prompt": "SwiftData で保存するモデルの定義です。空欄を埋めてください。",
+      "skills": [
+        "foundation",
+        "types"
+      ],
+      "content": {
+        "template": "import SwiftData\n\n{{a}}\nfinal class Workout {\n    var name: String\n    var minutes: Int\n    {{b}}\n    var id: UUID\n\n    init(name: String, minutes: Int, id: UUID = UUID()) {\n        self.name = name\n        self.minutes = minutes\n        self.id = id\n    }\n}",
+        "blanks": [
+          {
+            "id": "a",
+            "options": [
+              "@Model",
+              "@Observable",
+              "@Query",
+              "@Entity"
+            ]
+          },
+          {
+            "id": "b",
+            "options": [
+              "@Attribute(.unique)",
+              "@Transient",
+              "@Relationship",
+              "@Published"
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "a": "@Model",
+          "b": "@Attribute(.unique)"
+        }
+      },
+      "hints": [
+        "クラスに付けるほうの属性は、この型を永続化の対象として登録する役割を持ちます。",
+        "id は同じ値が2件存在してはいけないプロパティです。その制約を宣言する属性を選びます。",
+        "画面の状態監視やデータ取得のための属性は、モデル定義そのものには使いません。"
+      ],
+      "explanation": "クラスには `@Model` を付けます。これは SwiftData に「この型を永続化の対象として扱う」と伝えるマクロで、付けるとスキーマが生成され、プロパティの変更が自動で追跡されるようになります。id には `@Attribute(.unique)` を付けます。これは「このプロパティの値はストア内で一意でなければならない」という制約で、同じ id の Workout を2件保存しようとすると、あとから保存したものが既存のレコードと統合されます（upsert）。`@Observable` は SwiftData ではなく Observation の機能で、`@Model` を付けた時点で監視は有効になるため不要です。`@Query` はモデル定義ではなく View 側でデータを取り出すときに使います。`@Transient` は逆に「保存しない」という指定なので、一意にしたい id には不適切です。",
+      "detail": {
+        "concept": "SwiftData のモデルは「クラスに @Model を付けるだけで永続化対象になる」設計です。プロパティごとの細かい制約は @Attribute や @Relationship で、必要なものにだけ追加します。",
+        "steps": [
+          "`@Model` … クラスをスキーマに登録し、変更追跡と保存の仕組みを組み込む。",
+          "通常のプロパティ（name, minutes）は指定なしでそのまま保存される。",
+          "`@Attribute(.unique)` … このプロパティの値がストア内で重複しないことを保証する。",
+          "重複する id を保存すると、新規追加ではなく既存レコードの更新として扱われる。"
+        ],
+        "whyCorrect": "@Model がなければ ModelContainer に登録できず保存自体が成立しません。@Attribute(.unique) を id に付けることで、同期や再取得のたびに同じレコードが増殖するのを防げます。",
+        "commonMistakes": [
+          "@Model と @Observable を両方付ける間違いです。@Model が監視も担うため、重複した指定になります。",
+          "struct に @Model を付けようとする間違いです。SwiftData のモデルは参照型である必要があり、class にしか付けられません。",
+          "一意制約を付けずに同期処理を書く間違いです。再取得のたびに同じデータが重複して増えていきます。"
+        ],
+        "takeaway": "@Model はクラスに、一意制約は @Attribute(.unique) で。",
+        "example": {
+          "code": "struct Workout { let id: String; let name: String }\nlet incoming = [Workout(id: \"a\", name: \"Run\"), Workout(id: \"a\", name: \"Run（再取得）\")]\nvar store: [String: Workout] = [:]\nfor w in incoming { store[w.id] = w }\nprint(store.count, store[\"a\"]!.name)",
+          "output": "1 Run（再取得）",
+          "explanation": "一意制約があると、同じidの2件目は追加ではなく更新になります。この辞書の挙動と同じ考え方です。"
+        }
+      },
+      "seriesId": "development-swiftdata",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-development-036",
+      "track": "development",
+      "lessonId": "dev-swiftdata-basics",
+      "type": "reorder",
+      "difficulty": 2,
+      "title": "SwiftDataに1件保存する手順を並べ替える",
+      "prompt": "新しい Workout を1件保存します。ブロックを正しい順に並べ替えてください。",
+      "skills": [
+        "foundation"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "    try context.save()"
+          },
+          {
+            "id": "b2",
+            "code": "func add(name: String, minutes: Int) throws {"
+          },
+          {
+            "id": "b3",
+            "code": "    context.insert(workout)"
+          },
+          {
+            "id": "b4",
+            "code": "    let workout = Workout(name: name, minutes: minutes)"
+          },
+          {
+            "id": "b5",
+            "code": "}"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b2",
+          "b4",
+          "b3",
+          "b1",
+          "b5"
+        ]
+      },
+      "hints": [
+        "挿入する対象がなければ挿入できません。まず何を作る必要がありますか。",
+        "insert はコンテキストに登録するだけで、まだディスクには書かれていません。",
+        "ディスクへの書き出しを行う呼び出しは、登録のあとに1回だけ置きます。"
+      ],
+      "explanation": "正しい順は「関数宣言 → インスタンスを作る → context.insert で登録する → context.save でディスクへ書き出す → 関数を閉じる」です。`insert` と `save` の役割の違いが要点です。`insert(_:)` は ModelContext というメモリ上の作業領域にオブジェクトを登録するだけで、この時点ではまだ永続ストアには書かれていません。`save()` を呼んで初めて、コンテキストに溜まっている変更がまとめてディスクに書き出されます。この2段構えのおかげで、複数の変更を1回の書き込みにまとめられ、途中で問題が起きたときは save を呼ばずに破棄することもできます。save は throws なので、呼び出し元へエラーを伝えられるよう関数側にも throws を付けています。",
+      "detail": {
+        "concept": "ModelContext は「下書き」の役割を持つ作業領域です。insert / delete / プロパティ変更はすべて下書きに溜まり、save で確定します。",
+        "steps": [
+          "`Workout(name:minutes:)` … 保存したいオブジェクトを作る。この時点ではただのインスタンス。",
+          "`context.insert(workout)` … コンテキストの管理下に置く。以後、変更が追跡される。",
+          "`try context.save()` … 溜まっている変更を永続ストアへ書き出す。",
+          "save が失敗した場合は throws で呼び出し元へ伝わる。"
+        ],
+        "whyCorrect": "insert の対象は先に生成されている必要があり、save は書き出す対象が登録されたあとでなければ意味を持ちません。依存関係がそのまま実行順になっています。",
+        "commonMistakes": [
+          "insert だけ呼んで save を忘れる間違いです。画面上は追加されたように見えても、アプリを再起動すると消えます。",
+          "1件ごとに save を呼ぶ間違いです。100件追加すると100回の書き込みが発生し、目に見えて遅くなります。",
+          "`try?` で save のエラーを握りつぶす間違いです。ディスク容量不足などの失敗に気づけません。"
+        ],
+        "takeaway": "insert は下書き、save で確定。まとめて save すると速い。",
+        "example": {
+          "code": "var draft: [String] = []\nvar disk: [String] = []\ndraft.append(\"Run\")\ndraft.append(\"Swim\")\nprint(\"save前 disk:\", disk)\ndisk.append(contentsOf: draft)\nprint(\"save後 disk:\", disk)",
+          "output": "save前 disk: []\nsave後 disk: [\"Run\", \"Swim\"]",
+          "explanation": "insert が draft への追加、save が disk への反映にあたります。save まで到達しなければ何も残りません。"
+        }
+      },
+      "seriesId": "development-swiftdata",
+      "seriesStep": 2
+    },
+    {
+      "id": "practice-development-037",
+      "track": "development",
+      "lessonId": "dev-swiftdata-query",
+      "type": "fillBlank",
+      "difficulty": 3,
+      "title": "条件つきの取得クエリを完成させる",
+      "prompt": "30分以上のワークアウトを、新しい順に取り出す @Query です。空欄を埋めてください。",
+      "skills": [
+        "foundation",
+        "collections"
+      ],
+      "content": {
+        "template": "@Query(\n    filter: {{a}} { $0.minutes >= 30 },\n    sort: \\Workout.date,\n    order: {{b}}\n)\nprivate var workouts: [Workout]",
+        "blanks": [
+          {
+            "id": "a",
+            "options": [
+              "#Predicate<Workout>",
+              "NSPredicate",
+              "{ (w: Workout) in }",
+              "Filter<Workout>"
+            ]
+          },
+          {
+            "id": "b",
+            "options": [
+              ".reverse",
+              ".forward",
+              ".descending",
+              ".ascending"
+            ]
+          }
+        ]
+      },
+      "solution": {
+        "answers": {
+          "a": "#Predicate<Workout>",
+          "b": ".reverse"
+        }
+      },
+      "hints": [
+        "SwiftData の絞り込み条件はマクロで書きます。文字列ベースの古い仕組みではありません。",
+        "「新しい順」とは、日付が大きいものから並べるということです。",
+        "SortOrder が持つケースの名前は、昇順・降順という言葉そのものではありません。"
+      ],
+      "explanation": "絞り込みには `#Predicate<Workout>` を使います。これはコンパイル時にクロージャを解析して、ストア側で実行できる条件式に変換するマクロです。文字列でキーパスを書く NSPredicate と違い、プロパティ名の打ち間違いがコンパイルエラーになります。並び順は `order: .reverse` です。SortOrder の2つのケースは `.forward`（小さい順）と `.reverse`（大きい順）で、日付を新しい順に並べたい場合は値が大きいほうを先にするため `.reverse` を選びます。`.ascending` / `.descending` は SortOrder には存在しない名前です。この形で書くと絞り込みと並び替えがストア側で行われるため、全件をメモリに読み込んでから filter / sorted する場合と違い、件数が増えても性能が落ちにくくなります。",
+      "detail": {
+        "concept": "@Query は「どう取り出すか」を宣言する仕組みです。filter と sort をクエリとして渡すと、その処理は永続ストア側で実行され、必要な分だけがメモリに載ります。",
+        "steps": [
+          "`#Predicate<Workout> { $0.minutes >= 30 }` … 条件をマクロで記述し、ストアが解釈できる形に変換する。",
+          "`sort: \\Workout.date` … キーパスで並び替えの基準を指定する。",
+          "`order: .reverse` … 大きい値が先。日付なら新しい順になる。",
+          "結果は View のプロパティに入り、データが変わると自動で再描画される。"
+        ],
+        "whyCorrect": "条件と並び順がクエリとして渡されるため、ストア側で絞り込みと並び替えが完了した結果だけを受け取れます。プロパティ名はキーパスとして検査されるので、タイプミスは実行時ではなくコンパイル時に見つかります。",
+        "commonMistakes": [
+          "全件を @Query で取得してから `workouts.filter { ... }` する間違いです。件数が増えるほど読み込みとメモリ使用量が増えます。",
+          "`.forward` を選んで古い順になる間違いです。日付の並び順は、値の大小と表示上の「新しい/古い」を対応づけて考えます。",
+          "#Predicate の中で自作の関数を呼ぶ間違いです。ストア側で解釈できない式はコンパイルエラーになります。"
+        ],
+        "takeaway": "絞り込みと並び替えはクエリに渡す。取り出してから filter しない。",
+        "example": {
+          "code": "struct W { let name: String; let minutes: Int; let day: Int }\nlet all = [W(name: \"A\", minutes: 20, day: 1), W(name: \"B\", minutes: 45, day: 3), W(name: \"C\", minutes: 30, day: 2)]\nlet result = all.filter { $0.minutes >= 30 }.sorted { $0.day > $1.day }\nprint(result.map(\\.name))",
+          "output": "[\"B\", \"C\"]",
+          "explanation": "同じ結果をメモリ上で書くとこうなります。@Query はこれをストア側で実行するため、全件を読み込まずに済みます。"
+        }
+      },
+      "seriesId": "development-swiftdata",
+      "seriesStep": 3
+    },
+    {
+      "id": "practice-development-038",
+      "track": "development",
+      "lessonId": "dev-swiftdata-query",
+      "type": "repair",
+      "difficulty": 3,
+      "title": "全件取得してから絞り込むコードを直す",
+      "prompt": "1件のワークアウトを id で取り出す関数です。データが増えると急激に遅くなります。修正として最も適切なものを選んでください。",
+      "skills": [
+        "foundation",
+        "debugging",
+        "collections"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "code": "func workout(id: UUID) throws -> Workout? {\n    let all = try context.fetch(FetchDescriptor<Workout>())\n    return all.first { $0.id == id }\n}",
+        "options": [
+          {
+            "id": "o1",
+            "code": "func workout(id: UUID) throws -> Workout? {\n    var descriptor = FetchDescriptor<Workout>(\n        predicate: #Predicate { $0.id == id }\n    )\n    descriptor.fetchLimit = 1\n    return try context.fetch(descriptor).first\n}"
+          },
+          {
+            "id": "o2",
+            "code": "func workout(id: UUID) throws -> Workout? {\n    let all = try context.fetch(FetchDescriptor<Workout>())\n    return all.filter { $0.id == id }.first\n}"
+          },
+          {
+            "id": "o3",
+            "code": "func workout(id: UUID) throws -> Workout? {\n    var descriptor = FetchDescriptor<Workout>()\n    descriptor.fetchLimit = 1\n    return try context.fetch(descriptor).first { $0.id == id }\n}"
+          },
+          {
+            "id": "o4",
+            "code": "func workout(id: UUID) throws -> Workout? {\n    let all = try context.fetch(FetchDescriptor<Workout>())\n    return all.sorted { $0.id.uuidString < $1.id.uuidString }.first { $0.id == id }\n}"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1",
+        "fixedCode": "func workout(id: UUID) throws -> Workout? {\n    var descriptor = FetchDescriptor<Workout>(\n        predicate: #Predicate { $0.id == id }\n    )\n    descriptor.fetchLimit = 1\n    return try context.fetch(descriptor).first\n}"
+      },
+      "hints": [
+        "遅さの原因は探し方ではなく、探す前に何件メモリへ読み込んでいるかです。",
+        "条件をストア側へ渡す手段が FetchDescriptor にあります。",
+        "1件しか必要ないことも、取得の時点で伝えられます。"
+      ],
+      "explanation": "問題は `FetchDescriptor<Workout>()` を条件なしで実行し、全件をメモリに読み込んでから Swift 側で探していることです。1万件あれば1万件分のオブジェクトが生成されるため、実行時間もメモリ使用量も件数に比例して増えます。修正は `predicate: #Predicate { $0.id == id }` を FetchDescriptor に渡し、絞り込みをストア側で行わせることです。さらに `fetchLimit = 1` を指定すると、条件に合う最初の1件が見つかった時点で取得が終わります。`filter` に変える案（o2）は探し方を変えただけで、全件読み込みはそのまま残ります。`fetchLimit = 1` だけを付ける案（o3）は、条件なしで取れた「先頭の1件」に対して id を照合するため、目的のレコードがそれ以外だと必ず nil を返す明確なバグになります。`sorted` を挟む案（o4）は全件読み込みに加えて並び替えのコストまで増やしており、いちばん遅くなります。",
+      "detail": {
+        "concept": "永続ストアへの問い合わせは「どこで絞り込むか」で性能が決まります。ストア側で絞り込めばインデックスを使えますが、読み込んだあとに絞り込むと全件の生成コストが必ず発生します。",
+        "steps": [
+          "現状は fetch が全件を返し、その全件が Workout オブジェクトとして生成される。",
+          "`predicate:` を渡すと、条件がストア側の問い合わせに変換される。",
+          "`fetchLimit = 1` … 該当が見つかった時点で打ち切る。",
+          "結果として、メモリに載るのは最大1件になる。"
+        ],
+        "whyCorrect": "絞り込みが読み込みより前に移動したため、件数が増えても取得コストがほぼ変わりません。取り出す件数の上限も明示されているので、意図しない大量取得も起きません。",
+        "commonMistakes": [
+          "fetchLimit だけを設定して predicate を省く間違いです。条件と無関係な先頭1件を取ってくるため、結果が誤ります。",
+          "first を filter に置き換えて「効率化した」と考える間違いです。どちらもメモリ上の探索で、支配的なコストである全件読み込みは減りません。",
+          "開発中は数十件しかなく速いため問題に気づかない間違いです。性能の問題は本番のデータ量で初めて現れます。"
+        ],
+        "takeaway": "絞り込みは fetch の前に渡す。取ってから絞ると件数分のコストが必ずかかる。",
+        "example": {
+          "code": "let total = 10000\nlet fetchedAll = total\nlet fetchedWithPredicate = 1\nprint(\"全件読み込み:\", fetchedAll, \"件を生成\")\nprint(\"predicate + limit:\", fetchedWithPredicate, \"件を生成\")",
+          "output": "全件読み込み: 10000 件を生成\npredicate + limit: 1 件を生成",
+          "explanation": "同じ結果を得るのに生成されるオブジェクト数が1万倍違います。これが体感速度の差になります。"
+        }
+      },
+      "seriesId": "development-swiftdata",
+      "seriesStep": 4
+    },
+    {
+      "id": "practice-development-039",
+      "track": "development",
+      "lessonId": "dev-swiftdata-migration",
+      "type": "chooseBlocks",
+      "difficulty": 4,
+      "title": "スキーマ移行に必要な要素を選ぶ",
+      "prompt": "Workout に必須プロパティ `category` を追加したため、既存データを壊さない移行が必要です。移行の定義に必要なブロックだけを、正しい順に選んでください。不要なブロックが混ざっています。",
+      "skills": [
+        "foundation",
+        "architecture"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "requireOrder": true,
+        "blocks": [
+          {
+            "id": "b1",
+            "code": "enum WorkoutMigrationPlan: SchemaMigrationPlan {"
+          },
+          {
+            "id": "b2",
+            "code": "    static var schemas: [any VersionedSchema.Type] { [SchemaV1.self, SchemaV2.self] }"
+          },
+          {
+            "id": "b3",
+            "code": "    static var stages: [MigrationStage] { [migrateV1toV2] }"
+          },
+          {
+            "id": "b4",
+            "code": "    static let migrateV1toV2 = MigrationStage.custom(\n        fromVersion: SchemaV1.self,\n        toVersion: SchemaV2.self,\n        willMigrate: nil,\n        didMigrate: { context in\n            for workout in try context.fetch(FetchDescriptor<SchemaV2.Workout>()) {\n                if workout.category.isEmpty { workout.category = \"other\" }\n            }\n            try context.save()\n        }\n    )"
+          },
+          {
+            "id": "b5",
+            "code": "}"
+          },
+          {
+            "id": "b6",
+            "code": "    static func deleteAllExistingData() { try? FileManager.default.removeItem(at: storeURL) }"
+          },
+          {
+            "id": "b7",
+            "code": "    static var stages: [MigrationStage] { [] }"
+          }
+        ]
+      },
+      "solution": {
+        "order": [
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5"
+        ],
+        "selected": [
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5"
+        ]
+      },
+      "hints": [
+        "移行計画は「どのバージョンが存在するか」と「どう移るか」の2つを宣言します。",
+        "既定値を持たない必須プロパティの追加は、自動的には移行できません。",
+        "既存データを消す解決策は、ユーザーのデータを失うため移行とは呼べません。"
+      ],
+      "explanation": "必要なのは、SchemaMigrationPlan の宣言、`schemas`（存在するバージョンの一覧）、`stages`（適用する移行段階）、移行段階の実体である `migrateV1toV2`、そして閉じかっこの5ブロックです。`schemas` はどのバージョンが存在するかを古い順に並べ、SwiftData はこの一覧を使って現在のストアがどのバージョンかを判定します。`stages` は実際に適用する移行を並べます。今回は既定値を持たない必須プロパティの追加なので、SwiftData が自動で埋める値を決められません。そのため `MigrationStage.custom` を使い、`didMigrate` で既存レコードの `category` に \"other\" を入れています。空の `stages` を返すブロックは移行を何も行わないため、既存ストアを開いた時点で失敗します。既存データを削除するブロックは、確かにエラーは出なくなりますが、ユーザーの記録をすべて失うため解決策になりません。",
+      "detail": {
+        "concept": "スキーマ移行は「バージョンを定義する」ことと「バージョン間の橋を架ける」ことの2段階です。橋が自動で架けられるかどうかは、変更が既存データから一意に導けるかで決まります。",
+        "steps": [
+          "`schemas` … V1, V2 を古い順に列挙し、SwiftData に選択肢を教える。",
+          "`stages` … 適用する移行段階を並べる。ここが空だと橋が存在しない。",
+          "`MigrationStage.custom` … 自動では決められない値を、コードで埋める。",
+          "`didMigrate` … 新スキーマ適用後に呼ばれ、既存レコードに既定値を設定する。",
+          "`try context.save()` … 埋めた値をストアへ確定させる。"
+        ],
+        "whyCorrect": "バージョンの一覧と、その間を埋める処理が両方そろっているため、既存データを保持したまま新しいスキーマへ移れます。既定値の決定という自動化できない部分だけをコードで補っています。",
+        "commonMistakes": [
+          "`stages` を空のままにする間違いです。schemas だけ増やしても橋がないため、既存ストアを開けずにクラッシュします。",
+          "移行できないときにストアを削除する対応です。開発中は動いたように見えますが、リリース後に実行するとユーザーのデータが消えます。",
+          "didMigrate で save を呼び忘れる間違いです。埋めた既定値が確定せず、次回起動時に同じ状態に戻ります。"
+        ],
+        "takeaway": "自動移行できない変更には custom stage を用意する。データ削除は移行ではない。",
+        "example": {
+          "code": "struct Row { var name: String; var category: String }\nvar rows = [Row(name: \"Run\", category: \"\"), Row(name: \"Swim\", category: \"cardio\")]\nfor i in rows.indices where rows[i].category.isEmpty { rows[i].category = \"other\" }\nprint(rows.map { \"\\($0.name):\\($0.category)\" })",
+          "output": "[\"Run:other\", \"Swim:cardio\"]",
+          "explanation": "didMigrate が行っているのはこの処理です。既存の値がある行はそのまま、空の行だけ既定値で埋めます。"
+        }
+      },
+      "seriesId": "development-swiftdata",
+      "seriesStep": 5
+    },
+    {
+      "id": "practice-development-040",
+      "track": "development",
+      "lessonId": "dev-lifecycle-config",
+      "type": "trace",
+      "difficulty": 1,
+      "title": "権限を尋ねる前に使うとどうなるか",
+      "prompt": "写真ライブラリへのアクセス権限をまだ求めていない状態で、このコードを実行しました。何が起きますか。",
+      "skills": [
+        "debugging",
+        "architecture"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "code": "// Info.plist に NSPhotoLibraryUsageDescription を書いていない\nlet status = PHPhotoLibrary.authorizationStatus(for: .readWrite)\nprint(status == .authorized ? \"読み込み開始\" : \"権限なし\")\nPHPhotoLibrary.requestAuthorization(for: .readWrite) { _ in }",
+        "options": [
+          {
+            "id": "o1",
+            "label": "「権限なし」と表示されたあと、権限を要求した時点でアプリがクラッシュする"
+          },
+          {
+            "id": "o2",
+            "label": "「権限なし」と表示され、そのあと権限を尋ねるダイアログが正常に出る"
+          },
+          {
+            "id": "o3",
+            "label": "1行目の authorizationStatus の時点でクラッシュする"
+          },
+          {
+            "id": "o4",
+            "label": "何も起きず、自動的に権限が許可された状態になる"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "コメントに書かれている「Info.plist に説明文がない」ことが鍵です。",
+        "状態を問い合わせるだけの処理と、実際にダイアログを出す処理は扱いが違います。",
+        "説明文が必要になるのは、ユーザーに表示する瞬間です。"
+      ],
+      "explanation": "まず1行目の `authorizationStatus(for:)` は現在の状態を返すだけで、ユーザーへの表示を伴わないため問題なく実行され、未許可なので `.notDetermined` が返り「権限なし」と表示されます。問題は3行目の `requestAuthorization(for:)` です。これは実際に許可を求めるダイアログを表示しますが、ダイアログには「なぜこのアプリが写真を使うのか」という説明文を必ず出す決まりになっています。その文言は Info.plist の `NSPhotoLibraryUsageDescription` から読み込まれ、キーが存在しないとダイアログを構成できないため、OS はその場でアプリを強制終了させます。これは実行時のクラッシュであり、ビルドは通ってしまうため、権限まわりのバグは実機で初めて気づくことが多い種類の問題です。修正は Info.plist に用途を説明する文字列を追加することです。",
+      "detail": {
+        "concept": "iOS のプライバシー権限は「状態を問い合わせる」「ユーザーに求める」の2段階です。説明文が必須になるのは後者で、ユーザーが判断するために必要な情報だからです。",
+        "steps": [
+          "`authorizationStatus(for:)` … 現在の状態を返すだけ。UI は出ないので説明文は不要。",
+          "未許可なので `.notDetermined` が返り、比較は false になって「権限なし」が表示される。",
+          "`requestAuthorization(for:)` … システムのダイアログを表示しようとする。",
+          "ダイアログに載せる説明文が Info.plist にないため、OS がアプリを終了させる。"
+        ],
+        "whyCorrect": "1行目は表示を伴わないので通過し、3行目で初めて説明文が必要になります。したがって表示が1回行われたあとにクラッシュする、という順序になります。",
+        "commonMistakes": [
+          "「Info.plist の設定漏れはビルドエラーになる」と考える間違いです。ビルドは成功し、実行時にだけ落ちます。",
+          "説明文を「写真を使います」のような内容のない文にする間違いです。審査で却下される理由になります。",
+          "権限を求める前に機能を実行してしまう間違いです。状態を確認して分岐する設計にします。"
+        ],
+        "takeaway": "権限ダイアログには Info.plist の説明文が必須。ないと実行時に落ちる。",
+        "example": {
+          "code": "let plistKeys: [String] = []\nlet needed = \"NSPhotoLibraryUsageDescription\"\nprint(\"状態の問い合わせ: OK\")\nprint(\"ダイアログ表示:\", plistKeys.contains(needed) ? \"OK\" : \"クラッシュ\")",
+          "output": "状態の問い合わせ: OK\nダイアログ表示: クラッシュ",
+          "explanation": "2つの処理で必要な条件が違うことが、このコードの挙動をそのまま説明しています。"
+        }
+      }
+    },
+    {
+      "id": "practice-development-041",
+      "track": "development",
+      "lessonId": "dev-capabilities-release",
+      "type": "testReasoning",
+      "difficulty": 3,
+      "title": "実機ビルドだけ失敗する原因を読み取る",
+      "prompt": "CI のジョブ結果です。シミュレータ向けは成功し、実機向けアーカイブだけ失敗しています。失敗の原因として最も適切な説明を選んでください。",
+      "skills": [
+        "architecture",
+        "debugging"
+      ],
+      "noRunSolution": true,
+      "content": {
+        "requirement": "Push通知を使うアプリを、CIから実機向けにアーカイブしてTestFlightへ配布できること。",
+        "code": "xcodebuild -scheme App -destination 'generic/platform=iOS' archive\n# error: Provisioning profile \"App Distribution\" doesn't include the aps-environment entitlement",
+        "tests": [
+          {
+            "name": "シミュレータ向けビルド",
+            "input": "-destination 'platform=iOS Simulator,name=iPhone 16'",
+            "expected": "成功",
+            "result": "成功"
+          },
+          {
+            "name": "実機向けアーカイブ",
+            "input": "-destination 'generic/platform=iOS'",
+            "expected": "成功",
+            "result": "失敗（aps-environment entitlement がない）"
+          },
+          {
+            "name": "ユニットテスト",
+            "input": "swift test",
+            "expected": "全件成功",
+            "result": "全件成功"
+          }
+        ],
+        "options": [
+          {
+            "id": "o1",
+            "label": "Push通知のCapabilityを有効にしたことで entitlement が要求されるようになったが、配布用プロビジョニングプロファイルがその権限を含んでいない"
+          },
+          {
+            "id": "o2",
+            "label": "Push通知のコードにコンパイルエラーがあり、実機向けの最適化ビルドでだけ検出された"
+          },
+          {
+            "id": "o3",
+            "label": "ユニットテストが Push通知の処理を検証していないため、アーカイブ時に検証が実行された"
+          },
+          {
+            "id": "o4",
+            "label": "シミュレータには通知機能がないため、実機向けビルドでのみ通知のコードが型チェックされた"
+          }
+        ]
+      },
+      "solution": {
+        "optionId": "o1"
+      },
+      "hints": [
+        "3つの結果のうち、失敗しているのは署名を必要とする工程だけです。",
+        "エラーメッセージが指しているのは、コードではなくプロファイルの内容です。",
+        "entitlement は「アプリが使ってよい機能」の一覧で、署名時に照合されます。"
+      ],
+      "explanation": "テスト結果が示しているのは、コードそのものは問題ないということです。シミュレータ向けビルドとユニットテストが成功しているため、コンパイルも型チェックも通っています。失敗しているのは実機向けアーカイブだけで、これは3つのうち唯一コード署名を伴う工程です。エラーメッセージも `Provisioning profile ... doesn't include the aps-environment entitlement` と、コードではなくプロファイルの内容を指しています。Push通知の Capability を有効にすると、アプリの entitlements に `aps-environment` が追加され、署名時にプロビジョニングプロファイルが同じ権限を含んでいるかが照合されます。プロファイル側が古いままだとこの照合に失敗します。修正は、Developer Portal で App ID に Push Notifications を有効化し、プロファイルを再生成して CI に配置し直すことです。コンパイルエラーやテスト不足を原因とする説明は、成功しているジョブの結果と矛盾します。",
+      "detail": {
+        "concept": "entitlement は「このアプリはこの機能を使ってよい」という宣言で、プロビジョニングプロファイルに含まれる権限と署名時に照合されます。コードの正しさとは独立した検証です。",
+        "steps": [
+          "要件は「実機向けにアーカイブして配布できること」。つまり署名の成立が要件に含まれる。",
+          "シミュレータ向けは署名を必要としないため成功する。",
+          "ユニットテストも署名を伴わないため成功する。",
+          "実機向けアーカイブだけが署名を行い、entitlements とプロファイルを照合する。",
+          "Capability を有効にした側だけ更新され、プロファイル側が追随していないため照合に失敗する。"
+        ],
+        "whyCorrect": "成功と失敗の差が「署名を行うかどうか」という1点に集約されており、エラーメッセージもプロファイルの内容を名指ししています。コードに原因があるなら、シミュレータ向けビルドも失敗するはずです。",
+        "commonMistakes": [
+          "Xcode の Capability を有効にすれば Developer Portal 側も自動で揃うと考える間違いです。CI が使う配布用プロファイルは手動更新が必要な場合があります。",
+          "entitlements ファイルから該当の行を削除して通す対応です。ビルドは通りますが、Push通知が実機で動きません。",
+          "ローカルで自動署名を使って成功するため CI でも通ると考える間違いです。自動署名と配布用プロファイルは別の仕組みです。"
+        ],
+        "takeaway": "Capability を追加したらプロファイルも再生成する。署名エラーはコードの問題ではない。",
+        "example": {
+          "code": "let entitlements = [\"aps-environment\"]\nlet profileIncludes = [\"application-identifier\", \"get-task-allow\"]\nlet missing = entitlements.filter { !profileIncludes.contains($0) }\nprint(missing.isEmpty ? \"署名OK\" : \"不足: \\(missing)\")",
+          "output": "不足: [\"aps-environment\"]",
+          "explanation": "署名時の照合はこの差分計算と同じで、片方にしかない権限があると失敗します。"
+        }
+      },
+      "seriesId": "development-release",
+      "seriesStep": 1
+    },
+    {
+      "id": "practice-development-042",
+      "track": "development",
+      "lessonId": "dev-architecture-security-git",
+      "type": "shortCode",
+      "difficulty": 4,
+      "title": "APIキーを読み込む1行を書く",
+      "prompt": "APIキーをソースコードに直接書かず、実行時に環境変数 API_KEY から読み込みます。値がない場合は nil になる1行を書いてください（変数名は apiKey）。",
+      "skills": [
+        "foundation",
+        "architecture"
+      ],
+      "content": {
+        "context": "import Foundation\n\n// APIキーはリポジトリに含めず、実行環境から渡す\n// ここに1行書く\nprint(apiKey ?? \"（未設定）\")",
+        "placeholder": "例: let 変数名 = ..."
+      },
+      "solution": {
+        "accepted": [
+          "let apiKey = ProcessInfo.processInfo.environment[\"API_KEY\"]",
+          "let apiKey: String? = ProcessInfo.processInfo.environment[\"API_KEY\"]"
+        ]
+      },
+      "hints": [
+        "実行中のプロセスの情報を取り出す型が Foundation にあります。",
+        "環境変数の一覧は辞書として取り出せます。辞書の添字アクセスは Optional を返します。",
+        "キーが存在しないときに nil になる性質を、そのまま利用します。"
+      ],
+      "explanation": "`let apiKey = ProcessInfo.processInfo.environment[\"API_KEY\"]` と書きます。`ProcessInfo.processInfo` は実行中のプロセス情報を表す共有インスタンスで、その `environment` プロパティは環境変数を `[String: String]` の辞書として返します。辞書の添字アクセスはキーが存在しないとき nil を返すため、`apiKey` の型は自動的に `String?` になり、要件の「値がない場合は nil」がそのまま満たされます。この書き方が重要なのは、APIキーをソースコードに書くとリポジトリの履歴に永久に残るためです。コミットから削除しても過去のコミットには残り続けるので、鍵の無効化と再発行が必要になります。環境変数から読む形にしておけば、鍵は CI の秘密変数や実行環境側にだけ存在し、リポジトリには一切現れません。",
+      "detail": {
+        "concept": "秘密情報は「コードに書かない」ことが原則です。実行時に外部から渡す仕組みにすると、コードと秘密情報のライフサイクルを分離でき、鍵の入れ替えにビルドが不要になります。",
+        "steps": [
+          "`ProcessInfo.processInfo` … 実行中のプロセスを表す共有インスタンスを取得する。",
+          "`.environment` … 環境変数を [String: String] の辞書として返す。",
+          "`[\"API_KEY\"]` … 辞書の添字アクセスなので戻り値は String?。",
+          "未設定なら nil が入り、呼び出し側が `??` などで扱える。"
+        ],
+        "whyCorrect": "辞書の添字アクセスが Optional を返すという Swift の標準的な挙動が、そのまま「値がなければ nil」という要件に一致します。追加の分岐や強制アンラップは不要です。",
+        "commonMistakes": [
+          "`environment[\"API_KEY\"]!` と強制アンラップする間違いです。環境変数を設定し忘れた環境でクラッシュします。",
+          "キーをソースに直書きして .gitignore で隠そうとする間違いです。ソースファイル自体は追跡対象なので隠せません。",
+          "誤ってコミットした鍵をあとから削除して安心する間違いです。過去のコミットに残るため、鍵の再発行が必要です。"
+        ],
+        "takeaway": "鍵はコードに書かず環境から読む。履歴に入った鍵は無効化して作り直す。",
+        "example": {
+          "code": "import Foundation\nlet apiKey = ProcessInfo.processInfo.environment[\"SLL_DEMO_KEY_UNSET\"]\nprint(apiKey ?? \"（未設定）\")",
+          "output": "（未設定）",
+          "explanation": "設定されていない環境変数を読むと nil が返るため、?? による既定値の指定がそのまま使えます。"
+        }
+      },
+      "seriesId": "development-release",
+      "seriesStep": 2
     }
   ]
 }
