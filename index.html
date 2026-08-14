@@ -147,6 +147,12 @@ pre{position:relative;margin:14px 0 0;padding:18px;border-radius:15px;background
 .pfilters .select{width:100%;min-width:0}
 .psummary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 18px}
 @media (max-width:640px){.psummary{grid-template-columns:1fr 1fr}}
+.pskill-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.pskill{padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.pskill-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.pskill-head strong{font-size:14px}
+.pskill-meta{color:var(--muted);font-size:12px;margin-top:6px;display:flex;flex-wrap:wrap;gap:10px}
+.pskill.untouched{opacity:.62}
 .pcard-list{display:grid;gap:10px}
 .pcard{width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:15px;padding:14px 15px;display:grid;gap:7px}
 .pcard:hover{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
@@ -587,12 +593,38 @@ function renderDashboard(){
     </div>
     <div class="card"><h3 style="margin-top:0">全体</h3><div class="muted">読了 ${read} / ${totalLessons} レッスン</div><div class="progressbar"><div style="width:${totalLessons?read/totalLessons*100:0}%"></div></div></div>
     <div class="card"><h3 style="margin-top:0">トラック別</h3><div class="track-progress-list">${rows}</div></div>
-    <div class="card"><h3 style="margin-top:0">進捗データ</h3><p class="muted">localStorageにのみ保存されます。</p><button class="btn danger-btn" onclick="resetProgress()">進捗をリセット</button></div>`;
+    ${practiceProgressCardHtml()}
+    <div class="card"><h3 style="margin-top:0">進捗データ</h3><p class="muted">知識問題と実装練習の進捗は、別々のキーでこの端末のlocalStorageにのみ保存されます。</p>
+      <div class="pactions"><button class="btn danger-btn" onclick="resetProgress()">知識問題の進捗をリセット</button>
+      <button class="btn danger-btn" onclick="resetPracticeProgress()">実装練習の進捗をリセット</button></div></div>`;
+}
+/* 進捗画面にも実装練習のサマリを出す。集計はホームと同じ practiceSummary を使う。 */
+function practiceProgressCardHtml(){
+  const p=practiceSummary();
+  return `<div class="card">
+    <h3 style="margin-top:0">実装練習</h3>
+    <div class="psummary">
+      <div class="stat"><div class="stat-value">${p.solved}</div><div class="stat-label">クリア</div></div>
+      <div class="stat"><div class="stat-value">${p.masteryPct}%</div><div class="stat-label">習得率</div></div>
+      <div class="stat"><div class="stat-value">${p.review}</div><div class="stat-label">要復習</div></div>
+      <div class="stat"><div class="stat-value">${p.solved?p.noHintPct+"%":"—"}</div><div class="stat-label">ヒントなし正解率</div></div>
+    </div>
+    <div class="muted">${p.solved} / ${p.total} 問クリア</div>
+    <div class="progressbar"><div style="width:${p.total?p.solved/p.total*100:0}%"></div></div>
+  </div>
+  ${skillDashboardHtml()}`;
 }
 function resetProgress(){
-  if(confirm("回答履歴と読了履歴をリセットしますか？")){
+  if(confirm("知識問題の回答履歴と読了履歴をリセットしますか？")){
     state.stats={answers:{},lessonRead:{}};
     saveStats();
+    renderDashboard();
+  }
+}
+function resetPracticeProgress(){
+  if(confirm("実装練習の成績（クリア状況・最高スコア・復習リスト）をリセットしますか？")){
+    Object.keys(practiceStats.challenges).forEach(k=>{ delete practiceStats.challenges[k]; });
+    savePracticeStats();
     renderDashboard();
   }
 }
@@ -675,6 +707,65 @@ function practiceSummary(){
     masteryPct: CHALLENGES.length ? Math.round(mastered/CHALLENGES.length*100) : 0,
     noHintPct: solved ? Math.round(noHint/solved*100) : 0
   };
+}
+/* 「実装力」ダッシュボード。スキルタグごとに練習の到達度を集計する。
+   開発力を測る指標ではなく、どのスキルの練習が手薄かを見るための目安。 */
+function practiceSkillStats(){
+  const rows=Object.keys(SKILL_LABELS).map(key=>{
+    const items=CHALLENGES.filter(c=>(c.skills||[]).includes(key));
+    let solved=0, mastered=0, review=0, noHint=0, attempted=0;
+    items.forEach(c=>{
+      const r=practiceRecord(c.id);
+      if(!r || !r.attempts) return;
+      attempted++;
+      if(r.solved) solved++;
+      if(r.needsReview) review++;
+      if((r.bestScore||0)>=MASTERY_SCORE) mastered++;
+      if(r.bestScore===100) noHint++;
+    });
+    return {
+      key, label:SKILL_LABELS[key], total:items.length,
+      attempted, solved, mastered, review, noHint,
+      masteryPct: items.length ? Math.round(mastered/items.length*100) : 0,
+      noHintPct: solved ? Math.round(noHint/solved*100) : 0
+    };
+  });
+  return rows.filter(r=>r.total>0);
+}
+function skillDashboardHtml(){
+  const rows=practiceSkillStats().map(s=>`
+    <div class="pskill ${s.attempted?"":"untouched"}">
+      <div class="pskill-head"><strong>${escapeHtml(s.label)}</strong><span class="muted">${s.solved} / ${s.total}</span></div>
+      <div class="progressbar" role="img" aria-label="${escapeHtml(s.label)} の習得率 ${s.masteryPct}%"><div style="width:${s.masteryPct}%"></div></div>
+      <div class="pskill-meta">
+        <span>習得 ${s.masteryPct}%</span>
+        <span>要復習 ${s.review}</span>
+        <span>ヒントなし正解 ${s.solved?s.noHintPct+"%":"—"}</span>
+      </div>
+    </div>`).join("");
+  return `<div class="card">
+    <h3 style="margin-top:0">実装力（練習の到達度）</h3>
+    <p class="muted" style="margin-top:0;font-size:13px">スキルごとに、解いた数・習得率・要復習・ヒントなしで解けた割合をまとめています。練習の進み具合の目安であり、開発力を正確に測るスコアではありません。</p>
+    <div class="pskill-grid">${rows}</div>
+  </div>`;
+}
+function reviewChallenges(){ return CHALLENGES.filter(c=>practiceStatus(c.id)==="review"); }
+function practiceReviewHtml(){
+  const list=reviewChallenges();
+  if(!list.length){
+    return `<div class="card"><h3 style="margin-top:0">復習リスト</h3>
+      <p class="muted" style="margin-bottom:0">要復習の問題はありません。間違えた問題、解答を見た問題、ヒントを多く使った問題がここに並びます。</p></div>`;
+  }
+  const shown=list.slice(0,5);
+  return `<div class="card">
+    <h3 style="margin-top:0">復習リスト（${list.length}問）</h3>
+    <p class="muted" style="margin-top:0;font-size:13px">不正解・解答表示・ヒント3つ使用のいずれかに当てはまる問題です。ヒントなしで解き直すと復習リストから外れます。過去の最高スコアは下がりません。</p>
+    <div class="pcard-list">${shown.map(challengeCard).join("")}</div>
+    <div class="pactions" style="margin-top:12px">
+      <button class="btn primary" data-pact="open" data-id="${escapeHtml(list[0].id)}">最初の1問を解き直す →</button>
+      <button class="btn secondary" data-pact="reviewAll">復習リストだけ表示</button>
+    </div>
+  </div>`;
 }
 function updatePracticeChrome(){
   const badge=document.getElementById("practiceCountBadge");
@@ -777,6 +868,8 @@ function renderPracticeHome(){
       <div class="stat"><div class="stat-value">${s.attempted}</div><div class="stat-label">挑戦済み</div></div>
     </div>
     ${recommendationCard()}
+    ${skillDashboardHtml()}
+    ${practiceReviewHtml()}
     ${practiceFilterBar()}
     <div class="muted" style="margin-bottom:10px">${list.length}問が条件に一致（${Math.min(shown.length,list.length)}問を表示）</div>
     <div class="pcard-list" id="practiceList">
@@ -810,6 +903,12 @@ function bindPracticeHome(){
       else if(act==="clearFilters"){
         practiceState.filters={track:"all",group:"all",type:"all",level:"all",skill:"all",status:"all"};
         practiceState.search=""; practiceState.limit=PAGE_SIZE; renderPracticeHome();
+      }
+      else if(act==="reviewAll"){
+        practiceState.filters={track:"all",group:"all",type:"all",level:"all",skill:"all",status:"review"};
+        practiceState.search=""; practiceState.limit=PAGE_SIZE; renderPracticeHome();
+        const list=document.getElementById("practiceList");
+        if(list) list.scrollIntoView({behavior:"smooth",block:"start"});
       }
     });
   });
@@ -1334,7 +1433,10 @@ function practiceCheck(){
   }else{
     rec.lastResult="wrong";
   }
-  rec.needsReview=!(rec.lastResult==="correct" && (rec.bestScore||0)>=MASTERY_SCORE);
+  rec.lastScore=score;
+  // 復習判定は「今回の解き方」で行う。bestScore（過去最高）は Math.max で残すため、
+  // ヒントを多く使った解き直しで履歴が下がることも、復習リストから外れることもない。
+  rec.needsReview=!(ok && score>=MASTERY_SCORE);
   practiceStats.challenges[ch.id]=rec;
   savePracticeStats();
   practiceState.checked=true;
