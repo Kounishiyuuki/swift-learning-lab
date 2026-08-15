@@ -344,6 +344,32 @@ def trigrams(text):
     return {t[i:i + 3] for i in range(max(len(t) - 2, 1))}
 
 
+def canonical_solution(c):
+    """The solution as compared for duplicate detection.
+
+    chooseBlocks hands the learner an unordered candidate pool, so a block id only
+    means something through the code it points at, and the ids in solution.selected
+    carry no order. Mapping ids to code and sorting that set makes two identical
+    exercises compare equal even when their candidates are presented in a different
+    order. solution.order stays a sequence (mapped, not sorted) because requireOrder
+    exercises are graded on that order; every other type is left untouched, so
+    reorder / buildFunction solutions remain fully order-sensitive.
+    """
+    sol = dict(c.get("solution") or {})
+    if c.get("type") != "chooseBlocks":
+        return sol
+    content = c.get("content") or {}
+    codes = {b.get("id"): str(b.get("code", "")) for b in content.get("blocks") or []}
+    require_order = bool(content.get("requireOrder"))
+    for key in ("selected", "order"):
+        ids = sol.get(key)
+        if not isinstance(ids, list):
+            continue
+        mapped = [codes.get(i, i) for i in ids]
+        sol[key] = mapped if (require_order and key == "order") else sorted(mapped)
+    return sol
+
+
 def code_signature(c):
     """The code a learner actually reasons about, plus the answer.
 
@@ -353,11 +379,15 @@ def code_signature(c):
     content = c.get("content") or {}
     parts = [str(content.get("code") or ""), str(content.get("template") or ""),
              str(content.get("context") or ""), str(content.get("requirement") or "")]
-    parts += [str(b.get("code", "")) for b in content.get("blocks") or []]
+    block_codes = [str(b.get("code", "")) for b in content.get("blocks") or []]
+    # A chooseBlocks pool is presented unordered, so its display order is not part
+    # of the exercise. Every other type that uses blocks (reorder, buildFunction,
+    # trace/sequence) is graded on order, so their block order is kept as authored.
+    parts += sorted(block_codes) if c.get("type") == "chooseBlocks" else block_codes
     parts += [str(l.get("code", "")) for l in content.get("lines") or []]
     parts += [str(o.get("code", "") or o.get("label", "")) for o in content.get("options") or []]
     parts += [str(x.get("label", "")) for x in (content.get("left") or []) + (content.get("right") or [])]
-    parts.append(json.dumps(c.get("solution") or {}, sort_keys=True, ensure_ascii=False))
+    parts.append(json.dumps(canonical_solution(c), sort_keys=True, ensure_ascii=False))
     return normalize_code("\n".join(p for p in parts if p.strip()))
 
 
