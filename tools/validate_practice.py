@@ -532,7 +532,8 @@ def main(argv):
         return 1
     print("OK: %d challenge(s) validated%s" % (n, "" if strict else " (partial mode)"))
     if pairs:
-        print("Similar pairs above 0.62: %d (highest %.2f)" % (len(pairs), pairs[0]["score"]))
+        print("Similarity audit pairs (0.42 cross-track / 0.62 within-track): %d (highest %.2f)" %
+              (len(pairs), pairs[0]["score"]))
     return 0
 
 
