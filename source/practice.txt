@@ -164,7 +164,7 @@ print(b)
 
 ### practice-starter-006 挨拶を表示するのに必要な行だけ選ぶ [ブロック選択 / Lv1 ガイド]
 対象レッスン: starter-read-line-by-line
-シリーズ: starter-values (2段階目)
+シリーズ: starter-values (3段階目)
 スキル: syntax, controlFlow
 問題: 「Hello, Yuki」と1行だけ表示したいです。必要な行だけを選び、実行順に並べてください。
 使うブロック:
@@ -193,7 +193,7 @@ print("Hello, " + name)
 
 ### practice-starter-007 上から順に実行される順番に直す [並べ替え / Lv1 ガイド]
 対象レッスン: starter-read-line-by-line
-シリーズ: starter-values (3段階目)
+シリーズ: starter-values (2段階目)
 スキル: syntax, controlFlow
 問題: 「合計は 300 です」と表示したいです。ブロックを正しい実行順に並べ替えてください。
 正解の並び:
@@ -543,7 +543,7 @@ if age >= 20 {
 
 ### practice-starter-018 3つに分かれる条件を書く [穴埋め / Lv2 基本]
 対象レッスン: starter-if-else
-シリーズ: starter-if (2段階目)
+シリーズ: starter-if (3段階目)
 スキル: controlFlow
 問題: 80点以上はA、60点以上はB、それ以外はCと表示したいです。空欄を埋めてください。
 埋めたあと:
@@ -584,7 +584,7 @@ if score >= 60 {
 
 ### practice-starter-019 どの分岐が実行されるか追う [実行追跡 / Lv2 基本]
 対象レッスン: starter-if-else
-シリーズ: starter-if (3段階目)
+シリーズ: starter-if (2段階目)
 スキル: controlFlow
 問題: このコードを実行したとき、出力される内容を選んでください。
 正解: 在庫なし
@@ -738,7 +738,7 @@ print("終了")
 
 ### practice-starter-023 if の外では使えない値がある [バグ発見 / Lv2 基本]
 対象レッスン: starter-braces-scope
-シリーズ: starter-scope (2段階目)
+シリーズ: starter-scope (3段階目)
 スキル: controlFlow, debugging
 問題: このコードはビルドできません。原因になっている行を選んでください。
 問題のある行: print(discount)
@@ -769,7 +769,7 @@ print(discount)
 
 ### practice-starter-024 ブロックを閉じる記号を入れる [穴埋め / Lv2 基本]
 対象レッスン: starter-braces-scope
-シリーズ: starter-scope (3段階目)
+シリーズ: starter-scope (2段階目)
 スキル: syntax, controlFlow
 問題: ループとif文が正しく閉じるように、空欄を埋めてください。
 埋めたあと:
@@ -879,7 +879,7 @@ if let name = input {
 
 ### practice-starter-027 nilのときの代わりの値を指定する [穴埋め / Lv2 基本]
 対象レッスン: starter-optional
-シリーズ: starter-optional (3段階目)
+シリーズ: starter-optional (4段階目)
 スキル: optional
 問題: nicknameがnilなら「ゲスト」を使うように空欄を埋めてください。
 埋めたあと:
@@ -911,7 +911,7 @@ print(nickname ?? "ゲスト")
 
 ### practice-starter-028 Optionalの流れを追う [実行追跡 / Lv2 基本]
 対象レッスン: starter-optional
-シリーズ: starter-optional (4段階目)
+シリーズ: starter-optional (3段階目)
 スキル: optional, controlFlow
 問題: このコードの出力を選んでください。
 正解: あり: A
@@ -1450,7 +1450,7 @@ print(s1.n, c1.n)
 
 ### practice-swift-002 コピーされる型を選んで書く [穴埋め / Lv2 基本]
 対象レッスン: swift-values-types
-シリーズ: swift-value-semantics (2段階目)
+シリーズ: swift-value-semantics (3段階目)
 スキル: types, syntax
 問題: p2 を書き換えても p1 が変わらないようにしたいです。空欄に入るキーワードを選んでください。
 埋めたあと:
@@ -1490,7 +1490,7 @@ print(fixed.x, movable.x)
 
 ### practice-swift-003 structとclassで代入の結果を追う [実行追跡 / Lv2 基本]
 対象レッスン: swift-values-types
-シリーズ: swift-value-semantics (3段階目)
+シリーズ: swift-value-semantics (2段階目)
 スキル: types, debugging
 問題: structとclassを同じ手順で書き換えました。最後のprintで表示される内容を選んでください。
 正解: 1 9
@@ -1520,7 +1520,7 @@ print(g.n)
 
 ### practice-swift-004 IntとDoubleを足している行を見つける [バグ発見 / Lv2 基本]
 対象レッスン: swift-numbers-conversion
-シリーズ: swift-number-conversion (1段階目)
+シリーズ: swift-number-conversion (2段階目)
 スキル: types, debugging
 問題: このコードはビルドできません。原因になっている行を選んでください。
 問題のある行: let total = count + unitPrice
@@ -1548,7 +1548,7 @@ print(Double(count) * unitPrice)
 
 ### practice-swift-005 整数の割り算で切り捨てられるページ数を直す [修正 / Lv2 基本]
 対象レッスン: swift-numbers-conversion
-シリーズ: swift-number-conversion (2段階目)
+シリーズ: swift-number-conversion (3段階目)
 スキル: types, debugging
 問題: 7件を1ページ2件で表示するには4ページ必要ですが、3と表示されます。3行目の修正として正しいものを選んでください。
 正解: let pages = (items + perPage - 1) / perPage
@@ -1578,7 +1578,7 @@ for items in [6, 7, 8] {
 
 ### practice-swift-006 平均点を小数で求める [穴埋め / Lv2 基本]
 対象レッスン: swift-numbers-conversion
-シリーズ: swift-number-conversion (3段階目)
+シリーズ: swift-number-conversion (1段階目)
 スキル: types
 問題: 3人の平均点を小数として求めたいです。空欄に入る式を選んでください。
 埋めたあと:
@@ -1737,7 +1737,7 @@ print(10 - (2 - 3))
 
 ### practice-swift-011 文字列を数字で添字アクセスしている行を見つける [バグ発見 / Lv3 実装]
 対象レッスン: swift-strings-unicode
-シリーズ: swift-string-index (1段階目)
+シリーズ: swift-string-index (2段階目)
 スキル: types, debugging, collections
 問題: このコードはビルドできません。原因になっている行を選んでください。
 問題のある行: let firstChar = text[0]
@@ -1768,7 +1768,7 @@ C
 
 ### practice-swift-012 先頭3文字を取り出す行だけを選ぶ [ブロック選択 / Lv3 実装]
 対象レッスン: swift-strings-unicode
-シリーズ: swift-string-index (2段階目)
+シリーズ: swift-string-index (1段階目)
 スキル: collections, syntax
 問題: 文字列の先頭3文字を表示したいです。必要な行だけを選び、実行順に並べてください。
 使うブロック:
@@ -1802,7 +1802,7 @@ Learning
 
 ### practice-swift-013 早期リターンで前提を確定させる [穴埋め / Lv2 基本]
 対象レッスン: swift-control-flow
-シリーズ: swift-branching (1段階目)
+シリーズ: swift-branching (2段階目)
 スキル: controlFlow, optional
 問題: 値が nil のときだけ早く抜ける形にします。空欄に入るキーワードを選んでください。
 埋めたあと:
@@ -1841,7 +1841,7 @@ print(describe(20), describe(17), describe(nil))
 
 ### practice-swift-014 成績判定のif文を組み立て直す [並べ替え / Lv2 基本]
 対象レッスン: swift-control-flow
-シリーズ: swift-branching (2段階目)
+シリーズ: swift-branching (1段階目)
 スキル: controlFlow, syntax
 問題: score が 75 のとき "B" と表示されるように、ブロックを正しい順に並べ替えてください。
 正解の並び:
@@ -1885,9 +1885,9 @@ for score in [95, 75, 30] {
 - 関連例の説明: 3つの入力を通すと、それぞれ想定した枝に入っていることを一度に確認できます。
 - 覚えておくこと: 重なる条件を並べるときは厳しい順。else を省くと初期化漏れの経路ができる。
 
-### practice-swift-015 条件式で代入している行を見つける [バグ発見 / Lv2 基本]
+### practice-swift-015 条件式で代入している行を見つける [バグ発見 / Lv3 実装]
 対象レッスン: swift-control-flow
-シリーズ: swift-branching (3段階目)
+シリーズ: swift-branching (4段階目)
 スキル: controlFlow, debugging
 問題: このコードはビルドできません。原因になっている行を選んでください。
 問題のある行: if score = 90 {
@@ -1954,7 +1954,7 @@ for v in [3, 200, 7] {
 
 ### practice-swift-017 範囲パターンと追加条件を書く [穴埋め / Lv3 実装]
 対象レッスン: swift-pattern-matching
-シリーズ: swift-pattern (2段階目)
+シリーズ: swift-pattern (3段階目)
 スキル: controlFlow, syntax
 問題: 1桁の数と偶数を区別する switch を完成させてください。
 埋めたあと:
@@ -1999,7 +1999,7 @@ for v in [9, 10] {
 
 ### practice-swift-018 網羅されていないswitchを安全に直す [修正 / Lv3 実装]
 対象レッスン: swift-pattern-matching
-シリーズ: swift-pattern (3段階目)
+シリーズ: swift-pattern (4段階目)
 スキル: controlFlow, types, debugging
 問題: このコードは 'Switch must be exhaustive' でビルドできません。今後 Status にケースを追加したときもコンパイラに気づかせたいです。追加する行として最適なものを選んでください。
 正解: case .stopped:
@@ -2035,7 +2035,7 @@ print(label(.paused), label(.stopped))
 
 ### practice-swift-019 最初に一致したcaseだけが実行される [実行追跡 / Lv3 実装]
 対象レッスン: swift-pattern-matching
-シリーズ: swift-pattern (4段階目)
+シリーズ: swift-pattern (2段階目)
 スキル: controlFlow, debugging
 問題: 次のコードを実行したとき、表示される内容を選んでください。
 正解: y軸上
@@ -2133,36 +2133,38 @@ for i in 0...4 { print(i, terminator: " ") }
 - 関連例の説明: 2つの書き方が同じ列を生むことを、横並びの出力で確認できます。
 - 覚えておくこと: 個数で考えるなら `..<`、終端の値で考えるなら `...`。
 
-### practice-swift-022 実行時にクラッシュする範囲指定を見つける [バグ発見 / Lv3 実装]
+### practice-swift-022 降順に回そうとして落ちる範囲を見つける [バグ発見 / Lv3 実装]
 対象レッスン: swift-loops-ranges
 シリーズ: swift-loop-basics (3段階目)
-スキル: collections, debugging
-問題: このコードはビルドできますが、実行すると途中でクラッシュします。原因になっている行を選んでください。
-問題のある行: for i in 0...items.count {
-ヒント1: 要素が3個の配列で、使える添字はいくつからいくつまででしょうか。
-ヒント2: 配列の添字は0から始まるので、最後の要素の添字は count そのものではありません。
-ヒント3: `0...items.count` は 0,1,2,3 の4回まわります。添字3の要素は存在しません。
-解説: バグは2行目の範囲指定にあります。`0...items.count` は終端を含む範囲なので 0,1,2,3 の4回まわりますが、要素3個の配列で有効な添字は 0,1,2 までです。4回目の `items[3]` で 'Fatal error: Index out of range' が発生し、a・b・c を出力したあとにクラッシュします。型としては Int の添字アクセスなのでコンパイルは通り、実行時まで問題が表面化しないのがこのバグの厄介なところです。修正は `for item in items` と要素を直接回す形にするのが最も安全で、添字が必要な場合は `0..<items.count` にします。
-- 使っている考え方: 配列の添字は 0 から count - 1 までです。`...` と `..<` の取り違えは、コンパイラが検出できず実行時クラッシュになる典型的なオフバイワンです。
-- 手順: items.count は 3。`0...3` は 0,1,2,3 の4個。
-- 手順: 1〜3回目の items[0..2] は成功し、a・b・c が出力される。
-- 手順: 4回目に items[3] を評価した時点で範囲外アクセスとなりプロセスが停止する。
-- 手順: `for item in items` にすれば、添字を計算しないので範囲外が原理的に起きない。
-- 動く理由: 原因は添字を使っている3行目ではなく、範囲を作っている2行目です。3行目は与えられた i をそのまま使っているだけで、i の範囲が正しければ何の問題もありません。
-- よくある間違い: クラッシュした行（items[i] の行）を原因だと判断してしまう間違いです。クラッシュ地点と原因の位置はしばしば異なります。
-- よくある間違い: `0..<items.count` に直せば正しく動きますが、添字が本当に必要でない限りは `for item in items` のほうが安全です。
+スキル: collections, controlFlow, debugging
+問題: このコードはビルドできますが、実行した瞬間にクラッシュし、1件も表示されません。原因になっている行を選んでください。
+問題のある行: for i in scores.count - 1 ... 0 {
+ヒント1: 1件も表示されていないことが手がかりです。ループの中身に入る前の段階で失敗しています。
+ヒント2: `a...b` という範囲は、a が b 以下であることを前提にしています。ここでの a と b を実際の数値に置き換えて確かめてください。
+ヒント3: scores.count - 1 は 3、右側は 0 なので `3...0` を作ろうとしています。降順に回すには範囲式ではなく別の手段が必要です。
+解説: 問題は2行目の `scores.count - 1 ... 0` です。`a...b` は「a から b まで昇順に並ぶ範囲」を表す値で、a が b より大きい状態は表現できません。ここでは `3...0` を作ろうとするため、範囲を組み立てた時点で `Fatal error: Range requires lowerBound <= upperBound` で停止します。添字アクセスに到達する前に落ちるので、表示は1件も出ません。ビルドが通るのは、`scores.count` が実行するまで決まらず、コンパイラには 3 > 0 だと判断できないためです。修正は `scores.indices.reversed()` を使い、有効な添字（0...3）を逆順にたどることです。`stride(from: scores.count - 1, through: 0, by: -1)` でも同じ結果になります。範囲の両端を入れ替えて `0...scores.count - 1` としても落ちなくなりますが、それは昇順に戻ってしまい、降順で表示したいという要件を満たしません。
+- 使っている考え方: `...` や `..<` が作るのは「下限から上限へ向かう範囲」という1つの値です。下限が上限より大きい範囲は Swift には存在しないため、そのような範囲を作ろうとした時点で実行が止まります。降順の反復は、範囲式ではなく `reversed()` や `stride` で表します。
+- 手順: `scores.count` は 4 なので、左側は 3 になる。
+- 手順: 右側は 0 なので、作ろうとしているのは `3...0`。
+- 手順: 下限 3 が上限 0 より大きいため、範囲の生成そのものが失敗して停止する。
+- 手順: `print(scores[i])` は一度も実行されないので、出力は空のまま。
+- 手順: `scores.indices.reversed()` は 3, 2, 1, 0 を順に返すので、要件どおり降順にたどれる。
+- 動く理由: `indices` は配列が実際に持っている有効な添字の集まりで、`reversed()` はその並びを逆にするだけです。範囲の下限と上限を逆転させることがないため落ちず、かつ添字は必ず有効な値なので範囲外アクセスも起きません。
+- よくある間違い: `0...scores.count - 1` に直して「落ちなくなった」で終える間違いです。クラッシュは消えますが昇順に戻るため、降順で表示したいという元の要件を満たしません。
+- よくある間違い: `scores.count ... 0` のように書き換えても同じ理由で落ちます。原因は端の値ではなく、下限が上限を超えている構造そのものです。
+- よくある間違い: `for i in scores.count - 1 >= 0 ...` のように条件式を範囲に混ぜようとする間違いです。範囲式が受け取るのは値であって条件ではありません。
 - 関連例:
 ```swift
-let items = ["a", "b", "c"]
-for (i, item) in items.enumerated() {
-    print(i, item)
-}
+let scores = [10, 20, 30, 40]
+print("有効な添字:", Array(scores.indices))
+print("降順にたどる:", Array(scores.indices.reversed()))
+print("strideでも同じ:", Array(stride(from: scores.count - 1, through: 0, by: -1)))
 ```
-- 関連例の出力: 0 a
-1 b
-2 c
-- 関連例の説明: 添字と要素の両方が必要なときは enumerated() を使うと、範囲を自分で計算せずに済みます。
-- 覚えておくこと: 有効な添字は 0..<count。クラッシュ地点と原因の行は別のことがある。
+- 関連例の出力: 有効な添字: [0, 1, 2, 3]
+降順にたどる: [3, 2, 1, 0]
+strideでも同じ: [3, 2, 1, 0]
+- 関連例の説明: 降順で欲しいのはこの並びです。範囲式そのものを逆向きに書くのではなく、正しい範囲を作ってから向きを変えます。
+- 覚えておくこと: 範囲は下限 ≤ 上限が前提。降順は reversed() か stride で表す。
 
 ### practice-swift-023 倍数の合計を返す関数を組み立てる [関数組み立て / Lv3 実装]
 対象レッスン: swift-loops-ranges
@@ -2211,7 +2213,7 @@ print(sumOfMultiples(of: 5, below: 20))
 
 ### practice-swift-024 guardで書く関数に必要な行だけ選ぶ [ブロック選択 / Lv3 実装]
 対象レッスン: swift-control-flow
-シリーズ: swift-branching (4段階目)
+シリーズ: swift-branching (3段階目)
 スキル: functions, optional, controlFlow
 問題: 名前が nil でも空文字でもないときだけ「〇〇さん」を返し、それ以外は「名無しさん」を返す関数を作ります。必要な行だけを選び、正しい順に並べてください。
 使うブロック:
@@ -2247,7 +2249,7 @@ print(greet("Yuki"), greet(""), greet(nil))
 
 ### practice-swift-025 税込み価格を返す関数を組み立てる [関数組み立て / Lv2 基本]
 対象レッスン: swift-functions
-シリーズ: swift-function-basics (1段階目)
+シリーズ: swift-function-basics (3段階目)
 スキル: functions, types
 問題: 本体価格と税率を受け取り、税込み価格（円未満切り捨て）を返す関数を作ります。必要なブロックだけを選んで正しい順に並べてください。
 正解の並び:
@@ -2285,7 +2287,7 @@ print(priceWithTax(980, rate: 0.08))
 
 ### practice-swift-026 引数ラベルを省略する書き方 [穴埋め / Lv2 基本]
 対象レッスン: swift-functions
-シリーズ: swift-function-basics (2段階目)
+シリーズ: swift-function-basics (1段階目)
 スキル: functions, syntax
 問題: 呼び出し側が `move(1, to: 5)` と書けるようにします。空欄を埋めてください。
 埋めたあと:
@@ -2318,7 +2320,7 @@ move(1, to: 5)
 
 ### practice-swift-027 戻り値を返していない関数を直す [修正 / Lv2 基本]
 対象レッスン: swift-functions
-シリーズ: swift-function-basics (3段階目)
+シリーズ: swift-function-basics (2段階目)
 スキル: functions, debugging
 問題: この関数は 'Missing return in a function expected to return Int' でビルドできません。2行目を書き換える修正として正しいものを選んでください。
 正解:     return width * height
@@ -2584,7 +2586,7 @@ print(names.reduce(0) { $0 + $1.count })
 
 ### practice-swift-035 並び順が逆になる比較クロージャを直す [修正 / Lv3 実装]
 対象レッスン: swift-closures
-シリーズ: swift-closure-basics (2段階目)
+シリーズ: swift-closure-basics (3段階目)
 スキル: collections, functions, debugging
 問題: 点数を高い順に並べたいのに低い順になります。2行目の修正として正しいものを選んでください。
 正解: let ranked = scores.sorted { $0 > $1 }
@@ -2615,7 +2617,7 @@ print(Array(scores.reversed()))
 
 ### practice-swift-036 reduceで合計するのに必要な行だけ選ぶ [ブロック選択 / Lv3 実装]
 対象レッスン: swift-closures
-シリーズ: swift-closure-basics (3段階目)
+シリーズ: swift-closure-basics (2段階目)
 スキル: collections, functions
 問題: 価格の合計をreduceで求めて表示します。必要な行だけを選び、正しい順に並べてください。
 使うブロック:
@@ -2647,7 +2649,7 @@ print([Int]().reduce(0, +))
 - 関連例の説明: 初期値を変えると意味が変わり、空配列では初期値がそのまま結果になります。
 - 覚えておくこと: reduce は初期値+畳み込み。$0 は途中経過、$1 は要素。
 
-### practice-swift-037 捕捉リストがある場合とない場合を追う [実行追跡 / Lv4 応用]
+### practice-swift-037 捕捉リストがある場合とない場合を追う [実行追跡 / Lv3 実装]
 対象レッスン: swift-closures-advanced
 シリーズ: swift-closure-capture (1段階目)
 スキル: functions, memory, debugging
@@ -2782,9 +2784,9 @@ print(a.count, s.count, d.count)
 - 関連例の説明: 同じデータでも Set にすると重複が消えるため、要素数が変わります。
 - 覚えておくこと: 順序が要るなら Array、重複排除と高速な判定なら Set、対応表なら Dictionary。
 
-### practice-swift-041 配列の追加と削除のメソッドを選ぶ [穴埋め / Lv2 基本]
+### practice-swift-041 配列の追加と削除のメソッドを選ぶ [穴埋め / Lv3 実装]
 対象レッスン: swift-array
-シリーズ: swift-array-safety (1段階目)
+シリーズ: swift-array-safety (2段階目)
 スキル: collections
 問題: 末尾に "c" を追加し、先頭の要素を削除します。空欄を埋めてください。
 埋めたあと:
@@ -2820,7 +2822,7 @@ print(removed, items)
 
 ### practice-swift-042 空配列でクラッシュする行を見つける [バグ発見 / Lv3 実装]
 対象レッスン: swift-array
-シリーズ: swift-array-safety (2段階目)
+シリーズ: swift-array-safety (3段階目)
 スキル: collections, optional, debugging
 問題: このコードはビルドできますが、実行するとクラッシュします。原因になっている行を選んでください。
 問題のある行: let first = names.first!
@@ -2849,7 +2851,7 @@ true
 
 ### practice-swift-043 安全に添字アクセスする関数を組み立てる [関数組み立て / Lv3 実装]
 対象レッスン: swift-array
-シリーズ: swift-array-safety (3段階目)
+シリーズ: swift-array-safety (4段階目)
 スキル: collections, optional, functions
 問題: 範囲外の添字を渡されても落ちず、nil を返す関数を作ります。必要なブロックだけを選んで正しい順に並べてください。
 正解の並び:
@@ -2892,7 +2894,7 @@ print(element(items, at: -1) ?? "なし")
 
 ### practice-swift-044 重複を除いて並べ替える手順を並べる [並べ替え / Lv3 実装]
 対象レッスン: swift-array
-シリーズ: swift-array-safety (4段階目)
+シリーズ: swift-array-safety (1段階目)
 スキル: collections
 問題: [3, 1, 3, 2] から重複を除き、小さい順に並べて表示します。ブロックを正しい順に並べ替えてください。
 正解の並び:
@@ -2927,7 +2929,7 @@ print(Array(Set(raw)).sorted(), keepOrder)
 
 ### practice-swift-045 集合演算のメソッドを選ぶ [穴埋め / Lv3 実装]
 対象レッスン: swift-set
-シリーズ: swift-set-basics (1段階目)
+シリーズ: swift-set-basics (2段階目)
 スキル: collections
 問題: 2つの集合の共通部分と、すべてを合わせた集合を求めます。空欄を埋めてください。
 埋めたあと:
@@ -2963,7 +2965,7 @@ print(a.symmetricDifference(b).sorted())
 
 ### practice-swift-046 Setに要素を追加する書き方に直す [修正 / Lv3 実装]
 対象レッスン: swift-set
-シリーズ: swift-set-basics (2段階目)
+シリーズ: swift-set-basics (3段階目)
 スキル: collections, debugging
 問題: この Set への追加はビルドできません。2行目の修正として正しいものを選んでください。
 正解: tags.insert("swift")
@@ -2994,7 +2996,7 @@ false
 
 ### practice-swift-047 insertの戻り値を追う [実行追跡 / Lv3 実装]
 対象レッスン: swift-set
-シリーズ: swift-set-basics (3段階目)
+シリーズ: swift-set-basics (1段階目)
 スキル: collections, debugging
 問題: 次のコードを実行したとき、表示される3行を選んでください。
 正解: a true / b true / a false
@@ -3022,7 +3024,7 @@ print(raw.filter { seen.insert($0).inserted })
 
 ### practice-swift-048 出現回数を数えるのに必要な行だけ選ぶ [ブロック選択 / Lv3 実装]
 対象レッスン: swift-collections
-シリーズ: swift-dictionary-count (1段階目)
+シリーズ: swift-dictionary-count (2段階目)
 スキル: collections, optional
 問題: 単語ごとの出現回数を辞書に集計し、"a" の回数を表示します。必要な行だけを選び、正しい順に並べてください。
 使うブロック:
@@ -3053,9 +3055,9 @@ print(counts.sorted { $0.key < $1.key })
 - 関連例の説明: 辞書は順序を持たないため、表示前にキーで並べ替えると結果が安定します。
 - 覚えておくこと: 辞書の集計は `dict[key, default: 0] += 1`。空辞書リテラルは `[:]`。
 
-### practice-swift-049 辞書から安全に取り出す行だけ選ぶ [ブロック選択 / Lv2 基本]
+### practice-swift-049 辞書から安全に取り出す行だけ選ぶ [ブロック選択 / Lv3 実装]
 対象レッスン: swift-dictionary
-シリーズ: swift-dictionary-count (2段階目)
+シリーズ: swift-dictionary-count (3段階目)
 スキル: collections, optional
 問題: 在庫があればその数を、キーがなければ「取り扱いなし」を表示します。必要な行だけを選び、正しい順に並べてください。
 使うブロック:
@@ -3092,7 +3094,7 @@ melon 取り扱いなし
 
 ### practice-swift-050 存在しないキーを強制アンラップしている行を見つける [バグ発見 / Lv3 実装]
 対象レッスン: swift-dictionary
-シリーズ: swift-dictionary-count (3段階目)
+シリーズ: swift-dictionary-count (4段階目)
 スキル: collections, optional, debugging
 問題: このコードはビルドできますが、実行するとクラッシュします。原因になっている行を選んでください。
 問題のある行: stock[key]! += 1
@@ -3122,7 +3124,7 @@ print(stock["apple"] ?? 0, stock["banana"] ?? 0)
 
 ### practice-swift-051 updateValueの戻り値を追う [実行追跡 / Lv3 実装]
 対象レッスン: swift-dictionary
-シリーズ: swift-dictionary-count (4段階目)
+シリーズ: swift-dictionary-count (1段階目)
 スキル: collections, optional, debugging
 問題: 次のコードを実行したとき、表示される内容を選んでください。
 正解: 1 -1 9
@@ -3191,7 +3193,7 @@ print(grouped["a"] ?? [], grouped["b"] ?? [])
 
 ### practice-swift-053 変換に失敗した要素を落とす [穴埋め / Lv3 実装]
 対象レッスン: swift-sequence-transform
-シリーズ: swift-transform-chain (1段階目)
+シリーズ: swift-transform-chain (2段階目)
 スキル: collections, optional
 問題: 文字列の配列から、数値に変換できたものだけを集めて合計します。空欄を埋めてください。
 埋めたあと:
@@ -3226,7 +3228,7 @@ print(raw.compactMap { Int($0) })
 
 ### practice-swift-054 絞る・変える・並べるの順に組み立てる [並べ替え / Lv3 実装]
 対象レッスン: swift-sequence-transform
-シリーズ: swift-transform-chain (2段階目)
+シリーズ: swift-transform-chain (1段階目)
 スキル: collections, functions
 問題: 20歳以上の人の名前を五十音順（文字列の昇順）で表示します。ブロックを正しい順に並べ替えてください。
 正解の並び:
@@ -3318,9 +3320,9 @@ print([Int]().reduce(0, +))
 - 関連例の説明: 合計と最大の求め方、空配列でも安全に0が返ることを並べて確認できます。
 - 覚えておくこと: 合計は reduce(0, +)。初期値があるので空配列でも安全。
 
-### practice-swift-057 既定値とOptional chainingを書き分ける [穴埋め / Lv2 基本]
+### practice-swift-057 既定値とOptional chainingを書き分ける [穴埋め / Lv3 実装]
 対象レッスン: swift-optionals
-シリーズ: swift-optional-handling (1段階目)
+シリーズ: swift-optional-handling (2段階目)
 スキル: optional, syntax
 問題: nil のときの既定値を与える書き方と、nil なら計算そのものを飛ばす書き方を使い分けます。空欄を埋めてください。
 埋めたあと:
@@ -3355,9 +3357,9 @@ print(a?.count ?? -1, b?.count ?? -1)
 - 関連例の説明: 値があるときとないときを並べると、?? と ?. の役割の違いがはっきりします。
 - 覚えておくこと: 既定値なら ??、辿るだけなら ?.。どちらも nil で落ちない。
 
-### practice-swift-058 Optionalをそのまま変換に渡している行を見つける [バグ発見 / Lv2 基本]
+### practice-swift-058 Optionalをそのまま変換に渡している行を見つける [バグ発見 / Lv3 実装]
 対象レッスン: swift-optionals
-シリーズ: swift-optional-handling (2段階目)
+シリーズ: swift-optional-handling (3段階目)
 スキル: optional, types, debugging
 問題: このコードはビルドできません。原因になっている行を選んでください。
 問題のある行: let n = Int(text)
@@ -3387,7 +3389,7 @@ print(b.flatMap { Int($0) } ?? -1)
 
 ### practice-swift-059 多段のOptionalを安全に辿る形に直す [修正 / Lv3 実装]
 対象レッスン: swift-optional-chaining
-シリーズ: swift-optional-handling (3段階目)
+シリーズ: swift-optional-handling (4段階目)
 スキル: optional, debugging
 問題: 入れ子になった Optional を辿る4行目がビルドできません。修正として最も適切なものを選んでください。
 正解: let length = user?.profile?.nickname?.count
@@ -3417,7 +3419,7 @@ print(a?.profile?.nickname?.count ?? -1, b?.profile?.nickname?.count ?? -1)
 
 ### practice-swift-060 途中がnilのときの結果を追う [実行追跡 / Lv3 実装]
 対象レッスン: swift-optional-chaining
-シリーズ: swift-optional-handling (4段階目)
+シリーズ: swift-optional-handling (1段階目)
 スキル: optional, debugging
 問題: 次のコードを実行したとき、表示される内容を選んでください。
 正解: 2 のあとに -1
@@ -3590,7 +3592,7 @@ print(Suit.allCases.map(\.rawValue).joined(separator: ","))
 
 ### practice-swift-065 コピーしたつもりが共有になっている行を見つける [バグ発見 / Lv3 実装]
 対象レッスン: swift-class-reference
-シリーズ: swift-reference-semantics (1段階目)
+シリーズ: swift-reference-semantics (2段階目)
 スキル: types, debugging, memory
 問題: base の設定は "light" のままのはずですが、"dark" と表示されます。原因になっている行を選んでください。
 問題のある行: let copy = base
@@ -3620,7 +3622,7 @@ print(base.theme, copy.theme)
 
 ### practice-swift-066 関数に渡した値が書き換わるか追う [実行追跡 / Lv3 実装]
 対象レッスン: swift-class-reference
-シリーズ: swift-reference-semantics (2段階目)
+シリーズ: swift-reference-semantics (1段階目)
 スキル: types, functions, debugging
 問題: class と struct を同じように関数へ渡しました。最後の print の結果を選んでください。
 正解: 1 0
@@ -3650,7 +3652,7 @@ print(bag.n)
 
 ### practice-swift-067 他のプロパティを使う定義を直す [修正 / Lv3 実装]
 対象レッスン: swift-properties
-シリーズ: swift-property-kinds (1段階目)
+シリーズ: swift-property-kinds (2段階目)
 スキル: types, debugging
 問題: この構造体は 'Cannot use instance member within property initializer' でビルドできません。4行目の修正として正しいものを選んでください。
 正解:     var area: Double { width * height }
@@ -3685,7 +3687,7 @@ print(r.area)
 
 ### practice-swift-068 プロパティオブザーバで値を補正する [穴埋め / Lv3 実装]
 対象レッスン: swift-properties
-シリーズ: swift-property-kinds (2段階目)
+シリーズ: swift-property-kinds (1段階目)
 スキル: types, syntax
 問題: hp が負になったら0に補正し、生存判定を計算プロパティで返します。空欄を埋めてください。
 埋めたあと:
@@ -4029,7 +4031,7 @@ print(User(name: "Yuki").greet(), Robot(name: "R2").greet())
 - 関連例の説明: 2つの型がどちらも name を持つだけで、同じ greet を共有できています。
 - 覚えておくこと: 要求は最小限に、導ける処理は protocol extension へ。
 
-### practice-swift-077 ジェネリック関数を並べ替える [並べ替え / Lv4 応用]
+### practice-swift-077 ジェネリック関数を並べ替える [並べ替え / Lv3 実装]
 対象レッスン: swift-generics
 シリーズ: swift-generic-basics (1段階目)
 スキル: protocols, collections, functions
@@ -4453,7 +4455,7 @@ print([Version(major: 2), Version(major: 1)].sorted())
 
 ### practice-foundation-005 JSONから型へデコードする [穴埋め / Lv2 基本]
 対象レッスン: foundation-codable
-シリーズ: foundation-codable-flow (1段階目)
+シリーズ: foundation-codable-flow (2段階目)
 スキル: foundation, types
 問題: JSON文字列を User にデコードして名前を表示します。空欄を埋めてください。
 埋めたあと:
@@ -4497,7 +4499,7 @@ print(user?.name ?? "失敗")
 
 ### practice-foundation-006 エンコードの手順を並べ替える [並べ替え / Lv2 基本]
 対象レッスン: foundation-codable
-シリーズ: foundation-codable-flow (2段階目)
+シリーズ: foundation-codable-flow (1段階目)
 スキル: foundation, functions
 問題: User を JSON 文字列に変換する関数を作ります。ブロックを正しい順に並べ替えてください。
 正解の並び:
@@ -5046,7 +5048,7 @@ print(components.url!.absoluteString)
 
 ### practice-foundation-021 記号を含む検索語を安全に載せる [ブロック選択 / Lv3 実装]
 対象レッスン: foundation-url-components
-シリーズ: foundation-url-build (2段階目)
+シリーズ: foundation-url-build (3段階目)
 スキル: foundation
 問題: 検索語 a&b をクエリの値として正しく載せます。必要な行だけを選び、正しい順に並べてください。
 使うブロック:
@@ -5082,7 +5084,7 @@ print(URLComponents(url: good.url!, resolvingAgainstBaseURL: false)!.queryItems!
 
 ### practice-foundation-022 検索URLを作る関数を組み立てる [関数組み立て / Lv3 実装]
 対象レッスン: foundation-url-components
-シリーズ: foundation-url-build (3段階目)
+シリーズ: foundation-url-build (4段階目)
 スキル: foundation, functions, optional
 問題: 検索語からURLを作る関数を作ります。必要なブロックだけを選んで正しい順に並べてください。
 正解の並び:
@@ -5122,7 +5124,7 @@ print(searchURL(query: "a&b")?.absoluteString ?? "作れません")
 
 ### practice-foundation-023 POSTリクエストを組み立てる [穴埋め / Lv3 実装]
 対象レッスン: foundation-http-request
-シリーズ: foundation-request (1段階目)
+シリーズ: foundation-request (2段階目)
 スキル: foundation
 問題: JSONを送るPOSTリクエストを作ります。空欄を埋めてください。
 埋めたあと:
@@ -5161,7 +5163,7 @@ print(request.httpMethod ?? "-", request.httpBody?.count ?? 0)
 
 ### practice-foundation-024 リクエスト組み立ての順に並べる [並べ替え / Lv3 実装]
 対象レッスン: foundation-http-request
-シリーズ: foundation-request (2段階目)
+シリーズ: foundation-request (1段階目)
 スキル: foundation
 問題: POSTリクエストを組み立てて内容を確認します。ブロックを正しい順に並べ替えてください。
 正解の並び:
@@ -5265,7 +5267,7 @@ print(describe(200), describe(204), describe(404), describe(500))
 
 ### practice-foundation-027 URLの各部品が何を返すか追う [実行追跡 / Lv3 実装]
 対象レッスン: foundation-url-components
-シリーズ: foundation-url-build (4段階目)
+シリーズ: foundation-url-build (2段階目)
 スキル: foundation, debugging
 問題: 次のコードを実行したとき、表示される3行を選んでください。
 正解: /a/b、q=1、example.com
@@ -5431,7 +5433,7 @@ true
 
 ### practice-foundation-032 未設定と false を区別できない行を見つける [バグ発見 / Lv2 基本]
 対象レッスン: foundation-userdefaults
-シリーズ: foundation-defaults (2段階目)
+シリーズ: foundation-defaults (3段階目)
 スキル: foundation, debugging, optional
 問題: 「まだ一度も設定していないときだけ表示したい」のに、明示的に false を保存したあとも表示されてしまいます。原因になっている行を選んでください。
 問題のある行: if d.bool(forKey: "didOnboard") == false {
@@ -5462,7 +5464,7 @@ true
 
 ### practice-foundation-033 設定を保存して読み出す [穴埋め / Lv1 ガイド]
 対象レッスン: foundation-userdefaults
-シリーズ: foundation-defaults (3段階目)
+シリーズ: foundation-defaults (2段階目)
 スキル: foundation
 問題: 名前を保存して、そのまま読み出して表示します。空欄を埋めてください。
 埋めたあと:
@@ -5596,7 +5598,7 @@ deinit
 
 ### practice-foundation-036 数字が含まれるか判定する1行を書く [記述 / Lv3 実装]
 対象レッスン: foundation-regex
-シリーズ: foundation-regex-basics (1段階目)
+シリーズ: foundation-regex-basics (2段階目)
 スキル: foundation, syntax
 問題: text に数字が1文字でも含まれるかを true / false で表示する1行を書いてください。正規表現リテラル `#/\d/#` を使います。
 想定する書き方: print(text.contains(#/\d/#))
@@ -5627,7 +5629,7 @@ false
 
 ### practice-foundation-037 正規表現の一致結果を追う [実行追跡 / Lv3 実装]
 対象レッスン: foundation-regex
-シリーズ: foundation-regex-basics (2段階目)
+シリーズ: foundation-regex-basics (1段階目)
 スキル: foundation, debugging
 問題: 次のコードを実行したとき、表示される2行を選んでください。
 正解: 2 と ["1", "22"]
@@ -5737,35 +5739,46 @@ print([Int]().chunked(into: 2))
 - 関連例の説明: 端数のある配列と空配列の両方で、例外なく動作することが確認できます。
 - 覚えておくこと: 分割は「開始位置の列 + 終端の min 抑え」。端数は式で吸収する。
 
-### practice-foundation-040 IDを表す型の宣言行を書く [記述 / Lv2 基本]
+### practice-foundation-040 IDを表す型を宣言する順に並べ替える [並べ替え / Lv2 基本]
 対象レッスン: foundation-data-modeling
 スキル: types, protocols, foundation
-問題: ユーザーIDを表す UserID 型を作ります。JSONとの変換と、辞書のキーとしての利用の両方ができるようにする宣言行（struct から始まる1行）を書いてください。
-想定する書き方: struct UserID: Codable, Hashable {
-ヒント1: 必要な能力は2つあります。JSONとの相互変換と、ハッシュ値を持つことです。
-ヒント2: 準拠はカンマで並べて書けます。順序はどちらでも構いません。
-ヒント3: 型名のあとにコロンを書き、2つのプロトコル名を並べ、中かっこを開きます。
-解説: `struct UserID: Codable, Hashable {` と書きます。Codable によって JSON との相互変換が自動生成され、Hashable によって Set の要素や辞書のキーとして使えるようになります。Hashable は Equatable を含むため == も使えます。Int をそのまま ID として持ち回るのではなく専用の型にすると、ユーザーIDと投稿IDを取り違えるようなバグをコンパイル時に防げます。準拠の順序は任意なので `Hashable, Codable` も正解です。
-- 使っている考え方: 「意味のある値」を素の Int や String のまま扱うと、型が同じであるがゆえに取り違えても気づけません。専用の型で包むと、コンパイラが取り違えを検出してくれます。
-- 手順: `struct UserID` … Int を包む専用の型を作る。
-- 手順: `Codable` … サーバとのやり取りでそのまま使えるようにする。
-- 手順: `Hashable` … 辞書のキーや Set の要素にできるようにする。
-- 手順: `let value: Int` … 実際の値を保持する。
-- 動く理由: 要求されている2つの能力がちょうど2つのプロトコルに対応し、どちらも自動生成が効くため実装を書く必要がありません。
-- よくある間違い: Equatable だけを書いて辞書のキーにしようとする間違いです。ハッシュ値が必要なので Hashable が要ります。
-- よくある間違い: IDを素の Int のまま扱う設計です。userID と postID を取り違えても型が同じなのでコンパイルが通ってしまいます。
+問題: JSONとの変換にも、Setや辞書のキーにも使える UserID 型を宣言し、重複を除いた件数を表示します。ブロックを正しい順に並べ替えてください。
+正解の並び:
+```swift
+struct UserID: Codable, Hashable {
+    let value: Int
+}
+let ids: Set<UserID> = [UserID(value: 1), UserID(value: 1), UserID(value: 2)]
+print(ids.count)
+```
+ヒント1: 型は、それを使う行より前に宣言されている必要があります。
+ヒント2: プロパティは struct の波かっこの内側に置きます。宣言を閉じてから、その型を使う行が続きます。
+ヒント3: struct の見出し → プロパティ → 閉じかっこ → Set を作る行 → 件数の表示、の順です。
+解説: 正しい順は「struct の宣言 → プロパティ → 閉じかっこ → Set を作る → 件数を表示」です。順序を決めているのは2つの制約です。1つ目は、`UserID` を使う行（Set を作る行）より前に型が宣言され、閉じられている必要があること。2つ目は、プロパティ `value` が struct の波かっこの内側になければならないことです。準拠しているプロトコルにも役割があります。`Codable` はJSONとの相互変換を可能にし、`Hashable` は Set や辞書のキーとして使えるようにします。`Hashable` に準拠していると、`value` が同じ UserID は同じものとして扱われるため、Set に同じIDを2回入れても1件に畳まれ、この例の表示は 2 になります。どちらのプロトコルも `let value: Int` という単一のプロパティから自動で実装が導かれるので、追加のコードは不要です。
+- 使っている考え方: IDのような「ただの Int」をそのまま持ち回らず専用の型で包むと、別の種類のIDと取り違える間違いをコンパイラが防いでくれます。この型に何を任せたいかは、準拠するプロトコルで宣言します。
+- 手順: `struct UserID: Codable, Hashable {` … 型の宣言と、任せたい役割の表明。
+- 手順: `let value: Int` … 実体となるプロパティ。波かっこの内側に置く。
+- 手順: `}` … 宣言を閉じる。ここまでで型が使える状態になる。
+- 手順: `let ids: Set<UserID> = [...]` … Hashable なので Set の要素にできる。同じ value のものは1件に畳まれる。
+- 手順: `print(ids.count)` … 重複を除いた件数として 2 が表示される。
+- 動く理由: 型の宣言が使用箇所より前にあり、プロパティが宣言の内側に収まっているため、構文としても意味としても成立します。Hashable への準拠があるので Set の要素として扱え、重複の除去がそのまま件数に反映されます。
+- よくある間違い: `Hashable` を付け忘れる間違いです。Set や辞書のキーに使えず、コンパイルエラーになります。
+- よくある間違い: `Codable` を付け忘れる間違いです。ビルドは通りますが、JSONへのエンコードやデコードができません。
+- よくある間違い: プロパティを閉じかっこの外に置く間違いです。型のメンバーではなくなるため、初期化子から渡せなくなります。
+- よくある間違い: ID を素の Int のまま扱う間違いです。商品IDとユーザーIDを取り違えても、型が同じなので気づけません。
 - 関連例:
 ```swift
-struct UserID: Codable, Hashable { let value: Int }
-var names: [UserID: String] = [:]
-names[UserID(value: 1)] = "Yuki"
-print(names[UserID(value: 1)] ?? "なし")
+struct UserID: Codable, Hashable {
+    let value: Int
+}
+let ids: Set<UserID> = [UserID(value: 1), UserID(value: 1), UserID(value: 2)]
+print(ids.count)
 ```
-- 関連例の出力: Yuki
-- 関連例の説明: Hashable に準拠しているため、そのまま辞書のキーとして使えます。
-- 覚えておくこと: 意味のあるIDは専用の型にする。Codable + Hashable が定番の組み合わせ。
+- 関連例の出力: 2
+- 関連例の説明: 同じ value を持つ UserID は等しいと判定されるため、3個入れても1件が畳まれて2件になります。
+- 覚えておくこと: 型は使う前に宣言する。役割はプロトコル準拠で表明する。
 
-### practice-foundation-041 値型の中に参照型がある場合を追う [実行追跡 / Lv4 応用]
+### practice-foundation-041 値型の中に参照型がある場合を追う [実行追跡 / Lv3 実装]
 対象レッスン: foundation-copy-value
 シリーズ: foundation-value-copy (1段階目)
 スキル: types, memory, debugging
@@ -5797,48 +5810,48 @@ print(a.box.n, b.box.n)
 - 関連例の説明: box に新しいインスタンスを代入し直せば共有は切れます。書き換える前に差し替えるかどうかが分かれ目です。
 - 覚えておくこと: 値型のコピーは浅い。参照型のプロパティは共有されたまま。
 
-### practice-foundation-042 共有を避ける初期化の順に並べる [並べ替え / Lv3 実装]
+### practice-foundation-042 共有を断ち切るコピーを書く [記述 / Lv3 実装]
 対象レッスン: foundation-copy-value
 シリーズ: foundation-value-copy (2段階目)
 スキル: types, memory
-問題: 2つの Holder がそれぞれ別の Box を持つようにして、片方だけを書き換えます。ブロックを正しい順に並べ替えてください。
-正解の並び:
-```swift
-final class Box { var n = 0 }
-struct Holder { var box: Box }
-var h1 = Holder(box: Box())
-var h2 = Holder(box: Box())
-h2.box.n = 9
-print(h1.box.n, h2.box.n)
-```
-ヒント1: 型の定義がなければインスタンスは作れません。Box が先です。
-ヒント2: それぞれが別のインスタンスを持つには、Box() を2回呼ぶ必要があります。
-ヒント3: Box → Holder → h1 → h2 → 書き換え → 表示、の順です。
-解説: Box() を2回呼ぶことで、h1 と h2 はそれぞれ別のインスタンスを持ちます。そのため h2.box.n の書き換えは h1 に影響せず、出力は「0 9」になります。`var h2 = h1` のようにコピーで作ると参照が共有され、両方とも9になってしまいます。プロパティに既定値を持たせて `Holder()` を2回呼んでも、初期化のたびに Box() が評価されるため同じく独立します。
-- 使っている考え方: 参照型のプロパティを独立させたいなら、インスタンスを別々に生成するしかありません。値型のコピーでは参照が複製されるだけです。
-- 手順: `final class Box` と `struct Holder` を定義する。
-- 手順: `Holder(box: Box())` を2回呼ぶと、Box のインスタンスが2つ作られる。
-- 手順: h1.box と h2.box は別の実体を指す。
-- 手順: `h2.box.n = 9` は h2 側だけを書き換え、出力は「0 9」。
-- 動く理由: Box() の呼び出しが2回あるため実体が2つ存在し、参照の共有が起きません。書き換えの影響範囲が片方に限定されます。
-- よくある間違い: `var h2 = h1` で作ってしまう間違いです。box の参照が共有され、両方が9になります。
-- よくある間違い: Box のインスタンスを定数にまとめて両方に渡す間違いも同じ結果になります。共有したいのか独立させたいのかを設計時に決めます。
+問題: Holder は class の Box を持っているため、代入でコピーしても両者が同じ Box を指したままになります。detach() の中に、自分だけの Box を持ち直す1行を書いてください。
+想定する書き方: box = Box(n: box.n)
+ヒント1: struct をコピーしても、中にある class のプロパティは同じ実体を指したままです。共有を断つには何を作り直す必要がありますか。
+ヒント2: 今の中身の値は引き継ぎたいので、値を読み取ったうえで、入れ物だけを新しく用意します。
+ヒント3: 現在の n を渡して Box を新しく生成し、それを自分の box に代入します。
+解説: `box = Box(n: box.n)` と書きます。struct の代入は各プロパティをコピーしますが、box は class への参照なので、コピーされるのは「同じインスタンスを指す矢印」だけです。その結果、コピー元とコピー先が1つの Box を共有し、片方で `box.n` を変えるともう片方にも反映されます。detach() では、現在の n を読み取ってから新しい Box を生成し、自分の box をそちらへ差し替えます。これで参照が別々になり、以後の変更は互いに影響しなくなります。右辺で `box.n` を読んでから左辺に代入するため、値は失われません。`box.n = box.n` のように中身だけ触っても参照は同じままなので共有は切れず、`var copy = box` としても新しいインスタンスは生まれません。この「必要になった時点で複製する」考え方は copy-on-write と同じ発想で、Swift の標準コレクションが内部で行っていることでもあります。
+- 使っている考え方: 値型のコピーは「プロパティを1つずつ写す」だけです。プロパティが参照型なら写されるのは参照であって、指している実体は共有されたままになります。実体まで分けたい場合は、自分で新しいインスタンスを作る必要があります。
+- 手順: `var b = a` … Holder は struct なのでプロパティが写される。
+- 手順: 写された box は「同じ Box を指す参照」なので、a と b は1つの Box を共有している。
+- 手順: `box.n` を読み取り、現在の値を取り出す。
+- 手順: `Box(n:)` で新しいインスタンスを生成し、box に代入して参照を差し替える。
+- 手順: 以後 b.box.n を変えても、a.box.n は元のインスタンスのままなので影響を受けない。
+- 動く理由: 代入の右辺で現在の値を読み出してから、左辺で参照を新しいインスタンスに置き換えているため、値を保ったまま共有だけが切れます。detach() を呼んだ側だけが新しい Box を持つので、呼んでいない側の状態は変わりません。
+- よくある間違い: `var copy = box` と書いて複製したつもりになる間違いです。class の代入は参照の複製なので、実体は1つのままです。
+- よくある間違い: `box.n = box.n` のように中身へ代入する間違いです。同じインスタンスを触っているだけで、共有関係は変わりません。
+- よくある間違い: detach() を呼び忘れたまま代入だけする間違いです。共有は残るので、片方の変更がもう片方に漏れます。
+- よくある間違い: Holder を class に変える対応です。共有の問題は解決せず、むしろ Holder 自体まで共有されるようになります。
 - 関連例:
 ```swift
-final class Box { var n = 0 }
-struct Holder { var box: Box }
-var h1 = Holder(box: Box())
-var h2 = Holder(box: Box())
-h2.box.n = 9
-print(h1.box.n, h2.box.n)
-var h3 = h1
-h3.box.n = 7
-print(h1.box.n, h3.box.n)
+final class Box {
+    var n: Int
+    init(n: Int) { self.n = n }
+}
+struct Holder {
+    var box: Box
+    mutating func detach() { box = Box(n: box.n) }
+}
+var a = Holder(box: Box(n: 0))
+var b = a
+print("detach前:", a.box.n, b.box.n)
+b.detach()
+b.box.n = 9
+print("detach後:", a.box.n, b.box.n)
 ```
-- 関連例の出力: 0 9
-7 7
-- 関連例の説明: 別々に作った場合は独立し、コピーで作った場合は共有されることが同時に確認できます。
-- 覚えておくこと: 参照型を独立させたいなら、インスタンスを別々に作る。コピーでは足りない。
+- 関連例の出力: detach前: 0 0
+detach後: 0 9
+- 関連例の説明: detach を挟むことで、b の変更が a に届かなくなります。挟まなければ両方 9 になります。
+- 覚えておくこと: 参照型のプロパティは自分で作り直さないと分かれない。
 
 ---
 
@@ -5882,7 +5895,7 @@ do { print(try load(1)); print(try load(-1)) } catch { print("失敗: \(error)")
 
 ### practice-concurrency-002 エラーを投げる関数を宣言する [穴埋め / Lv2 基本]
 対象レッスン: concurrency-errors
-シリーズ: concurrency-error-basics (2段階目)
+シリーズ: concurrency-error-basics (3段階目)
 スキル: errors, types
 問題: 独自のエラー型を定義し、投げる関数を作ります。空欄を埋めてください。
 埋めたあと:
@@ -5929,7 +5942,7 @@ do { _ = try load(-5) } catch LoadError.notFound(let id) { print("見つかり�
 
 ### practice-concurrency-003 throws宣言が抜けている行を見つける [バグ発見 / Lv2 基本]
 対象レッスン: concurrency-errors
-シリーズ: concurrency-error-basics (3段階目)
+シリーズ: concurrency-error-basics (4段階目)
 スキル: errors, debugging
 問題: このコードはビルドできません。原因になっている行を選んでください。
 問題のある行: func load(_ id: Int) -> String {
@@ -5960,7 +5973,7 @@ print((try? load(-1)) ?? "エラーだった")
 
 ### practice-concurrency-004 どのエラーか分かるcatchに直す [修正 / Lv3 実装]
 対象レッスン: concurrency-errors
-シリーズ: concurrency-error-basics (4段階目)
+シリーズ: concurrency-error-basics (5段階目)
 スキル: errors, debugging
 問題: どんな失敗でも「エラー」としか出ません。catch 節を書き換えて、失敗の種類が分かるようにします。適切なものを選んでください。
 正解: } catch let error as LoadError {
@@ -5995,9 +6008,9 @@ for e in [LoadError.notFound, .network] {
 - 関連例の説明: ケースごとに catch を分けると、種類に応じた処理を書き分けられます。
 - 覚えておくこと: catch は型やケースで絞れる。表示には必ず error 自体を含める。
 
-### practice-concurrency-005 エラーを投げて捕まえる流れを並べる [並べ替え / Lv3 実装]
+### practice-concurrency-005 エラーを投げて捕まえる流れを並べる [並べ替え / Lv2 基本]
 対象レッスン: concurrency-errors
-シリーズ: concurrency-error-basics (5段階目)
+シリーズ: concurrency-error-basics (2段階目)
 スキル: errors, controlFlow
 問題: エラーを投げる関数を定義し、失敗する呼び出しを捕まえて表示します。ブロックを正しい順に並べ替えてください。
 正解の並び:
@@ -6241,7 +6254,7 @@ nil
 
 ### practice-concurrency-011 長生きするクロージャの捕捉を直す [修正 / Lv4 応用]
 対象レッスン: concurrency-weak-unowned
-シリーズ: concurrency-reference-strength (2段階目)
+シリーズ: concurrency-reference-strength (3段階目)
 スキル: memory, debugging, functions
 問題: Registry に登録したクロージャは Owner より長く残ります。Owner が解放されたあとに呼ばれても落ちないようにします。5行目の修正として正しいものを選んでください。
 正解: Registry.handlers.append { [weak self] in self?.finish() }
@@ -6281,7 +6294,7 @@ end
 
 ### practice-concurrency-012 解放されるクラスに必要な行だけ選ぶ [ブロック選択 / Lv3 実装]
 対象レッスン: concurrency-weak-unowned
-シリーズ: concurrency-reference-strength (3段階目)
+シリーズ: concurrency-reference-strength (2段階目)
 スキル: memory, functions
 問題: クロージャをプロパティに保持しても、正しく解放される（deinit が呼ばれる）クラスを作ります。必要な行だけを選び、正しい順に並べてください。
 使うブロック:
@@ -6458,9 +6471,9 @@ sum 3
 - 関連例の説明: 後から宣言した fetch(1) のほうが先に完了していることが、出力順から確認できます。
 - 覚えておくこと: async let は宣言時に開始、await 時に待機。完了順は所要時間で決まる。
 
-### practice-concurrency-017 2件を同時に取得する関数を組み立てる [関数組み立て / Lv3 実装]
+### practice-concurrency-017 2件を同時に取得する関数を組み立てる [関数組み立て / Lv4 応用]
 対象レッスン: concurrency-async-let
-シリーズ: concurrency-parallel (2段階目)
+シリーズ: concurrency-parallel (3段階目)
 スキル: concurrency, functions
 問題: 2件の取得を同時に走らせて、両方そろってから配列で返す関数を作ります。必要なブロックだけを選んで正しい順に並べてください。
 正解の並び:
@@ -6500,7 +6513,7 @@ print(await fetchAll())
 
 ### practice-concurrency-018 直列になっている取得を並行にする [修正 / Lv4 応用]
 対象レッスン: concurrency-async-let
-シリーズ: concurrency-parallel (3段階目)
+シリーズ: concurrency-parallel (2段階目)
 スキル: concurrency, debugging
 問題: 2件の取得は互いに独立していますが、直列に実行されるため2倍の時間がかかります。関数の中身（3〜5行目）の修正として正しいものを選んでください。
 正解:     async let a = fetch(1)
@@ -6579,7 +6592,7 @@ print((try? await t.value) ?? -1)
 
 ### practice-concurrency-020 キャンセルに反応しない箇所を見つける [バグ発見 / Lv4 応用]
 対象レッスン: concurrency-task-cancel
-シリーズ: concurrency-cancel (2段階目)
+シリーズ: concurrency-cancel (3段階目)
 スキル: concurrency, debugging
 問題: cancel() を呼んでいるのに最後まで走り切って「完了」が表示されます。キャンセルの確認を入れるべき箇所を選んでください。
 問題のある行:     for i in 1...1_000_000 {
@@ -6612,7 +6625,7 @@ print(await task.value)
 
 ### practice-concurrency-021 中断を呼び出し元に伝える行を選ぶ [ブロック選択 / Lv3 実装]
 対象レッスン: concurrency-task-cancel
-シリーズ: concurrency-cancel (3段階目)
+シリーズ: concurrency-cancel (2段階目)
 スキル: concurrency, errors
 問題: キャンセルされたら、そのことをエラーとして呼び出し元に伝えたいです。必要な行だけを選び、正しい順に並べてください。
 使うブロック:
@@ -6648,7 +6661,7 @@ catch { print("その他") }
 - 関連例の説明: 呼び出し元が CancellationError として中断を判別できています。
 - 覚えておくこと: 中断を伝えるなら checkCancellation。静かに終えるだけなら isCancelled。
 
-### practice-concurrency-022 件数が可変の並行処理を並べる [並べ替え / Lv4 応用]
+### practice-concurrency-022 件数が可変の並行処理を並べる [並べ替え / Lv3 実装]
 対象レッスン: concurrency-taskgroup
 シリーズ: concurrency-taskgroup (1段階目)
 スキル: concurrency, collections
@@ -7105,7 +7118,7 @@ dark
 
 ### practice-concurrency-034 コールバックAPIをasyncに橋渡しする [関数組み立て / Lv4 応用]
 対象レッスン: concurrency-continuation
-シリーズ: concurrency-continuation (1段階目)
+シリーズ: concurrency-continuation (2段階目)
 スキル: concurrency, functions
 問題: 完了ハンドラ形式の古いAPIを、async/await から使える関数に変換します。必要なブロックだけを選んで正しい順に並べてください。
 正解の並び:
@@ -7148,7 +7161,7 @@ print(await load())
 
 ### practice-concurrency-035 continuationの再開順を追う [実行追跡 / Lv3 実装]
 対象レッスン: concurrency-continuation
-シリーズ: concurrency-continuation (2段階目)
+シリーズ: concurrency-continuation (1段階目)
 スキル: concurrency, debugging
 問題: 次のコードを実行したとき、出力される順番を選んでください。
 正解: 開始 → コールバック → done → 終了
@@ -7453,7 +7466,7 @@ print(t.value)
 
 ### practice-development-008 Package.swiftの構成を並べ替える [並べ替え / Lv3 実装]
 対象レッスン: dev-spm
-シリーズ: development-spm (1段階目)
+シリーズ: development-spm (2段階目)
 スキル: architecture
 問題: ライブラリを1つ提供する Package.swift を作ります。ブロックを正しい順に並べ替えてください。
 正解の並び:
@@ -7498,7 +7511,7 @@ print(layout.count)
 
 ### practice-development-009 SwiftPMの要素を対応づける [対応づけ / Lv1 ガイド]
 対象レッスン: dev-spm
-シリーズ: development-spm (2段階目)
+シリーズ: development-spm (1段階目)
 スキル: architecture
 問題: Swift Package Manager に関する用語と、その役割を対応させてください。
 対応:
@@ -7528,7 +7541,7 @@ print("\(manifest): 人が書く / \(lockfile): ツールが書く")
 - 関連例の説明: どちらもコミット対象ですが、編集するのは前者だけです。
 - 覚えておくこと: Package.swift は許容範囲、Package.resolved は確定したバージョン。両方コミットする。
 
-### practice-development-010 依存を追加する1行を書く [記述 / Lv2 基本]
+### practice-development-010 依存を追加する1行を書く [記述 / Lv3 実装]
 対象レッスン: dev-dependencies
 シリーズ: development-spm (3段階目)
 スキル: architecture
@@ -7722,7 +7735,7 @@ print("ログはシステムのログストアに記録され、標準出力に�
 
 ### practice-development-016 機密情報を露出しているログ行を見つける [バグ発見 / Lv3 実装]
 対象レッスン: dev-logging
-シリーズ: development-logging (2段階目)
+シリーズ: development-logging (3段階目)
 スキル: architecture, debugging
 問題: このログはリリースビルドで問題になります。原因になっている行を選んでください。
 問題のある行: logger.info("token=\(token, privacy: .public)")
@@ -7753,7 +7766,7 @@ print("既定は伏せ字、hash なら同一性だけ追える")
 
 ### practice-development-017 失敗時だけ記録する行を選ぶ [ブロック選択 / Lv3 実装]
 対象レッスン: dev-logging
-シリーズ: development-logging (3段階目)
+シリーズ: development-logging (2段階目)
 スキル: architecture, debugging
 問題: ログイン失敗のときだけログに残します。必要な行だけを選び、正しい順に並べてください。
 使うブロック:
@@ -7821,7 +7834,7 @@ print(seen.count, dupes)
 
 ### practice-development-019 0を渡したときだけ落ちるテストを読む [テスト読解 / Lv2 基本]
 対象レッスン: dev-swift-testing
-シリーズ: development-testing (1段階目)
+シリーズ: development-testing (4段階目)
 スキル: testing, debugging
 問題: 新しく追加した1件のテストだけが失敗します。実装と要件のどこがずれていますか。
 正解: n > 0 という条件が余分にあるため、要件どおり 0 を偶数として扱えていない
@@ -7887,9 +7900,9 @@ print(isEven(4), !isEven(3))
 - 関連例の説明: テストが検証している条件そのものを、通常のコードとして確認したものです。
 - 覚えておくこと: Swift Testing は @Test と #expect。前提が崩れたら止めたいときは #require。
 
-### practice-development-021 テスト1件の構成を並べ替える [並べ替え / Lv3 実装]
+### practice-development-021 テスト1件の構成を並べ替える [並べ替え / Lv2 基本]
 対象レッスン: dev-swift-testing
-シリーズ: development-testing (3段階目)
+シリーズ: development-testing (1段階目)
 スキル: testing
 問題: 税込み価格のテストを1件書きます。ブロックを正しい順に並べ替えてください。
 正解の並び:
@@ -7927,7 +7940,7 @@ print(result == 1100, result)
 
 ### practice-development-022 常に成功するテストの問題点を読む [テスト読解 / Lv3 実装]
 対象レッスン: dev-swift-testing
-シリーズ: development-testing (4段階目)
+シリーズ: development-testing (5段階目)
 スキル: testing, debugging
 問題: このテストは成功していますが、結果を信頼してよいか判断してください。問題点として最も妥当なものを選んでください。
 正解: 期待値が実際の値自身と比較されているため、実装が何を返しても必ず成功する
@@ -8029,7 +8042,7 @@ for items in [6, 7, 8] { print(items, pageCount(items: items, perPage: 2)) }
 
 ### practice-development-025 検証の1行を書く [記述 / Lv2 基本]
 対象レッスン: dev-swift-testing
-シリーズ: development-testing (5段階目)
+シリーズ: development-testing (3段階目)
 スキル: testing
 問題: Swift Testing で、result が 1100 であることを検証する1行を書いてください。失敗しても後続の検証を続けたい場合のマクロを使います。
 想定する書き方: #expect(result == 1100)
@@ -8059,7 +8072,7 @@ print(result == 1100)
 
 ### practice-development-026 CIでだけ不安定になるUIテストを読む [テスト読解 / Lv4 応用]
 対象レッスン: dev-xctest-ui
-シリーズ: development-uitest (1段階目)
+シリーズ: development-uitest (2段階目)
 スキル: testing, debugging
 問題: 手元では常に通る UI テストが、CI ではときどき失敗します。原因の説明として最も妥当なものを選んでください。
 正解: 固定時間の sleep で待っているため、描画が遅い環境では要素が現れる前にタップしてしまう
@@ -8090,7 +8103,7 @@ waitForExistence: 状態で待つ（環境非依存）
 
 ### practice-development-027 時間で待つUIテストを直す [修正 / Lv3 実装]
 対象レッスン: dev-xctest-ui
-シリーズ: development-uitest (2段階目)
+シリーズ: development-uitest (1段階目)
 スキル: testing, debugging
 問題: 描画を待つのに固定時間を使っているため、環境によって失敗します。修正として最も適切なものを選んでください。
 正解: app.buttons["追加"].tap()
@@ -8153,7 +8166,7 @@ print(s.split(separator: " ").map(String.init))
 
 ### practice-development-029 テストできない依存関係を直す [修正 / Lv3 実装]
 対象レッスン: dev-di
-シリーズ: development-di (1段階目)
+シリーズ: development-di (2段階目)
 スキル: architecture, testing
 問題: ProfileLoader が内部で本番用の APIClient を直接生成しているため、テストからネットワークを差し替えられません。修正として最も適切なものを選んでください。
 正解: protocol ProfileFetching {
@@ -8203,7 +8216,7 @@ stub
 
 ### practice-development-030 テストダブルの種類を対応づける [対応づけ / Lv2 基本]
 対象レッスン: dev-di
-シリーズ: development-di (2段階目)
+シリーズ: development-di (1段階目)
 スキル: testing, architecture
 問題: テストで本物の代わりに置く部品（テストダブル）の名前と、その役割を対応づけてください。
 対応:
@@ -8394,7 +8407,7 @@ isLoggedIn=true （平文で読めても被害は限定的）
 
 ### practice-development-035 SwiftDataのモデル定義を完成させる [穴埋め / Lv2 基本]
 対象レッスン: dev-swiftdata-basics
-シリーズ: development-swiftdata (1段階目)
+シリーズ: development-swiftdata (2段階目)
 スキル: foundation, types
 問題: SwiftData で保存するモデルの定義です。空欄を埋めてください。
 埋めたあと:
@@ -8442,7 +8455,7 @@ print(store.count, store["a"]!.name)
 
 ### practice-development-036 SwiftDataに1件保存する手順を並べ替える [並べ替え / Lv2 基本]
 対象レッスン: dev-swiftdata-basics
-シリーズ: development-swiftdata (2段階目)
+シリーズ: development-swiftdata (1段階目)
 スキル: foundation
 問題: 新しい Workout を1件保存します。ブロックを正しい順に並べ替えてください。
 正解の並び:
@@ -8519,9 +8532,9 @@ print(result.map(\.name))
 - 関連例の説明: 同じ結果をメモリ上で書くとこうなります。@Query はこれをストア側で実行するため、全件を読み込まずに済みます。
 - 覚えておくこと: 絞り込みと並び替えはクエリに渡す。取り出してから filter しない。
 
-### practice-development-038 全件取得してから絞り込むコードを直す [修正 / Lv3 実装]
+### practice-development-038 全件取得してから絞り込むコードを直す [修正 / Lv4 応用]
 対象レッスン: dev-swiftdata-query
-シリーズ: development-swiftdata (4段階目)
+シリーズ: development-swiftdata (5段階目)
 スキル: foundation, debugging, collections
 問題: 1件のワークアウトを id で取り出す関数です。データが増えると急激に遅くなります。修正として最も適切なものを選んでください。
 正解: func workout(id: UUID) throws -> Workout? {
@@ -8559,7 +8572,7 @@ predicate + limit: 1 件を生成
 
 ### practice-development-039 スキーマ移行に必要な要素を選ぶ [ブロック選択 / Lv4 応用]
 対象レッスン: dev-swiftdata-migration
-シリーズ: development-swiftdata (5段階目)
+シリーズ: development-swiftdata (4段階目)
 スキル: foundation, architecture
 問題: Workout に必須プロパティ `category` を追加したため、既存データを壊さない移行が必要です。移行の定義に必要なブロックだけを、正しい順に選んでください。不要なブロックが混ざっています。
 使うブロック:
@@ -8811,7 +8824,7 @@ print(original.padded, modified.padded)
 
 ### practice-swiftui-004 余白の内側に色を敷く順番に並べ替える [並べ替え / Lv2 基本]
 対象レッスン: swiftui-layout-modifiers
-シリーズ: swiftui-layout (1段階目)
+シリーズ: swiftui-layout (2段階目)
 スキル: swiftui
 問題: 文字の周囲に余白をとり、その余白の内側までを黄色く塗り、さらに全体の外側に余白をとります。ブロックを正しい順に並べ替えてください。
 正解の並び:
@@ -8851,7 +8864,7 @@ padding(8)後: 88.0 → 外側8は塗られない
 
 ### practice-swiftui-005 modifierの順序による見た目の違いを追う [実行追跡 / Lv2 基本]
 対象レッスン: swiftui-layout-modifiers
-シリーズ: swiftui-layout (2段階目)
+シリーズ: swiftui-layout (1段階目)
 スキル: swiftui
 問題: 2つの View を並べました。見た目はどう違いますか。
 正解: A は 120×44 全体が青くなり、B は文字の大きさぶんだけ青くなって、その青い部分が 120×44 の領域の中央に置かれる
@@ -8886,6 +8899,7 @@ A も B も View 全体の大きさ: (w: 120.0, h: 44.0)
 
 ### practice-swiftui-006 左右に寄せる行レイアウトを組む [ブロック選択 / Lv2 基本]
 対象レッスン: swiftui-layout-modifiers
+シリーズ: swiftui-layout (3段階目)
 スキル: swiftui
 問題: 1行の中で、ラベルを左端に、金額を右端に配置します。必要なブロックだけを正しい順に選んでください。不要なブロックが混ざっています。
 使うブロック:
@@ -8922,6 +8936,7 @@ print("左:", left, "Spacer:", spacer, "右:", right)
 
 ### practice-swiftui-007 タップできる範囲が狭いボタンの原因を見つける [バグ発見 / Lv3 実装]
 対象レッスン: swiftui-layout-modifiers
+シリーズ: swiftui-layout (4段階目)
 スキル: swiftui, debugging
 問題: 行全体をタップできるようにしたつもりですが、実際には文字の上しか反応しません。原因となっている行を1つ選んでください。
 問題のある行: .onTapGesture { openSettings() }
@@ -8953,9 +8968,9 @@ contentShape(Rectangle())後: 375.0
 - 関連例の説明: レイアウト幅と判定幅が別々の数値である、という点がこのバグの本質です。
 - 覚えておくこと: 透明な領域はタップに反応しない。contentShape(Rectangle()) で判定形状を指定する。
 
-### practice-swiftui-008 カウンターの状態宣言を完成させる [穴埋め / Lv1 ガイド]
+### practice-swiftui-008 カウンターの状態宣言を完成させる [穴埋め / Lv2 基本]
 対象レッスン: swiftui-state-binding
-シリーズ: swiftui-state (1段階目)
+シリーズ: swiftui-state (2段階目)
 スキル: swiftui, syntax
 問題: ボタンを押すと数が増えるカウンターです。空欄を埋めてください。
 埋めたあと:
@@ -8999,9 +9014,9 @@ print(storage.value)
 - 関連例の説明: @State の仕組みはこれに近く、値の実体は struct の外にあるため、struct が作り直されても保持されます。
 - 覚えておくこと: 自分が持つ値は @State。値そのものは count、書き換え権を渡すときだけ $count。
 
-### practice-swiftui-009 子Viewへ書き換え権を渡す形に並べ替える [並べ替え / Lv2 基本]
+### practice-swiftui-009 子Viewへ書き換え権を渡す形に並べ替える [並べ替え / Lv1 ガイド]
 対象レッスン: swiftui-state-binding
-シリーズ: swiftui-state (2段階目)
+シリーズ: swiftui-state (1段階目)
 スキル: swiftui
 問題: 親が持つ isOn を、子の Toggle から書き換えられるようにします。ブロックを正しい順に並べ替えてください。
 正解の並び:
@@ -9075,6 +9090,7 @@ print("参照渡し後:", parent)
 
 ### practice-swiftui-011 お気に入りを切り替えるメソッドを組み立てる [関数組み立て / Lv3 実装]
 対象レッスン: swiftui-state-binding
+シリーズ: swiftui-state (5段階目)
 スキル: swiftui, controlFlow, collections
 問題: お気に入りの状態を反転し、上限（10件）を超える場合は追加せずに警告フラグを立てるメソッドを作ります。必要なブロックだけを正しい順に選んでください。
 正解の並び:
@@ -9122,7 +9138,7 @@ print(favorites.count, showsLimitAlert)
 - 関連例の説明: 10件の状態から解除は通り、その後の追加は9件目なので上限に触れません。分岐の順序がこの挙動を作っています。
 - 覚えておくこと: 解除は上限に関係なく通す。状態ごとに経路を排他にする。
 
-### practice-swiftui-012 TextFieldに状態をつなぐ1行を書く [記述 / Lv1 ガイド]
+### practice-swiftui-012 TextFieldに状態をつなぐ1行を書く [記述 / Lv3 実装]
 対象レッスン: swiftui-state-binding
 シリーズ: swiftui-state (4段階目)
 スキル: swiftui, syntax
@@ -9362,7 +9378,7 @@ print("経路の深さ:", path.count, "表示するのは:", path.last!.name)
 
 ### practice-swiftui-018 行を削除するメソッドを組み立てる [関数組み立て / Lv3 実装]
 対象レッスン: swiftui-list-navigation
-シリーズ: swiftui-list (2段階目)
+シリーズ: swiftui-list (3段階目)
 スキル: swiftui, collections, foundation
 問題: List の onDelete から呼ばれ、指定された行を配列とストアの両方から削除するメソッドを作ります。この課題では自動保存に頼らず、その場で明示的に保存します。必要なブロックだけを正しい順に選んでください。
 正解の並び:
@@ -9408,7 +9424,7 @@ index 2 が指しているのは: D
 
 ### practice-swiftui-019 並べ替えると表示がずれる一覧の原因を見つける [バグ発見 / Lv3 実装]
 対象レッスン: swiftui-list-navigation
-シリーズ: swiftui-list (3段階目)
+シリーズ: swiftui-list (2段階目)
 スキル: swiftui, debugging, collections
 問題: 一覧を並べ替えると、行に表示される内容と選択状態が入れ替わってしまいます。原因となっている行を1つ選んでください。
 問題のある行:     ForEach(workouts.indices, id: \.self) { index in
@@ -9501,9 +9517,9 @@ print("後ろから順に:", b)
 - 関連例の説明: 後ろから消せば、まだ処理していない前方の要素の位置は変わりません。これがずれを避ける原理です。
 - 覚えておくこと: 削除でインデックスはずれる。まとめて消すか、後ろから消す。
 
-### practice-swiftui-022 画面表示時の読み込み処理を組み立てる [関数組み立て / Lv3 実装]
+### practice-swiftui-022 画面表示時の読み込み処理を組み立てる [関数組み立て / Lv4 応用]
 対象レッスン: swiftui-task-concurrency
-シリーズ: swiftui-task (1段階目)
+シリーズ: swiftui-task (2段階目)
 スキル: swiftui, concurrency, errors
 問題: 画面が現れたときにデータを読み込み、読み込み中フラグを正しく戻すメソッドを作ります。必要なブロックだけを正しい順に選んでください。
 正解の並び:
@@ -9552,7 +9568,7 @@ run(shouldFail: true)
 
 ### practice-swiftui-023 古い書き方の非同期更新を直す [修正 / Lv4 応用]
 対象レッスン: swiftui-task-concurrency
-シリーズ: swiftui-task (2段階目)
+シリーズ: swiftui-task (1段階目)
 スキル: swiftui, concurrency
 問題: 読み込み処理が古い書き方のままで、画面表示時のキャンセルも効きません。修正として最も適切なものを選んでください。
 正解: // View 側
@@ -9915,7 +9931,7 @@ viewDidLoad
 
 ### practice-uikit-005 画面表示までの呼び出し順に並べ替える [並べ替え / Lv2 基本]
 対象レッスン: uikit-lifecycle
-シリーズ: uikit-lifecycle (1段階目)
+シリーズ: uikit-lifecycle (2段階目)
 スキル: uikit
 問題: ViewController が画面に現れるまでに呼ばれるメソッドを、実際に呼ばれる順に並べ替えてください。
 正解の並び:
@@ -9953,9 +9969,9 @@ for (i, name) in order.enumerated() { print(i + 1, name) }
 - 関連例の説明: この順序を覚えておくと、「なぜここでは frame が正しくないのか」がすぐ説明できます。
 - 覚えておくこと: 初期化は viewDidLoad、サイズ依存の計算は viewDidLayoutSubviews。
 
-### practice-uikit-006 ライフサイクルメソッドと処理を対応づける [対応づけ / Lv2 基本]
+### practice-uikit-006 ライフサイクルメソッドと処理を対応づける [対応づけ / Lv1 ガイド]
 対象レッスン: uikit-lifecycle
-シリーズ: uikit-lifecycle (2段階目)
+シリーズ: uikit-lifecycle (1段階目)
 スキル: uikit, architecture
 問題: 処理内容と、それを書くべきライフサイクルメソッドを対応づけてください。
 対応:
@@ -9989,8 +10005,9 @@ print("部品の数:", subviewCount)
 - 関連例の説明: 3回表示しても部品は1つのままです。生成を viewWillAppear に書くと4つになります。
 - 覚えておくこと: 1回だけは viewDidLoad、毎回は viewWillAppear、サイズ依存は viewDidLayoutSubviews。
 
-### practice-uikit-007 戻るたびに通知が二重になる原因を見つける [バグ発見 / Lv2 基本]
+### practice-uikit-007 戻るたびに通知が二重になる原因を見つける [バグ発見 / Lv3 実装]
 対象レッスン: uikit-lifecycle
+シリーズ: uikit-lifecycle (4段階目)
 スキル: uikit, debugging, memory
 問題: 他画面から戻るたびに、通知を受け取る回数が1回ずつ増えていきます。原因となっている行を1つ選んでください。
 問題のある行:     NotificationCenter.default.addObserver(self, selector: #selector(reload), name: .dataChanged, object: nil)
@@ -10023,6 +10040,7 @@ print("通知1回で reload が走る回数:", observers)
 
 ### practice-uikit-008 画面を往復したときの呼び出しを追う [実行追跡 / Lv3 実装]
 対象レッスン: uikit-lifecycle
+シリーズ: uikit-lifecycle (3段階目)
 スキル: uikit, debugging
 問題: 画面A から画面B へ push し、戻るボタンで A に戻りました。A の viewDidLoad と viewWillAppear はそれぞれ何回呼ばれますか（A の初回表示から数えます）。
 正解: viewDidLoad は1回、viewWillAppear は2回
@@ -10054,9 +10072,9 @@ print("viewDidLoad:", didLoad, "viewWillAppear:", willAppear)
 - 関連例の説明: 初回だけ実行される処理と毎回実行される処理の違いが、この2つの数字になります。
 - 覚えておくこと: push で前の画面は残る。viewDidLoad は1回、viewWillAppear は毎回。
 
-### practice-uikit-009 ラベルを画面中央に置く制約を組み立てる [関数組み立て / Lv2 基本]
+### practice-uikit-009 ラベルを画面中央に置く制約を組み立てる [関数組み立て / Lv3 実装]
 対象レッスン: uikit-autolayout
-シリーズ: uikit-autolayout (1段階目)
+シリーズ: uikit-autolayout (4段階目)
 スキル: uikit
 問題: label を親 view の中央に配置します。必要なブロックだけを正しい順に選んでください。
 正解の並び:
@@ -10200,6 +10218,7 @@ SE: safeArea.top = 20.0
 
 ### practice-uikit-013 横幅いっぱいのカードを配置する制約を選ぶ [ブロック選択 / Lv2 基本]
 対象レッスン: uikit-autolayout
+シリーズ: uikit-autolayout (1段階目)
 スキル: uikit
 問題: cardView を、安全領域の上端から16、左右に16の余白をとって配置し、高さを200にします。必要なブロックだけを正しい順に選んでください。不要なブロックが混ざっています。
 使うブロック:
@@ -10479,7 +10498,7 @@ print("100行表示して生成された数:", created)
 
 ### practice-uikit-020 セルの内容を設定するメソッドを組み立てる [関数組み立て / Lv3 実装]
 対象レッスン: uikit-lists
-シリーズ: uikit-lists (2段階目)
+シリーズ: uikit-lists (3段階目)
 スキル: uikit, optional
 問題: セル側で、渡された Workout の内容を表示します。再利用されても前の内容が残らないメソッドを作ってください。必要なブロックだけを正しい順に選んでください。
 正解の並び:
@@ -10522,7 +10541,7 @@ print("両方設定:", accessory)
 
 ### practice-uikit-021 スクロールすると画像が入れ替わるセルを直す [修正 / Lv3 実装]
 対象レッスン: uikit-lists
-シリーズ: uikit-lists (3段階目)
+シリーズ: uikit-lists (2段階目)
 スキル: uikit, concurrency, debugging
 問題: 画像を非同期で読み込むセルです。速くスクロールすると、別の行の画像が一瞬表示されます。修正として最も適切なものを選んでください。
 正解: private var currentTask: Task<Void, Never>?

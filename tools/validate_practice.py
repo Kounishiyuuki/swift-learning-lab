@@ -45,6 +45,8 @@ MIN_HINT = 10
 MIN_CONCEPT = 25
 MIN_WHY = 30
 MIN_TAKEAWAY = 12
+# Cross-track exercises this similar are printed for a human to judge, not failed.
+CROSS_TRACK_REPORT = 0.42
 
 
 class Report:
@@ -342,6 +344,23 @@ def trigrams(text):
     return {t[i:i + 3] for i in range(max(len(t) - 2, 1))}
 
 
+def code_signature(c):
+    """The code a learner actually reasons about, plus the answer.
+
+    Wording can differ while the exercise is the same, so title/prompt similarity
+    alone misses duplicated exercises. This signature compares the material itself.
+    """
+    content = c.get("content") or {}
+    parts = [str(content.get("code") or ""), str(content.get("template") or ""),
+             str(content.get("context") or ""), str(content.get("requirement") or "")]
+    parts += [str(b.get("code", "")) for b in content.get("blocks") or []]
+    parts += [str(l.get("code", "")) for l in content.get("lines") or []]
+    parts += [str(o.get("code", "") or o.get("label", "")) for o in content.get("options") or []]
+    parts += [str(x.get("label", "")) for x in (content.get("left") or []) + (content.get("right") or [])]
+    parts.append(json.dumps(c.get("solution") or {}, sort_keys=True, ensure_ascii=False))
+    return normalize_code("\n".join(p for p in parts if p.strip()))
+
+
 def duplicate_audit(challenges, rep):
     """Exact duplicates are errors; high-similarity pairs are reported for review."""
     pairs = []
@@ -351,6 +370,36 @@ def duplicate_audit(challenges, rep):
         if key in seen:
             rep.error(c["id"], "duplicate title+prompt with %s" % seen[key])
         seen[key] = c["id"]
+
+    # Identical exercise material is a defect wherever it appears, including across
+    # tracks, where the title/prompt sweep below never compares the two.
+    by_code = {}
+    for c in challenges:
+        sig = code_signature(c)
+        if not sig:
+            continue
+        if sig in by_code:
+            rep.error(c["id"], "identical exercise material and solution as %s" % by_code[sig])
+        by_code[sig] = c["id"]
+
+    # Cross-track near duplicates are reported, never auto-failed: a shared idea
+    # taught at two levels can be legitimate, so a human decides. The threshold is
+    # deliberately low (the same-idea pair found in review scored 0.43 after rewording),
+    # which costs a handful of pairs to eyeball rather than hiding real repeats.
+    code_grams = [(c, trigrams(code_signature(c))) for c in challenges]
+    for i in range(len(code_grams)):
+        ci, gi = code_grams[i]
+        for j in range(i + 1, len(code_grams)):
+            cj, gj = code_grams[j]
+            if ci.get("track") == cj.get("track"):
+                continue
+            score = len(gi & gj) / (len(gi | gj) or 1)
+            if score >= CROSS_TRACK_REPORT:
+                pairs.append({"a": ci["id"], "b": cj["id"], "score": round(score, 3),
+                              "track": "%s/%s" % (ci.get("track"), cj.get("track")),
+                              "kind": "cross-track-material",
+                              "aTitle": ci.get("title"), "bTitle": cj.get("title")})
+
     grams = [(c, trigrams(str(c.get("title", "")) + " " + str(c.get("prompt", "")))) for c in challenges]
     by_track = {}
     for c, g in grams:
@@ -418,6 +467,18 @@ def validate(data, strict=True):
         tracks = {c.get("track") for c in items}
         if len(tracks) != 1:
             rep.error(sid, "all challenges in a series must use the same track")
+        # A series is meant to build on itself. Repeating the same exercise, or the
+        # same answer over identical material, adds a step without adding a demand.
+        # Note this is a structural guard only: whether the reasoning actually
+        # deepens from step to step still needs a human read of the series.
+        sigs = {}
+        for c in sorted(items, key=lambda x: x.get("seriesStep") or 0):
+            sig = code_signature(c)
+            if sig and sig in sigs:
+                rep.error(sid, "steps %s and %s present the same exercise" % (sigs[sig], c.get("id")))
+            sigs[sig] = c.get("id")
+        if len(items) >= 3 and len({c.get("type") for c in items}) == 1:
+            rep.error(sid, "every step uses the same challenge type %r" % items[0].get("type"))
 
     pairs = duplicate_audit(challenges, rep)
 

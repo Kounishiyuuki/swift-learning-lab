@@ -436,7 +436,7 @@
         }
       },
       "seriesId": "starter-values",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-starter-007",
@@ -505,7 +505,7 @@
         }
       },
       "seriesId": "starter-values",
-      "seriesStep": 3
+      "seriesStep": 2
     },
     {
       "id": "practice-starter-008",
@@ -1294,7 +1294,7 @@
         }
       },
       "seriesId": "starter-if",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-starter-019",
@@ -1358,7 +1358,7 @@
         }
       },
       "seriesId": "starter-if",
-      "seriesStep": 3
+      "seriesStep": 2
     },
     {
       "id": "practice-starter-020",
@@ -1690,7 +1690,7 @@
         }
       },
       "seriesId": "starter-scope",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-starter-024",
@@ -1761,7 +1761,7 @@
         }
       },
       "seriesId": "starter-scope",
-      "seriesStep": 3
+      "seriesStep": 2
     },
     {
       "id": "practice-starter-025",
@@ -1953,7 +1953,7 @@
         }
       },
       "seriesId": "starter-optional",
-      "seriesStep": 3
+      "seriesStep": 4
     },
     {
       "id": "practice-starter-028",
@@ -2018,7 +2018,7 @@
         }
       },
       "seriesId": "starter-optional",
-      "seriesStep": 4
+      "seriesStep": 3
     },
     {
       "id": "practice-starter-029",
@@ -3167,7 +3167,7 @@
         }
       },
       "seriesId": "swift-value-semantics",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-swift-003",
@@ -3233,7 +3233,7 @@
         }
       },
       "seriesId": "swift-value-semantics",
-      "seriesStep": 3
+      "seriesStep": 2
     },
     {
       "id": "practice-swift-004",
@@ -3298,7 +3298,7 @@
         }
       },
       "seriesId": "swift-number-conversion",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-swift-005",
@@ -3364,7 +3364,7 @@
         }
       },
       "seriesId": "swift-number-conversion",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-swift-006",
@@ -3433,7 +3433,7 @@
         }
       },
       "seriesId": "swift-number-conversion",
-      "seriesStep": 3
+      "seriesStep": 1
     },
     {
       "id": "practice-swift-007",
@@ -3749,7 +3749,7 @@
         }
       },
       "seriesId": "swift-string-index",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-swift-012",
@@ -3831,7 +3831,7 @@
         }
       },
       "seriesId": "swift-string-index",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-swift-013",
@@ -3901,7 +3901,7 @@
         }
       },
       "seriesId": "swift-branching",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-swift-014",
@@ -4000,14 +4000,14 @@
         }
       },
       "seriesId": "swift-branching",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-swift-015",
       "track": "swift",
       "lessonId": "swift-control-flow",
       "type": "bugHunt",
-      "difficulty": 2,
+      "difficulty": 3,
       "title": "条件式で代入している行を見つける",
       "prompt": "このコードはビルドできません。原因になっている行を選んでください。",
       "skills": [
@@ -4073,7 +4073,7 @@
         }
       },
       "seriesId": "swift-branching",
-      "seriesStep": 3
+      "seriesStep": 4
     },
     {
       "id": "practice-swift-016",
@@ -4234,7 +4234,7 @@
         }
       },
       "seriesId": "swift-pattern",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-swift-018",
@@ -4302,7 +4302,7 @@
         }
       },
       "seriesId": "swift-pattern",
-      "seriesStep": 3
+      "seriesStep": 4
     },
     {
       "id": "practice-swift-019",
@@ -4367,7 +4367,7 @@
         }
       },
       "seriesId": "swift-pattern",
-      "seriesStep": 4
+      "seriesStep": 2
     },
     {
       "id": "practice-swift-020",
@@ -4508,29 +4508,33 @@
     },
     {
       "id": "practice-swift-022",
-      "track": "swift",
+      "seriesStep": 3,
+      "seriesId": "swift-loop-basics",
       "lessonId": "swift-loops-ranges",
+      "track": "swift",
       "type": "bugHunt",
       "difficulty": 3,
-      "title": "実行時にクラッシュする範囲指定を見つける",
-      "prompt": "このコードはビルドできますが、実行すると途中でクラッシュします。原因になっている行を選んでください。",
+      "title": "降順に回そうとして落ちる範囲を見つける",
+      "prompt": "このコードはビルドできますが、実行した瞬間にクラッシュし、1件も表示されません。原因になっている行を選んでください。",
       "skills": [
         "collections",
+        "controlFlow",
         "debugging"
       ],
+      "noRunSolution": true,
       "content": {
         "lines": [
           {
             "id": "l1",
-            "code": "let items = [\"a\", \"b\", \"c\"]"
+            "code": "let scores = [10, 20, 30, 40]"
           },
           {
             "id": "l2",
-            "code": "for i in 0...items.count {"
+            "code": "for i in scores.count - 1 ... 0 {"
           },
           {
             "id": "l3",
-            "code": "    print(items[i])"
+            "code": "    print(scores[i])"
           },
           {
             "id": "l4",
@@ -4540,36 +4544,36 @@
       },
       "solution": {
         "optionId": "l2",
-        "fixedCode": "let items = [\"a\", \"b\", \"c\"]\nfor item in items {\n    print(item)\n}"
+        "fixedCode": "let scores = [10, 20, 30, 40]\nfor i in scores.indices.reversed() {\n    print(scores[i])\n}"
       },
       "hints": [
-        "要素が3個の配列で、使える添字はいくつからいくつまででしょうか。",
-        "配列の添字は0から始まるので、最後の要素の添字は count そのものではありません。",
-        "`0...items.count` は 0,1,2,3 の4回まわります。添字3の要素は存在しません。"
+        "1件も表示されていないことが手がかりです。ループの中身に入る前の段階で失敗しています。",
+        "`a...b` という範囲は、a が b 以下であることを前提にしています。ここでの a と b を実際の数値に置き換えて確かめてください。",
+        "scores.count - 1 は 3、右側は 0 なので `3...0` を作ろうとしています。降順に回すには範囲式ではなく別の手段が必要です。"
       ],
-      "explanation": "バグは2行目の範囲指定にあります。`0...items.count` は終端を含む範囲なので 0,1,2,3 の4回まわりますが、要素3個の配列で有効な添字は 0,1,2 までです。4回目の `items[3]` で 'Fatal error: Index out of range' が発生し、a・b・c を出力したあとにクラッシュします。型としては Int の添字アクセスなのでコンパイルは通り、実行時まで問題が表面化しないのがこのバグの厄介なところです。修正は `for item in items` と要素を直接回す形にするのが最も安全で、添字が必要な場合は `0..<items.count` にします。",
+      "explanation": "問題は2行目の `scores.count - 1 ... 0` です。`a...b` は「a から b まで昇順に並ぶ範囲」を表す値で、a が b より大きい状態は表現できません。ここでは `3...0` を作ろうとするため、範囲を組み立てた時点で `Fatal error: Range requires lowerBound <= upperBound` で停止します。添字アクセスに到達する前に落ちるので、表示は1件も出ません。ビルドが通るのは、`scores.count` が実行するまで決まらず、コンパイラには 3 > 0 だと判断できないためです。修正は `scores.indices.reversed()` を使い、有効な添字（0...3）を逆順にたどることです。`stride(from: scores.count - 1, through: 0, by: -1)` でも同じ結果になります。範囲の両端を入れ替えて `0...scores.count - 1` としても落ちなくなりますが、それは昇順に戻ってしまい、降順で表示したいという要件を満たしません。",
       "detail": {
-        "concept": "配列の添字は 0 から count - 1 までです。`...` と `..<` の取り違えは、コンパイラが検出できず実行時クラッシュになる典型的なオフバイワンです。",
+        "concept": "`...` や `..<` が作るのは「下限から上限へ向かう範囲」という1つの値です。下限が上限より大きい範囲は Swift には存在しないため、そのような範囲を作ろうとした時点で実行が止まります。降順の反復は、範囲式ではなく `reversed()` や `stride` で表します。",
         "steps": [
-          "items.count は 3。`0...3` は 0,1,2,3 の4個。",
-          "1〜3回目の items[0..2] は成功し、a・b・c が出力される。",
-          "4回目に items[3] を評価した時点で範囲外アクセスとなりプロセスが停止する。",
-          "`for item in items` にすれば、添字を計算しないので範囲外が原理的に起きない。"
+          "`scores.count` は 4 なので、左側は 3 になる。",
+          "右側は 0 なので、作ろうとしているのは `3...0`。",
+          "下限 3 が上限 0 より大きいため、範囲の生成そのものが失敗して停止する。",
+          "`print(scores[i])` は一度も実行されないので、出力は空のまま。",
+          "`scores.indices.reversed()` は 3, 2, 1, 0 を順に返すので、要件どおり降順にたどれる。"
         ],
-        "whyCorrect": "原因は添字を使っている3行目ではなく、範囲を作っている2行目です。3行目は与えられた i をそのまま使っているだけで、i の範囲が正しければ何の問題もありません。",
+        "whyCorrect": "`indices` は配列が実際に持っている有効な添字の集まりで、`reversed()` はその並びを逆にするだけです。範囲の下限と上限を逆転させることがないため落ちず、かつ添字は必ず有効な値なので範囲外アクセスも起きません。",
         "commonMistakes": [
-          "クラッシュした行（items[i] の行）を原因だと判断してしまう間違いです。クラッシュ地点と原因の位置はしばしば異なります。",
-          "`0..<items.count` に直せば正しく動きますが、添字が本当に必要でない限りは `for item in items` のほうが安全です。"
+          "`0...scores.count - 1` に直して「落ちなくなった」で終える間違いです。クラッシュは消えますが昇順に戻るため、降順で表示したいという元の要件を満たしません。",
+          "`scores.count ... 0` のように書き換えても同じ理由で落ちます。原因は端の値ではなく、下限が上限を超えている構造そのものです。",
+          "`for i in scores.count - 1 >= 0 ...` のように条件式を範囲に混ぜようとする間違いです。範囲式が受け取るのは値であって条件ではありません。"
         ],
-        "takeaway": "有効な添字は 0..<count。クラッシュ地点と原因の行は別のことがある。",
+        "takeaway": "範囲は下限 ≤ 上限が前提。降順は reversed() か stride で表す。",
         "example": {
-          "code": "let items = [\"a\", \"b\", \"c\"]\nfor (i, item) in items.enumerated() {\n    print(i, item)\n}",
-          "output": "0 a\n1 b\n2 c",
-          "explanation": "添字と要素の両方が必要なときは enumerated() を使うと、範囲を自分で計算せずに済みます。"
+          "code": "let scores = [10, 20, 30, 40]\nprint(\"有効な添字:\", Array(scores.indices))\nprint(\"降順にたどる:\", Array(scores.indices.reversed()))\nprint(\"strideでも同じ:\", Array(stride(from: scores.count - 1, through: 0, by: -1)))",
+          "output": "有効な添字: [0, 1, 2, 3]\n降順にたどる: [3, 2, 1, 0]\nstrideでも同じ: [3, 2, 1, 0]",
+          "explanation": "降順で欲しいのはこの並びです。範囲式そのものを逆向きに書くのではなく、正しい範囲を作ってから向きを変えます。"
         }
-      },
-      "seriesId": "swift-loop-basics",
-      "seriesStep": 3
+      }
     },
     {
       "id": "practice-swift-023",
@@ -4759,7 +4763,7 @@
         }
       },
       "seriesId": "swift-branching",
-      "seriesStep": 4
+      "seriesStep": 3
     },
     {
       "id": "practice-swift-025",
@@ -4836,7 +4840,7 @@
         }
       },
       "seriesId": "swift-function-basics",
-      "seriesStep": 1
+      "seriesStep": 3
     },
     {
       "id": "practice-swift-026",
@@ -4906,7 +4910,7 @@
         }
       },
       "seriesId": "swift-function-basics",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-swift-027",
@@ -4972,7 +4976,7 @@
         }
       },
       "seriesId": "swift-function-basics",
-      "seriesStep": 3
+      "seriesStep": 2
     },
     {
       "id": "practice-swift-028",
@@ -5566,7 +5570,7 @@
         }
       },
       "seriesId": "swift-closure-basics",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-swift-036",
@@ -5648,14 +5652,14 @@
         }
       },
       "seriesId": "swift-closure-basics",
-      "seriesStep": 3
+      "seriesStep": 2
     },
     {
       "id": "practice-swift-037",
       "track": "swift",
       "lessonId": "swift-closures-advanced",
       "type": "trace",
-      "difficulty": 4,
+      "difficulty": 3,
       "title": "捕捉リストがある場合とない場合を追う",
       "prompt": "捕捉リスト付きのクロージャと、付いていないクロージャを比べます。出力を選んでください。",
       "skills": [
@@ -5956,7 +5960,7 @@
       "track": "swift",
       "lessonId": "swift-array",
       "type": "fillBlank",
-      "difficulty": 2,
+      "difficulty": 3,
       "title": "配列の追加と削除のメソッドを選ぶ",
       "prompt": "末尾に \"c\" を追加し、先頭の要素を削除します。空欄を埋めてください。",
       "skills": [
@@ -6019,7 +6023,7 @@
         }
       },
       "seriesId": "swift-array-safety",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-swift-042",
@@ -6081,7 +6085,7 @@
         }
       },
       "seriesId": "swift-array-safety",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-swift-043",
@@ -6169,7 +6173,7 @@
         }
       },
       "seriesId": "swift-array-safety",
-      "seriesStep": 3
+      "seriesStep": 4
     },
     {
       "id": "practice-swift-044",
@@ -6237,7 +6241,7 @@
         }
       },
       "seriesId": "swift-array-safety",
-      "seriesStep": 4
+      "seriesStep": 1
     },
     {
       "id": "practice-swift-045",
@@ -6306,7 +6310,7 @@
         }
       },
       "seriesId": "swift-set-basics",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-swift-046",
@@ -6372,7 +6376,7 @@
         }
       },
       "seriesId": "swift-set-basics",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-swift-047",
@@ -6437,7 +6441,7 @@
         }
       },
       "seriesId": "swift-set-basics",
-      "seriesStep": 3
+      "seriesStep": 1
     },
     {
       "id": "practice-swift-048",
@@ -6521,14 +6525,14 @@
         }
       },
       "seriesId": "swift-dictionary-count",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-swift-049",
       "track": "swift",
       "lessonId": "swift-dictionary",
       "type": "chooseBlocks",
-      "difficulty": 2,
+      "difficulty": 3,
       "title": "辞書から安全に取り出す行だけ選ぶ",
       "prompt": "在庫があればその数を、キーがなければ「取り扱いなし」を表示します。必要な行だけを選び、正しい順に並べてください。",
       "skills": [
@@ -6617,7 +6621,7 @@
         }
       },
       "seriesId": "swift-dictionary-count",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-swift-050",
@@ -6683,7 +6687,7 @@
         }
       },
       "seriesId": "swift-dictionary-count",
-      "seriesStep": 3
+      "seriesStep": 4
     },
     {
       "id": "practice-swift-051",
@@ -6749,7 +6753,7 @@
         }
       },
       "seriesId": "swift-dictionary-count",
-      "seriesStep": 4
+      "seriesStep": 1
     },
     {
       "id": "practice-swift-052",
@@ -6919,7 +6923,7 @@
         }
       },
       "seriesId": "swift-transform-chain",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-swift-054",
@@ -6998,7 +7002,7 @@
         }
       },
       "seriesId": "swift-transform-chain",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-swift-055",
@@ -7125,7 +7129,7 @@
       "track": "swift",
       "lessonId": "swift-optionals",
       "type": "fillBlank",
-      "difficulty": 2,
+      "difficulty": 3,
       "title": "既定値とOptional chainingを書き分ける",
       "prompt": "nil のときの既定値を与える書き方と、nil なら計算そのものを飛ばす書き方を使い分けます。空欄を埋めてください。",
       "skills": [
@@ -7188,14 +7192,14 @@
         }
       },
       "seriesId": "swift-optional-handling",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-swift-058",
       "track": "swift",
       "lessonId": "swift-optionals",
       "type": "bugHunt",
-      "difficulty": 2,
+      "difficulty": 3,
       "title": "Optionalをそのまま変換に渡している行を見つける",
       "prompt": "このコードはビルドできません。原因になっている行を選んでください。",
       "skills": [
@@ -7250,7 +7254,7 @@
         }
       },
       "seriesId": "swift-optional-handling",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-swift-059",
@@ -7316,7 +7320,7 @@
         }
       },
       "seriesId": "swift-optional-handling",
-      "seriesStep": 3
+      "seriesStep": 4
     },
     {
       "id": "practice-swift-060",
@@ -7381,7 +7385,7 @@
         }
       },
       "seriesId": "swift-optional-handling",
-      "seriesStep": 4
+      "seriesStep": 1
     },
     {
       "id": "practice-swift-061",
@@ -7783,7 +7787,7 @@
         }
       },
       "seriesId": "swift-reference-semantics",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-swift-066",
@@ -7849,7 +7853,7 @@
         }
       },
       "seriesId": "swift-reference-semantics",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-swift-067",
@@ -7915,7 +7919,7 @@
         }
       },
       "seriesId": "swift-property-kinds",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-swift-068",
@@ -7986,7 +7990,7 @@
         }
       },
       "seriesId": "swift-property-kinds",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-swift-069",
@@ -8647,7 +8651,7 @@
       "track": "swift",
       "lessonId": "swift-generics",
       "type": "reorder",
-      "difficulty": 4,
+      "difficulty": 3,
       "title": "ジェネリック関数を並べ替える",
       "prompt": "どんな型の配列でも先頭2件を返す関数を作ります。ブロックを正しい順に並べ替えてください。",
       "skills": [
@@ -9650,7 +9654,7 @@
         }
       },
       "seriesId": "foundation-codable-flow",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-foundation-006",
@@ -9740,7 +9744,7 @@
         }
       },
       "seriesId": "foundation-codable-flow",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-foundation-007",
@@ -10881,7 +10885,7 @@
         }
       },
       "seriesId": "foundation-url-build",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-foundation-022",
@@ -10969,7 +10973,7 @@
         }
       },
       "seriesId": "foundation-url-build",
-      "seriesStep": 3
+      "seriesStep": 4
     },
     {
       "id": "practice-foundation-023",
@@ -11038,7 +11042,7 @@
         }
       },
       "seriesId": "foundation-request",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-foundation-024",
@@ -11116,7 +11120,7 @@
         }
       },
       "seriesId": "foundation-request",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-foundation-025",
@@ -11319,7 +11323,7 @@
         }
       },
       "seriesId": "foundation-url-build",
-      "seriesStep": 4
+      "seriesStep": 2
     },
     {
       "id": "practice-foundation-028",
@@ -11717,7 +11721,7 @@
         }
       },
       "seriesId": "foundation-defaults",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-foundation-033",
@@ -11786,7 +11790,7 @@
         }
       },
       "seriesId": "foundation-defaults",
-      "seriesStep": 3
+      "seriesStep": 2
     },
     {
       "id": "practice-foundation-034",
@@ -12024,7 +12028,7 @@
         }
       },
       "seriesId": "foundation-regex-basics",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-foundation-037",
@@ -12089,7 +12093,7 @@
         }
       },
       "seriesId": "foundation-regex-basics",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-foundation-038",
@@ -12275,52 +12279,77 @@
     },
     {
       "id": "practice-foundation-040",
-      "track": "foundation",
       "lessonId": "foundation-data-modeling",
-      "type": "shortCode",
+      "track": "foundation",
+      "type": "reorder",
       "difficulty": 2,
-      "title": "IDを表す型の宣言行を書く",
-      "prompt": "ユーザーIDを表す UserID 型を作ります。JSONとの変換と、辞書のキーとしての利用の両方ができるようにする宣言行（struct から始まる1行）を書いてください。",
+      "title": "IDを表す型を宣言する順に並べ替える",
+      "prompt": "JSONとの変換にも、Setや辞書のキーにも使える UserID 型を宣言し、重複を除いた件数を表示します。ブロックを正しい順に並べ替えてください。",
       "skills": [
         "types",
         "protocols",
         "foundation"
       ],
       "content": {
-        "context": "// ここに1行書く\n    let value: Int\n}",
-        "contextRun": "{{answer}}\n    let value: Int\n}\nprint(UserID(value: 1) == UserID(value: 1))",
-        "placeholder": "例: struct 型名: プロトコル, プロトコル {"
+        "blocks": [
+          {
+            "id": "b2",
+            "code": "    let value: Int"
+          },
+          {
+            "id": "b4",
+            "code": "let ids: Set<UserID> = [UserID(value: 1), UserID(value: 1), UserID(value: 2)]"
+          },
+          {
+            "id": "b1",
+            "code": "struct UserID: Codable, Hashable {"
+          },
+          {
+            "id": "b5",
+            "code": "print(ids.count)"
+          },
+          {
+            "id": "b3",
+            "code": "}"
+          }
+        ]
       },
       "solution": {
-        "accepted": [
-          "struct UserID: Codable, Hashable {",
-          "struct UserID: Hashable, Codable {"
+        "order": [
+          "b1",
+          "b2",
+          "b3",
+          "b4",
+          "b5"
         ]
       },
       "hints": [
-        "必要な能力は2つあります。JSONとの相互変換と、ハッシュ値を持つことです。",
-        "準拠はカンマで並べて書けます。順序はどちらでも構いません。",
-        "型名のあとにコロンを書き、2つのプロトコル名を並べ、中かっこを開きます。"
+        "型は、それを使う行より前に宣言されている必要があります。",
+        "プロパティは struct の波かっこの内側に置きます。宣言を閉じてから、その型を使う行が続きます。",
+        "struct の見出し → プロパティ → 閉じかっこ → Set を作る行 → 件数の表示、の順です。"
       ],
-      "explanation": "`struct UserID: Codable, Hashable {` と書きます。Codable によって JSON との相互変換が自動生成され、Hashable によって Set の要素や辞書のキーとして使えるようになります。Hashable は Equatable を含むため == も使えます。Int をそのまま ID として持ち回るのではなく専用の型にすると、ユーザーIDと投稿IDを取り違えるようなバグをコンパイル時に防げます。準拠の順序は任意なので `Hashable, Codable` も正解です。",
+      "explanation": "正しい順は「struct の宣言 → プロパティ → 閉じかっこ → Set を作る → 件数を表示」です。順序を決めているのは2つの制約です。1つ目は、`UserID` を使う行（Set を作る行）より前に型が宣言され、閉じられている必要があること。2つ目は、プロパティ `value` が struct の波かっこの内側になければならないことです。準拠しているプロトコルにも役割があります。`Codable` はJSONとの相互変換を可能にし、`Hashable` は Set や辞書のキーとして使えるようにします。`Hashable` に準拠していると、`value` が同じ UserID は同じものとして扱われるため、Set に同じIDを2回入れても1件に畳まれ、この例の表示は 2 になります。どちらのプロトコルも `let value: Int` という単一のプロパティから自動で実装が導かれるので、追加のコードは不要です。",
       "detail": {
-        "concept": "「意味のある値」を素の Int や String のまま扱うと、型が同じであるがゆえに取り違えても気づけません。専用の型で包むと、コンパイラが取り違えを検出してくれます。",
+        "concept": "IDのような「ただの Int」をそのまま持ち回らず専用の型で包むと、別の種類のIDと取り違える間違いをコンパイラが防いでくれます。この型に何を任せたいかは、準拠するプロトコルで宣言します。",
         "steps": [
-          "`struct UserID` … Int を包む専用の型を作る。",
-          "`Codable` … サーバとのやり取りでそのまま使えるようにする。",
-          "`Hashable` … 辞書のキーや Set の要素にできるようにする。",
-          "`let value: Int` … 実際の値を保持する。"
+          "`struct UserID: Codable, Hashable {` … 型の宣言と、任せたい役割の表明。",
+          "`let value: Int` … 実体となるプロパティ。波かっこの内側に置く。",
+          "`}` … 宣言を閉じる。ここまでで型が使える状態になる。",
+          "`let ids: Set<UserID> = [...]` … Hashable なので Set の要素にできる。同じ value のものは1件に畳まれる。",
+          "`print(ids.count)` … 重複を除いた件数として 2 が表示される。"
         ],
-        "whyCorrect": "要求されている2つの能力がちょうど2つのプロトコルに対応し、どちらも自動生成が効くため実装を書く必要がありません。",
+        "whyCorrect": "型の宣言が使用箇所より前にあり、プロパティが宣言の内側に収まっているため、構文としても意味としても成立します。Hashable への準拠があるので Set の要素として扱え、重複の除去がそのまま件数に反映されます。",
         "commonMistakes": [
-          "Equatable だけを書いて辞書のキーにしようとする間違いです。ハッシュ値が必要なので Hashable が要ります。",
-          "IDを素の Int のまま扱う設計です。userID と postID を取り違えても型が同じなのでコンパイルが通ってしまいます。"
+          "`Hashable` を付け忘れる間違いです。Set や辞書のキーに使えず、コンパイルエラーになります。",
+          "`Codable` を付け忘れる間違いです。ビルドは通りますが、JSONへのエンコードやデコードができません。",
+          "プロパティを閉じかっこの外に置く間違いです。型のメンバーではなくなるため、初期化子から渡せなくなります。",
+          "ID を素の Int のまま扱う間違いです。商品IDとユーザーIDを取り違えても、型が同じなので気づけません。"
         ],
-        "takeaway": "意味のあるIDは専用の型にする。Codable + Hashable が定番の組み合わせ。",
+        "takeaway": "型は使う前に宣言する。役割はプロトコル準拠で表明する。",
         "example": {
-          "code": "struct UserID: Codable, Hashable { let value: Int }\nvar names: [UserID: String] = [:]\nnames[UserID(value: 1)] = \"Yuki\"\nprint(names[UserID(value: 1)] ?? \"なし\")",
-          "output": "Yuki",
-          "explanation": "Hashable に準拠しているため、そのまま辞書のキーとして使えます。"
+          "code": "struct UserID: Codable, Hashable {\n    let value: Int\n}\nlet ids: Set<UserID> = [UserID(value: 1), UserID(value: 1), UserID(value: 2)]\nprint(ids.count)",
+          "output": "2",
+          "explanation": "同じ value を持つ UserID は等しいと判定されるため、3個入れても1件が畳まれて2件になります。"
         }
       }
     },
@@ -12329,7 +12358,7 @@
       "track": "foundation",
       "lessonId": "foundation-copy-value",
       "type": "trace",
-      "difficulty": 4,
+      "difficulty": 3,
       "title": "値型の中に参照型がある場合を追う",
       "prompt": "struct の中に class のプロパティがあります。最後の print の結果を選んでください。",
       "skills": [
@@ -12392,82 +12421,58 @@
     },
     {
       "id": "practice-foundation-042",
-      "track": "foundation",
+      "seriesStep": 2,
+      "seriesId": "foundation-value-copy",
       "lessonId": "foundation-copy-value",
-      "type": "reorder",
+      "track": "foundation",
+      "type": "shortCode",
       "difficulty": 3,
-      "title": "共有を避ける初期化の順に並べる",
-      "prompt": "2つの Holder がそれぞれ別の Box を持つようにして、片方だけを書き換えます。ブロックを正しい順に並べ替えてください。",
+      "title": "共有を断ち切るコピーを書く",
+      "prompt": "Holder は class の Box を持っているため、代入でコピーしても両者が同じ Box を指したままになります。detach() の中に、自分だけの Box を持ち直す1行を書いてください。",
       "skills": [
         "types",
         "memory"
       ],
       "content": {
-        "blocks": [
-          {
-            "id": "b1",
-            "code": "print(h1.box.n, h2.box.n)"
-          },
-          {
-            "id": "b2",
-            "code": "final class Box { var n = 0 }"
-          },
-          {
-            "id": "b3",
-            "code": "struct Holder { var box: Box }"
-          },
-          {
-            "id": "b4",
-            "code": "var h1 = Holder(box: Box())"
-          },
-          {
-            "id": "b5",
-            "code": "var h2 = Holder(box: Box())"
-          },
-          {
-            "id": "b6",
-            "code": "h2.box.n = 9"
-          }
-        ]
+        "context": "final class Box {\n    var n: Int\n    init(n: Int) { self.n = n }\n}\n\nstruct Holder {\n    var box: Box\n\n    mutating func detach() {\n        // ここに1行書く\n    }\n}",
+        "contextRun": "final class Box {\n    var n: Int\n    init(n: Int) { self.n = n }\n}\nstruct Holder {\n    var box: Box\n    mutating func detach() {\n{{answer}}\n    }\n}\nvar a = Holder(box: Box(n: 0))\nvar b = a\nb.detach()\nb.box.n = 9\nprint(a.box.n, b.box.n)",
+        "placeholder": "例: box = ..."
       },
       "solution": {
-        "order": [
-          "b2",
-          "b3",
-          "b4",
-          "b5",
-          "b6",
-          "b1"
+        "accepted": [
+          "box = Box(n: box.n)",
+          "self.box = Box(n: box.n)"
         ]
       },
       "hints": [
-        "型の定義がなければインスタンスは作れません。Box が先です。",
-        "それぞれが別のインスタンスを持つには、Box() を2回呼ぶ必要があります。",
-        "Box → Holder → h1 → h2 → 書き換え → 表示、の順です。"
+        "struct をコピーしても、中にある class のプロパティは同じ実体を指したままです。共有を断つには何を作り直す必要がありますか。",
+        "今の中身の値は引き継ぎたいので、値を読み取ったうえで、入れ物だけを新しく用意します。",
+        "現在の n を渡して Box を新しく生成し、それを自分の box に代入します。"
       ],
-      "explanation": "Box() を2回呼ぶことで、h1 と h2 はそれぞれ別のインスタンスを持ちます。そのため h2.box.n の書き換えは h1 に影響せず、出力は「0 9」になります。`var h2 = h1` のようにコピーで作ると参照が共有され、両方とも9になってしまいます。プロパティに既定値を持たせて `Holder()` を2回呼んでも、初期化のたびに Box() が評価されるため同じく独立します。",
+      "explanation": "`box = Box(n: box.n)` と書きます。struct の代入は各プロパティをコピーしますが、box は class への参照なので、コピーされるのは「同じインスタンスを指す矢印」だけです。その結果、コピー元とコピー先が1つの Box を共有し、片方で `box.n` を変えるともう片方にも反映されます。detach() では、現在の n を読み取ってから新しい Box を生成し、自分の box をそちらへ差し替えます。これで参照が別々になり、以後の変更は互いに影響しなくなります。右辺で `box.n` を読んでから左辺に代入するため、値は失われません。`box.n = box.n` のように中身だけ触っても参照は同じままなので共有は切れず、`var copy = box` としても新しいインスタンスは生まれません。この「必要になった時点で複製する」考え方は copy-on-write と同じ発想で、Swift の標準コレクションが内部で行っていることでもあります。",
       "detail": {
-        "concept": "参照型のプロパティを独立させたいなら、インスタンスを別々に生成するしかありません。値型のコピーでは参照が複製されるだけです。",
+        "concept": "値型のコピーは「プロパティを1つずつ写す」だけです。プロパティが参照型なら写されるのは参照であって、指している実体は共有されたままになります。実体まで分けたい場合は、自分で新しいインスタンスを作る必要があります。",
         "steps": [
-          "`final class Box` と `struct Holder` を定義する。",
-          "`Holder(box: Box())` を2回呼ぶと、Box のインスタンスが2つ作られる。",
-          "h1.box と h2.box は別の実体を指す。",
-          "`h2.box.n = 9` は h2 側だけを書き換え、出力は「0 9」。"
+          "`var b = a` … Holder は struct なのでプロパティが写される。",
+          "写された box は「同じ Box を指す参照」なので、a と b は1つの Box を共有している。",
+          "`box.n` を読み取り、現在の値を取り出す。",
+          "`Box(n:)` で新しいインスタンスを生成し、box に代入して参照を差し替える。",
+          "以後 b.box.n を変えても、a.box.n は元のインスタンスのままなので影響を受けない。"
         ],
-        "whyCorrect": "Box() の呼び出しが2回あるため実体が2つ存在し、参照の共有が起きません。書き換えの影響範囲が片方に限定されます。",
+        "whyCorrect": "代入の右辺で現在の値を読み出してから、左辺で参照を新しいインスタンスに置き換えているため、値を保ったまま共有だけが切れます。detach() を呼んだ側だけが新しい Box を持つので、呼んでいない側の状態は変わりません。",
         "commonMistakes": [
-          "`var h2 = h1` で作ってしまう間違いです。box の参照が共有され、両方が9になります。",
-          "Box のインスタンスを定数にまとめて両方に渡す間違いも同じ結果になります。共有したいのか独立させたいのかを設計時に決めます。"
+          "`var copy = box` と書いて複製したつもりになる間違いです。class の代入は参照の複製なので、実体は1つのままです。",
+          "`box.n = box.n` のように中身へ代入する間違いです。同じインスタンスを触っているだけで、共有関係は変わりません。",
+          "detach() を呼び忘れたまま代入だけする間違いです。共有は残るので、片方の変更がもう片方に漏れます。",
+          "Holder を class に変える対応です。共有の問題は解決せず、むしろ Holder 自体まで共有されるようになります。"
         ],
-        "takeaway": "参照型を独立させたいなら、インスタンスを別々に作る。コピーでは足りない。",
+        "takeaway": "参照型のプロパティは自分で作り直さないと分かれない。",
         "example": {
-          "code": "final class Box { var n = 0 }\nstruct Holder { var box: Box }\nvar h1 = Holder(box: Box())\nvar h2 = Holder(box: Box())\nh2.box.n = 9\nprint(h1.box.n, h2.box.n)\nvar h3 = h1\nh3.box.n = 7\nprint(h1.box.n, h3.box.n)",
-          "output": "0 9\n7 7",
-          "explanation": "別々に作った場合は独立し、コピーで作った場合は共有されることが同時に確認できます。"
+          "code": "final class Box {\n    var n: Int\n    init(n: Int) { self.n = n }\n}\nstruct Holder {\n    var box: Box\n    mutating func detach() { box = Box(n: box.n) }\n}\nvar a = Holder(box: Box(n: 0))\nvar b = a\nprint(\"detach前:\", a.box.n, b.box.n)\nb.detach()\nb.box.n = 9\nprint(\"detach後:\", a.box.n, b.box.n)",
+          "output": "detach前: 0 0\ndetach後: 0 9",
+          "explanation": "detach を挟むことで、b の変更が a に届かなくなります。挟まなければ両方 9 になります。"
         }
-      },
-      "seriesId": "foundation-value-copy",
-      "seriesStep": 2
+      }
     },
     {
       "id": "practice-concurrency-001",
@@ -12628,7 +12633,7 @@
         }
       },
       "seriesId": "concurrency-error-basics",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-concurrency-003",
@@ -12697,7 +12702,7 @@
         }
       },
       "seriesId": "concurrency-error-basics",
-      "seriesStep": 3
+      "seriesStep": 4
     },
     {
       "id": "practice-concurrency-004",
@@ -12763,14 +12768,14 @@
         }
       },
       "seriesId": "concurrency-error-basics",
-      "seriesStep": 4
+      "seriesStep": 5
     },
     {
       "id": "practice-concurrency-005",
       "track": "concurrency",
       "lessonId": "concurrency-errors",
       "type": "reorder",
-      "difficulty": 3,
+      "difficulty": 2,
       "title": "エラーを投げて捕まえる流れを並べる",
       "prompt": "エラーを投げる関数を定義し、失敗する呼び出しを捕まえて表示します。ブロックを正しい順に並べ替えてください。",
       "skills": [
@@ -12862,7 +12867,7 @@
         }
       },
       "seriesId": "concurrency-error-basics",
-      "seriesStep": 5
+      "seriesStep": 2
     },
     {
       "id": "practice-concurrency-006",
@@ -13313,7 +13318,7 @@
         }
       },
       "seriesId": "concurrency-reference-strength",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-concurrency-012",
@@ -13405,7 +13410,7 @@
         }
       },
       "seriesId": "concurrency-reference-strength",
-      "seriesStep": 3
+      "seriesStep": 2
     },
     {
       "id": "practice-concurrency-013",
@@ -13685,7 +13690,7 @@
       "track": "concurrency",
       "lessonId": "concurrency-async-let",
       "type": "buildFunction",
-      "difficulty": 3,
+      "difficulty": 4,
       "title": "2件を同時に取得する関数を組み立てる",
       "prompt": "2件の取得を同時に走らせて、両方そろってから配列で返す関数を作ります。必要なブロックだけを選んで正しい順に並べてください。",
       "skills": [
@@ -13765,7 +13770,7 @@
         }
       },
       "seriesId": "concurrency-parallel",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-concurrency-018",
@@ -13831,7 +13836,7 @@
         }
       },
       "seriesId": "concurrency-parallel",
-      "seriesStep": 3
+      "seriesStep": 2
     },
     {
       "id": "practice-concurrency-019",
@@ -13978,7 +13983,7 @@
         }
       },
       "seriesId": "concurrency-cancel",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-concurrency-021",
@@ -14074,14 +14079,14 @@
         }
       },
       "seriesId": "concurrency-cancel",
-      "seriesStep": 3
+      "seriesStep": 2
     },
     {
       "id": "practice-concurrency-022",
       "track": "concurrency",
       "lessonId": "concurrency-taskgroup",
       "type": "reorder",
-      "difficulty": 4,
+      "difficulty": 3,
       "title": "件数が可変の並行処理を並べる",
       "prompt": "任意の件数を同時に取得して集める関数を作ります。ブロックを正しい順に並べ替えてください。",
       "skills": [
@@ -15112,7 +15117,7 @@
         }
       },
       "seriesId": "concurrency-continuation",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-concurrency-035",
@@ -15178,7 +15183,7 @@
         }
       },
       "seriesId": "concurrency-continuation",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-concurrency-036",
@@ -15874,7 +15879,7 @@
         }
       },
       "seriesId": "development-spm",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-development-009",
@@ -15964,14 +15969,14 @@
         }
       },
       "seriesId": "development-spm",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-development-010",
       "track": "development",
       "lessonId": "dev-dependencies",
       "type": "shortCode",
-      "difficulty": 2,
+      "difficulty": 3,
       "title": "依存を追加する1行を書く",
       "prompt": "Package.swift の dependencies に、https://github.com/apple/swift-log を「1.5.0 以上（メジャーバージョンは 1 のまま）」で追加する1行を書いてください。末尾のカンマは不要です。",
       "skills": [
@@ -16429,7 +16434,7 @@
         }
       },
       "seriesId": "development-logging",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-development-017",
@@ -16513,7 +16518,7 @@
         }
       },
       "seriesId": "development-logging",
-      "seriesStep": 3
+      "seriesStep": 2
     },
     {
       "id": "practice-development-018",
@@ -16657,7 +16662,7 @@
         }
       },
       "seriesId": "development-testing",
-      "seriesStep": 1
+      "seriesStep": 4
     },
     {
       "id": "practice-development-020",
@@ -16734,7 +16739,7 @@
       "track": "development",
       "lessonId": "dev-swift-testing",
       "type": "reorder",
-      "difficulty": 3,
+      "difficulty": 2,
       "title": "テスト1件の構成を並べ替える",
       "prompt": "税込み価格のテストを1件書きます。ブロックを正しい順に並べ替えてください。",
       "skills": [
@@ -16806,7 +16811,7 @@
         }
       },
       "seriesId": "development-testing",
-      "seriesStep": 3
+      "seriesStep": 1
     },
     {
       "id": "practice-development-022",
@@ -16887,7 +16892,7 @@
         }
       },
       "seriesId": "development-testing",
-      "seriesStep": 4
+      "seriesStep": 5
     },
     {
       "id": "practice-development-023",
@@ -17112,7 +17117,7 @@
         }
       },
       "seriesId": "development-testing",
-      "seriesStep": 5
+      "seriesStep": 3
     },
     {
       "id": "practice-development-026",
@@ -17193,7 +17198,7 @@
         }
       },
       "seriesId": "development-uitest",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-development-027",
@@ -17260,7 +17265,7 @@
         }
       },
       "seriesId": "development-uitest",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-development-028",
@@ -17414,7 +17419,7 @@
         }
       },
       "seriesId": "development-di",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-development-030",
@@ -17507,7 +17512,7 @@
         }
       },
       "seriesId": "development-di",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-development-031",
@@ -17926,7 +17931,7 @@
         }
       },
       "seriesId": "development-swiftdata",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-development-036",
@@ -18001,7 +18006,7 @@
         }
       },
       "seriesId": "development-swiftdata",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-development-037",
@@ -18079,7 +18084,7 @@
       "track": "development",
       "lessonId": "dev-swiftdata-query",
       "type": "repair",
-      "difficulty": 3,
+      "difficulty": 4,
       "title": "全件取得してから絞り込むコードを直す",
       "prompt": "1件のワークアウトを id で取り出す関数です。データが増えると急激に遅くなります。修正として最も適切なものを選んでください。",
       "skills": [
@@ -18141,7 +18146,7 @@
         }
       },
       "seriesId": "development-swiftdata",
-      "seriesStep": 4
+      "seriesStep": 5
     },
     {
       "id": "practice-development-039",
@@ -18234,7 +18239,7 @@
         }
       },
       "seriesId": "development-swiftdata",
-      "seriesStep": 5
+      "seriesStep": 4
     },
     {
       "id": "practice-development-040",
@@ -18749,7 +18754,7 @@
         }
       },
       "seriesId": "swiftui-layout",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-swiftui-005",
@@ -18817,7 +18822,7 @@
         }
       },
       "seriesId": "swiftui-layout",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-swiftui-006",
@@ -18907,7 +18912,9 @@
           "output": "左: 40.0 Spacer: 100.0 右: 60.0",
           "explanation": "Spacer の幅は指定するものではなく、全体から他の要素を引いた残りとして決まります。"
         }
-      }
+      },
+      "seriesId": "swiftui-layout",
+      "seriesStep": 3
     },
     {
       "id": "practice-swiftui-007",
@@ -18981,14 +18988,16 @@
           "output": "レイアウト上の幅: 375.0\n既定の当たり判定: 90.0\ncontentShape(Rectangle())後: 375.0",
           "explanation": "レイアウト幅と判定幅が別々の数値である、という点がこのバグの本質です。"
         }
-      }
+      },
+      "seriesId": "swiftui-layout",
+      "seriesStep": 4
     },
     {
       "id": "practice-swiftui-008",
       "track": "swiftui",
       "lessonId": "swiftui-state-binding",
       "type": "fillBlank",
-      "difficulty": 1,
+      "difficulty": 2,
       "title": "カウンターの状態宣言を完成させる",
       "prompt": "ボタンを押すと数が増えるカウンターです。空欄を埋めてください。",
       "skills": [
@@ -19052,14 +19061,14 @@
         }
       },
       "seriesId": "swiftui-state",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-swiftui-009",
       "track": "swiftui",
       "lessonId": "swiftui-state-binding",
       "type": "reorder",
-      "difficulty": 2,
+      "difficulty": 1,
       "title": "子Viewへ書き換え権を渡す形に並べ替える",
       "prompt": "親が持つ isOn を、子の Toggle から書き換えられるようにします。ブロックを正しい順に並べ替えてください。",
       "skills": [
@@ -19133,7 +19142,7 @@
         }
       },
       "seriesId": "swiftui-state",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-swiftui-010",
@@ -19304,14 +19313,16 @@
           "output": "9 false\n10 false",
           "explanation": "10件の状態から解除は通り、その後の追加は9件目なので上限に触れません。分岐の順序がこの挙動を作っています。"
         }
-      }
+      },
+      "seriesId": "swiftui-state",
+      "seriesStep": 5
     },
     {
       "id": "practice-swiftui-012",
       "track": "swiftui",
       "lessonId": "swiftui-state-binding",
       "type": "shortCode",
-      "difficulty": 1,
+      "difficulty": 3,
       "title": "TextFieldに状態をつなぐ1行を書く",
       "prompt": "@State private var name = \"\" を宣言済みです。プレースホルダを「名前」とする TextField を、name とつなげる1行を書いてください。",
       "skills": [
@@ -19852,7 +19863,7 @@
         }
       },
       "seriesId": "swiftui-list",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-swiftui-019",
@@ -19929,7 +19940,7 @@
         }
       },
       "seriesId": "swiftui-list",
-      "seriesStep": 3
+      "seriesStep": 2
     },
     {
       "id": "practice-swiftui-020",
@@ -20074,7 +20085,7 @@
       "track": "swiftui",
       "lessonId": "swiftui-task-concurrency",
       "type": "buildFunction",
-      "difficulty": 3,
+      "difficulty": 4,
       "title": "画面表示時の読み込み処理を組み立てる",
       "prompt": "画面が現れたときにデータを読み込み、読み込み中フラグを正しく戻すメソッドを作ります。必要なブロックだけを正しい順に選んでください。",
       "skills": [
@@ -20173,7 +20184,7 @@
         }
       },
       "seriesId": "swiftui-task",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-swiftui-023",
@@ -20241,7 +20252,7 @@
         }
       },
       "seriesId": "swiftui-task",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-swiftui-024",
@@ -20939,14 +20950,14 @@
         }
       },
       "seriesId": "uikit-lifecycle",
-      "seriesStep": 1
+      "seriesStep": 2
     },
     {
       "id": "practice-uikit-006",
       "track": "uikit",
       "lessonId": "uikit-lifecycle",
       "type": "matching",
-      "difficulty": 2,
+      "difficulty": 1,
       "title": "ライフサイクルメソッドと処理を対応づける",
       "prompt": "処理内容と、それを書くべきライフサイクルメソッドを対応づけてください。",
       "skills": [
@@ -21031,14 +21042,14 @@
         }
       },
       "seriesId": "uikit-lifecycle",
-      "seriesStep": 2
+      "seriesStep": 1
     },
     {
       "id": "practice-uikit-007",
       "track": "uikit",
       "lessonId": "uikit-lifecycle",
       "type": "bugHunt",
-      "difficulty": 2,
+      "difficulty": 3,
       "title": "戻るたびに通知が二重になる原因を見つける",
       "prompt": "他画面から戻るたびに、通知を受け取る回数が1回ずつ増えていきます。原因となっている行を1つ選んでください。",
       "skills": [
@@ -21102,7 +21113,9 @@
           "output": "往復3回後の登録数: 3\n通知1回で reload が走る回数: 3",
           "explanation": "登録数がそのまま実行回数になります。画面を往復するほど症状が悪化します。"
         }
-      }
+      },
+      "seriesId": "uikit-lifecycle",
+      "seriesStep": 4
     },
     {
       "id": "practice-uikit-008",
@@ -21167,14 +21180,16 @@
           "output": "viewDidLoad: 1 viewWillAppear: 2",
           "explanation": "初回だけ実行される処理と毎回実行される処理の違いが、この2つの数字になります。"
         }
-      }
+      },
+      "seriesId": "uikit-lifecycle",
+      "seriesStep": 3
     },
     {
       "id": "practice-uikit-009",
       "track": "uikit",
       "lessonId": "uikit-autolayout",
       "type": "buildFunction",
-      "difficulty": 2,
+      "difficulty": 3,
       "title": "ラベルを画面中央に置く制約を組み立てる",
       "prompt": "label を親 view の中央に配置します。必要なブロックだけを正しい順に選んでください。",
       "skills": [
@@ -21256,7 +21271,7 @@
         }
       },
       "seriesId": "uikit-autolayout",
-      "seriesStep": 1
+      "seriesStep": 4
     },
     {
       "id": "practice-uikit-010",
@@ -21551,7 +21566,9 @@
           "output": "画面幅: 393.0 → カード幅: 361.0",
           "explanation": "幅を書かなくても、左右の制約から一意に決まります。画面幅が変われば自動的に追従します。"
         }
-      }
+      },
+      "seriesId": "uikit-autolayout",
+      "seriesStep": 1
     },
     {
       "id": "practice-uikit-014",
@@ -22152,7 +22169,7 @@
         }
       },
       "seriesId": "uikit-lists",
-      "seriesStep": 2
+      "seriesStep": 3
     },
     {
       "id": "practice-uikit-021",
@@ -22222,7 +22239,7 @@
         }
       },
       "seriesId": "uikit-lists",
-      "seriesStep": 3
+      "seriesStep": 2
     },
     {
       "id": "practice-uikit-022",
