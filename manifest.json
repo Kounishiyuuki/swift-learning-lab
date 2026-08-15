@@ -1,45 +1,66 @@
 {
   "name": "Swift Learning Lab",
-  "version": "0.4.0",
-  "generated": "2026-08-01",
+  "version": "0.5.0",
+  "generated": "2026-08-15",
   "offline": true,
   "lessons": 116,
   "questions": 252,
+  "practiceChallenges": 300,
+  "learningItems": 552,
+  "practiceTypes": [
+    "reorder",
+    "fillBlank",
+    "chooseBlocks",
+    "bugHunt",
+    "repair",
+    "trace",
+    "matching",
+    "buildFunction",
+    "shortCode",
+    "testReasoning"
+  ],
   "tracks": {
     "starter": {
       "name": "Swift Starter",
       "lessons": 20,
-      "questions": 60
+      "questions": 60,
+      "practice": 42
     },
     "swift": {
       "name": "Swift Language",
       "lessons": 36,
-      "questions": 72
+      "questions": 72,
+      "practice": 84
     },
     "foundation": {
       "name": "Foundation & Data",
       "lessons": 16,
-      "questions": 32
+      "questions": 32,
+      "practice": 42
     },
     "concurrency": {
       "name": "Concurrency & Memory",
       "lessons": 12,
-      "questions": 24
+      "questions": 24,
+      "practice": 36
     },
     "development": {
       "name": "Development Essentials",
       "lessons": 20,
-      "questions": 40
+      "questions": 40,
+      "practice": 42
     },
     "swiftui": {
       "name": "SwiftUI",
       "lessons": 6,
-      "questions": 12
+      "questions": 12,
+      "practice": 27
     },
     "uikit": {
       "name": "UIKit",
       "lessons": 6,
-      "questions": 12
+      "questions": 12,
+      "practice": 27
     }
   }
 }
